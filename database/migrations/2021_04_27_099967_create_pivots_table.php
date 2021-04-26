@@ -35,6 +35,13 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('classtype_school', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('classtype_id')->constrained();
+            $table->foreignId('school_id')->constrained();
+            $table->timestamps();
+        });
+
         Schema::create('school_subject', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->constrained();
@@ -63,7 +70,7 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
-        
+
         Schema::create('article_subject', function (Blueprint $table) {
             $table->id();
             $table->foreignId('article_id')->constrained();

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiAuthController;
+use App\Models\City;
 use App\Models\Province;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,7 @@ Route::get('me', fn (Request $request) => $request->user());
 
 Route::get('/provinces', fn () => Province::all());
 Route::get('/provinces/{id}/city', fn ($id) => Province::find($id)->cities);
+Route::get('/cities/{id}/schools', fn ($id) => City::find($id)->schools);
 
 Route::post("/token", [ApiAuthController::class, "token"]);
 Route::post("/login", [ApiAuthController::class, "login"]);

@@ -17,7 +17,7 @@ class CreateSubjectsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('abbreviation')->nullable();
-            $table->longText('description');
+            $table->longText('description')->nullable();
             $table->timestamps();
         });
     }
