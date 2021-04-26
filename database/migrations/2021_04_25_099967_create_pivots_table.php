@@ -28,6 +28,56 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('classroom_school', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('classroom_id')->constrained();
+            $table->foreignId('school_id')->constrained();
+            $table->timestamps();
+        });
+
+        Schema::create('school_subject', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('subject_id')->constrained();
+            $table->foreignId('school_id')->constrained();
+            $table->timestamps();
+        });
+
+        Schema::create('assigment_subject', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('assigment_id')->constrained();
+            $table->foreignId('subject_id')->constrained();
+            $table->timestamps();
+        });
+
+        Schema::create('exam_subject', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('exam_id')->constrained();
+            $table->foreignId('subject_id')->constrained();
+            $table->timestamps();
+        });
+
+        Schema::create('question_subject', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('question_id')->constrained();
+            $table->foreignId('subject_id')->constrained();
+            $table->timestamps();
+        });
+
+        
+        Schema::create('article_subject', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('article_id')->constrained();
+            $table->foreignId('subject_id')->constrained();
+            $table->timestamps();
+        });
+
+        Schema::create('subject_teacher', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('subject_id')->constrained();
+            $table->foreignId('teacher_id')->constrained();
+            $table->timestamps();
+        });
+
         foreach (['teacher_teacher', 'teacher_student'] as $y) {
             Schema::create($y, function (Blueprint $table) {
                 $table->id();

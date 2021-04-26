@@ -16,8 +16,9 @@ class CreateClassRoomsTable extends Migration
         Schema::create('classrooms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('homeroom_id')->nullable();
+            $table->foreignId('classtype_id')->nullable();
             $table->string('name');
-            $table->integer('level');
+
             $table->timestamps();
         });
     }

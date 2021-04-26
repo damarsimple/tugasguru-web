@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -15,9 +16,23 @@ class School extends Model
     {
         return $this->hasMany('App\Models\Teacher');
     }
-    
-    public function partteacher() : BelongsToMany
+
+    public function partteacher(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Teacher');
+    }
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Province');
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\City');
+    }
+
+    public function schooltype(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Schooltype');
     }
 }
