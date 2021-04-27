@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -22,6 +24,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'gender',
+        'province_id',
+        'city_id',
+        'district_id',
+        'phone',
+        'roles'
     ];
 
     /**
@@ -58,6 +66,18 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\District');
     }
 
-    
-}
+    public function student(): HasOne
+    {
+        return $this->hasOne('App\Models\Student');
+    }
 
+    public function childrens(): HasMany
+    {
+        return $this->hasMany('App\Models\User', 'parent_id');
+    }
+
+    public function teacher(): HasOne
+    {
+        return $this->hasOne('App\Models\Teacher');
+    }
+}

@@ -30,7 +30,15 @@ Route::get('me', fn (Request $request) => $request->user());
 Route::get('/provinces', fn () => Province::all());
 Route::get('/provinces/{id}/city', fn ($id) => Province::find($id)->cities);
 Route::get('/cities/{id}/districts', fn ($id) => City::find($id)->districts);
-Route::get('/cities/{id}/schools', fn ($id) => City::find($id)->schools);
+Route::get('/cities/{id}/schools', function (Request $request, $id) {
+    $city =  City::find($id);
+
+    return $city->schools()
+        ->where('name', 'LIKE', "%$request->q%")
+        ->orWhere('npsn', 'LIKE', "%$request->q%")
+        ->take(10)
+        ->get();
+}); 
 
 Route::get('/test', fn () => Schooltype::withCount('schools')->get());
 

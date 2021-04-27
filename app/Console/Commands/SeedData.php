@@ -23,7 +23,7 @@ class SeedData extends Command
      *
      * @var string
      */
-    protected $signature = 'seed:data';
+    protected $signature = 'seed:data {--test}';
 
     /**
      * The console command description.
@@ -54,9 +54,12 @@ class SeedData extends Command
 
         $places = json_decode($places);
 
+        $onTest = $this->option('test');
+
         foreach ($places as $place) {
             $provinceName = $place->nama;
-
+            if ($onTest && $provinceName !== "Kalimantan Timur")
+                continue;
             $province = new Province();
 
             $province->name = $provinceName;
@@ -166,15 +169,17 @@ class SeedData extends Command
             foreach ($schoolsData as $key => $schools) {
 
                 foreach ($schools as $key => $school) {
-                    print($school->sekolah . PHP_EOL);
-                    $disctrictName = str_ireplace("Kec. ", "", $school->kecamatan);
-                    $disctrictName = str_ireplace("KEC. ", "", $school->kecamatan);
+
+                    $disctrictName = preg_replace(['/Kec./', '/KEC. /', '/Kecamatan/'], "", $school->kecamatan);
                     if (str_contains($school->kabupaten_kota, "Kab.")) {
                         $cityName = str_replace("Kab. ", "Kabupaten ", $school->kabupaten_kota);
                     }
 
                     $provinceName = str_replace("Prov. ", "", $school->propinsi);
+                    if ($onTest && $provinceName !== "Kalimantan Timur")
+                        continue;
 
+                    print($school->sekolah . PHP_EOL);
                     if (str_contains($provinceName, "D.K.I. ")) {
                         $provinceName = str_replace("D.K.I.", "DKI", $provinceName);
                     }
@@ -183,6 +188,16 @@ class SeedData extends Command
                     }
                     try {
                         $provinceId = $provinceMap[$provinceName];
+
+                        if (!array_key_exists($cityName, $cityMap)) {
+                            $city = new City();
+                            $city->name = preg_replace(['/Kota /', '/Kabupaten /'], "", $cityName);
+                            $city->province_id = $provinceId;
+                            $city->type = str_contains($cityName, 'Kabupaten') ? 'Kabupaten' : 'Kota';
+                            $city->save();
+                            $cityMap[$cityName] = $city->id;
+                        }
+
                         $cityId = $cityMap[$cityName];
                         if (!array_key_exists($disctrictName, $districtMap)) {
                             $district = new District();
