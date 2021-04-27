@@ -49,6 +49,7 @@ class SeedData extends Command
      */
     public function handle()
     {
+        $start = time();
         $places = file_get_contents(base_path() . '/data/places.json');
 
         $places = json_decode($places);
@@ -367,6 +368,7 @@ class SeedData extends Command
 
 
 
+        print("finish at " . time() - $start . PHP_EOL);
         return 0;
     }
 }
