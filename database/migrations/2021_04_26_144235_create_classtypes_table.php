@@ -16,7 +16,7 @@ class CreateClasstypesTable extends Migration
         Schema::create('classtypes', function (Blueprint $table) {
             $table->id();
             $table->integer('level');
-            $table->foreignId('schooltype_id')->constrained();
+            $table->foreignId('schooltype_id')->index()->constrained();
             $table->timestamps();
         });
     }
