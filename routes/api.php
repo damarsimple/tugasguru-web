@@ -33,12 +33,18 @@ Route::get('/cities/{id}/districts', fn ($id) => City::find($id)->districts);
 Route::get('/cities/{id}/schools', function (Request $request, $id) {
     $city =  City::find($id);
 
-    return $city->schools()
-        ->where('name', 'LIKE', "%$request->q%")
-        ->orWhere('npsn', 'LIKE', "%$request->q%")
-        ->take(10)
-        ->get();
-}); 
+    if ($request->q) {
+        return $city->schools()
+            ->where('name', 'LIKE', "%$request->q%")
+            ->orWhere('npsn', 'LIKE', "%$request->q%")
+            ->take(10)
+            ->get();
+    } else {
+        return $city->schools()
+            ->take(10)
+            ->get();
+    }
+});
 
 Route::get('/test', fn () => Schooltype::withCount('schools')->get());
 
