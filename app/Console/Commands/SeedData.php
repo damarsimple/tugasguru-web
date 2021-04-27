@@ -5,11 +5,11 @@ namespace App\Console\Commands;
 use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
+use App\Models\District;
 use App\Models\Province;
 use App\Models\School;
 use App\Models\Schooltype;
 use App\Models\Subject;
-use App\Models\User;
 use Illuminate\Console\Command;
 use Faker\Factory;
 
@@ -54,7 +54,7 @@ class SeedData extends Command
         $places = json_decode($places);
 
         foreach ($places as $place) {
-            $provinceName = $place->provinsi;
+            $provinceName = $place->nama;
 
             $province = new Province();
 
@@ -62,11 +62,14 @@ class SeedData extends Command
 
             $province->save();
 
-            $cities = $place->kota;
+            $cities = $place->cities;
 
             foreach ($cities as $city) {
-                if (str_contains($city, "Kab.")) {
-                    $cityName = str_replace("Kab. ", "", $city);
+                $districts = $city->districts;
+                $city = $city->nama;
+
+                if (str_contains($city, "Kabupaten")) {
+                    $cityName = str_replace("Kabupaten ", "", $city);
 
                     $city = new City;
 
@@ -90,6 +93,15 @@ class SeedData extends Command
 
                     $city->save();
                 }
+
+                $districtsModel = [];
+
+                foreach ($districts as $disctrictBase) {
+                    $district = new District();
+                    $district->name = $disctrictBase->nama;
+                    $districtsModel[] = $district;
+                }
+                $city->districts()->saveMany($districtsModel);
             }
         }
 
@@ -105,6 +117,15 @@ class SeedData extends Command
         foreach (City::all() as $city) {
             $cityMap[$city->type . " " . $city->name] = $city->id;
         }
+
+
+
+        $districtMap = [];
+
+        foreach (District::all() as $district) {
+            $districtMap[$district->name] = $district->id;
+        }
+
 
         $subjectsData = [
             "Pendidikan Agama",
@@ -135,186 +156,209 @@ class SeedData extends Command
         $classTypeMap = [];
 
         foreach (glob(base_path() . '/data/schools/*.json') as $filename) {
-            $schools = file_get_contents($filename);
+            $schoolsData = file_get_contents($filename);
 
-            $schools = json_decode($schools);
+            $schoolsData = json_decode($schoolsData);
 
-            foreach ($schools as $school) {
-                print($school->sekolah . PHP_EOL);
+            // var_dump($schoolsData);
 
-                if (str_contains($school->kabupaten_kota, "Kab.")) {
-                    $cityName = str_replace("Kab. ", "Kabupaten ", $school->kabupaten_kota);
-                }
+            foreach ($schoolsData as $key => $schools) {
 
-                $provinceName = str_replace("Prov. ", "", $school->propinsi);
-
-                try {
-
-                    $provinceId = $provinceMap[$provinceName];
-                    $cityId = $cityMap[$cityName];
-
-                    if (!array_key_exists($school->bentuk, $schoolTypeMap)) {
-                        $schooltype = new Schooltype();
-
-                        switch (strtolower($school->bentuk)) {
-                            case 'smk':
-                            case 'sma':
-                                $schooltype->level = 3;
-                                break;
-
-                            case 'smp':
-                                $schooltype->level = 2;
-                                break;
-                            case 'sd':
-                                $schooltype->level = 1;
-                                break;
-                            default:
-                                break;
-                        }
-
-                        if (!$schooltype->level) {
-                            continue;
-                        }
-                        $schooltype->name = $school->bentuk;
-
-                        $schooltype->save();
-
-                        $schoolTypeMap[$schooltype->name] = $schooltype->id;
-
-                        $classtypes = [];
-
-                        switch (strtolower($school->bentuk)) {
-                            case 'smk':
-                            case 'sma':
-                                for ($i = 0; $i < 3; $i++) {
-                                    $classtype = new Classtype();
-
-                                    $classtype->level = $i + 10;
-
-                                    $classtypes[] = $classtype;
-                                }
-
-
-                                break;
-                            case 'smp':
-                                for ($i = 0; $i < 3; $i++) {
-                                    $classtype = new Classtype();
-
-                                    $classtype->level = $i + 7;
-
-                                    $classtypes[] = $classtype;
-                                }
-                                break;
-                            case 'sd':
-                                for ($i = 0; $i < 6; $i++) {
-                                    $classtype = new Classtype();
-
-                                    $classtype->level = $i + 1;
-
-                                    $classtypes[] = $classtype;
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-
-                        $schooltype->classtypes()->saveMany($classtypes);
+                foreach ($schools as $key => $school) {
+                    print($school->sekolah . PHP_EOL);
+                    $disctrictName = str_ireplace("Kec. ", "", $school->kecamatan);
+                    $disctrictName = str_ireplace("KEC. ", "", $school->kecamatan);
+                    if (str_contains($school->kabupaten_kota, "Kab.")) {
+                        $cityName = str_replace("Kab. ", "Kabupaten ", $school->kabupaten_kota);
                     }
 
-                    $schooltypeId = $schoolTypeMap[$school->bentuk];
+                    $provinceName = str_replace("Prov. ", "", $school->propinsi);
 
-                    $schoolModel = new School();
-
-                    $schoolModel->name =  $school->sekolah;
-                    $schoolModel->province_id = $provinceId;
-                    $schoolModel->npsn = $school->npsn;
-                    $schoolModel->city_id = $cityId;
-                    $schoolModel->address = $school->alamat_jalan;
-                    $schoolModel->schooltype_id = $schooltypeId;
-                    $schoolModel->latitude = $school->lintang;
-                    $schoolModel->longtitude = $school->bujur;
-
-
-
-                    $schoolModel->save();
-
-
-                    $schoolModel->subjects()->attach($subjectsIds);
-
-                    $classtypesIds = [];
-
+                    if (str_contains($provinceName, "D.K.I. ")) {
+                        $provinceName = str_replace("D.K.I.", "DKI", $provinceName);
+                    }
+                    if (str_contains($provinceName, "D.I. ")) {
+                        $provinceName = str_replace("D.I.", "DI", $provinceName);
+                    }
                     try {
-
-
-                        switch (strtolower($school->bentuk)) {
-                            case 'smk':
-                            case 'sma':
-                                for ($i = 0; $i < 3; $i++) {
-                                    $level = $i + 10;
-                                    $classtypesIds[] = $classTypeMap[$level];
-                                }
-                                break;
-                            case 'smp':
-                                for ($i = 0; $i < 3; $i++) {
-                                    $level = $i + 7;
-                                    $classtypesIds[] = $classTypeMap[$level];
-                                }
-                                break;
-                            case 'sd':
-                                for ($i = 0; $i < 6; $i++) {
-                                    $level = $i + 1;
-                                    $classtypesIds[] = $classTypeMap[$level];
-                                }
-                                break;
-                            default:
-                                break;
+                        $provinceId = $provinceMap[$provinceName];
+                        $cityId = $cityMap[$cityName];
+                        if (!array_key_exists($disctrictName, $districtMap)) {
+                            $district = new District();
+                            $district->name = $disctrictName;
+                            $district->city_id = $cityId;
+                            $district->save();
+                            $districtMap[$disctrictName] = $district->id;
                         }
+
+                        $districtId = $districtMap[$disctrictName];
+                        if (!array_key_exists($school->bentuk, $schoolTypeMap)) {
+                            $schooltype = new Schooltype();
+
+                            switch (strtolower($school->bentuk)) {
+                                case 'smk':
+                                case 'sma':
+                                    $schooltype->level = 3;
+                                    break;
+
+                                case 'smp':
+                                    $schooltype->level = 2;
+                                    break;
+                                case 'sd':
+                                    $schooltype->level = 1;
+                                    break;
+                                default:
+                                    $schooltype->level = 4;
+                                    break;
+                            }
+
+                            // if (!$schooltype->level) {
+                            //     continue;
+                            // }
+                            $schooltype->name = $school->bentuk;
+
+                            $schooltype->save();
+
+                            $schoolTypeMap[$schooltype->name] = $schooltype->id;
+
+                            $classtypes = [];
+
+                            switch (strtolower($school->bentuk)) {
+                                case 'smk':
+                                case 'sma':
+                                    for ($i = 0; $i < 3; $i++) {
+                                        $classtype = new Classtype();
+
+                                        $classtype->level = $i + 10;
+
+                                        $classtypes[] = $classtype;
+                                    }
+
+
+                                    break;
+                                case 'smp':
+                                    for ($i = 0; $i < 3; $i++) {
+                                        $classtype = new Classtype();
+
+                                        $classtype->level = $i + 7;
+
+                                        $classtypes[] = $classtype;
+                                    }
+                                    break;
+                                case 'sd':
+                                    for ($i = 0; $i < 6; $i++) {
+                                        $classtype = new Classtype();
+
+                                        $classtype->level = $i + 1;
+
+                                        $classtypes[] = $classtype;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            $schooltype->classtypes()->saveMany($classtypes);
+                        }
+
+                        $schooltypeId = $schoolTypeMap[$school->bentuk];
+
+                        $schoolModel = new School();
+
+                        $schoolModel->name =  $school->sekolah;
+                        $schoolModel->province_id = $provinceId;
+                        $schoolModel->npsn = $school->npsn;
+                        $schoolModel->city_id = $cityId;
+                        $schoolModel->district_id = $districtId;
+                        $schoolModel->address = $school->alamat_jalan;
+                        $schoolModel->schooltype_id = $schooltypeId;
+                        $schoolModel->latitude = $school->lintang;
+                        $schoolModel->longtitude = $school->bujur;
+
+
+
+                        $schoolModel->save();
+
+
+                        $schoolModel->subjects()->attach($subjectsIds);
+
+                        $classtypesIds = [];
+
+                        try {
+
+
+                            switch (strtolower($school->bentuk)) {
+                                case 'smk':
+                                case 'sma':
+                                    for ($i = 0; $i < 3; $i++) {
+                                        $level = $i + 10;
+                                        $classtypesIds[] = $classTypeMap[$level];
+                                    }
+                                    break;
+                                case 'smp':
+                                    for ($i = 0; $i < 3; $i++) {
+                                        $level = $i + 7;
+                                        $classtypesIds[] = $classTypeMap[$level];
+                                    }
+                                    break;
+                                case 'sd':
+                                    for ($i = 0; $i < 6; $i++) {
+                                        $level = $i + 1;
+                                        $classtypesIds[] = $classTypeMap[$level];
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } catch (\Throwable $th) {
+                            print($th->getMessage() . PHP_EOL);
+                            switch (strtolower($school->bentuk)) {
+                                case 'smk':
+                                case 'sma':
+                                    for ($i = 0; $i < 3; $i++) {
+                                        $level = $i + 10;
+                                        $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
+                                        $classtypesIds[] = $classTypeMap[$level];
+                                    }
+                                    break;
+                                case 'smp':
+                                    for ($i = 0; $i < 3; $i++) {
+                                        $level = $i + 7;
+                                        $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
+                                        $classtypesIds[] = $classTypeMap[$level];
+                                    }
+                                    break;
+                                case 'sd':
+                                    for ($i = 0; $i < 6; $i++) {
+                                        $level = $i + 1;
+                                        $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
+                                        $classtypesIds[] = $classTypeMap[$level];
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        $schoolModel->classtypes()->attach($classtypesIds);
+
+                        $classrooms = [];
+                        foreach ($schoolModel->classtypes as $classtype) {
+                            for ($i = 0; $i < 3; $i++) {
+                                $classroom = new Classroom();
+                                $classroom->classtype_id = $classtype->id;
+                                $classroom->name = "Kelas " . $classtype->level . " " . chr($i + 65);
+                                $classrooms[] = $classroom;
+                            }
+                        }
+
+                        $schoolModel->classrooms()->saveMany($classrooms);
+                        print($schoolModel->id . PHP_EOL);
                     } catch (\Throwable $th) {
-                        switch (strtolower($school->bentuk)) {
-                            case 'smk':
-                            case 'sma':
-                                for ($i = 0; $i < 3; $i++) {
-                                    $level = $i + 10;
-                                    $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
-                                    $classtypesIds[] = $classTypeMap[$level];
-                                }
-                                break;
-                            case 'smp':
-                                for ($i = 0; $i < 3; $i++) {
-                                    $level = $i + 7;
-                                    $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
-                                    $classtypesIds[] = $classTypeMap[$level];
-                                }
-                                break;
-                            case 'sd':
-                                for ($i = 0; $i < 6; $i++) {
-                                    $level = $i + 1;
-                                    $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
-                                    $classtypesIds[] = $classTypeMap[$level];
-                                }
-                                break;
-                            default:
-                                break;
-                        }
+                        print($th->getMessage() . PHP_EOL);
+                        print($th->getLine() . PHP_EOL);
+                        continue;
                     }
-
-                    $schoolModel->classtypes()->attach($classtypesIds);
-
-                    $classrooms = [];
-                    foreach ($schoolModel->classtypes as $classtype) {
-                        for ($i = 0; $i < 3; $i++) {
-                            $classroom = new Classroom();
-                            $classroom->classtype_id = $classtype->id;
-                            $classroom->name = "Kelas " . $classtype->level . " " . chr($i + 65);
-                            $classrooms[] = $classroom;
-                        }
-                    }
-
-                    $schoolModel->classrooms()->saveMany($classrooms);
-                    print($schoolModel->id . PHP_EOL);
-                } catch (\Throwable $th) {
-                    print($th->getMessage() . PHP_EOL);
-                    continue;
                 }
             }
         }

@@ -21,6 +21,7 @@ class CreateUsersTable extends Migration
             $table->longText('address')->nullable();
             $table->foreignId('province_id')->constrained();
             $table->foreignId('city_id')->constrained();
+            $table->foreignId('district_id')->constrained();
             $table->string('phone')->nullable();
             $table->integer('gender')->nullable();
             $table->string('password');

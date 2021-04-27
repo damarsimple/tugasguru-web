@@ -17,9 +17,10 @@ class CreateSchoolsTable extends Migration
         Schema::create('schools', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->bigInteger('npsn');
+            $table->string('npsn')->unique();
             $table->foreignId('province_id')->constrained();
             $table->foreignId('city_id')->constrained();
+            $table->foreignId('district_id')->constrained();
             $table->foreignId('schooltype_id')->constrained();
             $table->string('address');
             $table->longText('description')->nullable();

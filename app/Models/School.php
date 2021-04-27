@@ -51,4 +51,9 @@ class School extends Model
     {
         return $this->hasMany('App\Models\Classroom');
     }
+
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\District');
+    }
 }

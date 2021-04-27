@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\City');
     }
 
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\District');
+    }
+
     
 }
 

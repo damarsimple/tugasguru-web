@@ -20,4 +20,9 @@ class City extends Model
     {
         return $this->hasMany('App\Models\School');
     }
+
+    public function districts(): HasMany
+    {
+        return $this->hasMany('App\Models\District');
+    }
 }
