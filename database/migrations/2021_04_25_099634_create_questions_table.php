@@ -18,7 +18,7 @@ class CreateQuestionsTable extends Migration
             $table->foreignId('teacher')->index()->constrained();
             $table->enum('type', ['MULTI_CHOICE', 'ESSAY', 'FILLER']);
             $table->longText('content');
-            $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIC');
+            $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');
             $table->timestamps();
         });
     }
