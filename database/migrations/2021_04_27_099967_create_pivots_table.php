@@ -63,6 +63,22 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('classroom_exam', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('exam_id')->index()->constrained()->onDelete('cascade');;
+            $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');;
+            $table->timestamps();
+        });
+
+
+        Schema::create('exam_question', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('exam_id')->index()->constrained()->onDelete('cascade');;
+            $table->foreignId('question_id')->index()->constrained()->onDelete('cascade');;
+            $table->timestamps();
+        });
+
+
         Schema::create('question_subject', function (Blueprint $table) {
             $table->id();
             $table->foreignId('question_id')->index()->constrained()->onDelete('cascade');;
@@ -74,6 +90,13 @@ class CreatePivotsTable extends Migration
             $table->id();
             $table->foreignId('classtype_id')->index()->constrained()->onDelete('cascade');;
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');;
+            $table->timestamps();
+        });
+
+        Schema::create('classtype_question', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('classtype_id')->index()->constrained()->onDelete('cascade');;
+            $table->foreignId('question_id')->index()->constrained()->onDelete('cascade');;
             $table->timestamps();
         });
 

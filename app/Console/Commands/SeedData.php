@@ -6,6 +6,8 @@ use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
 use App\Models\District;
+use App\Models\Exam;
+use App\Models\Examtype;
 use App\Models\Province;
 use App\Models\School;
 use App\Models\Schooltype;
@@ -56,6 +58,22 @@ class SeedData extends Command
 
         $onTest = $this->option('test');
 
+
+        $examsType = [
+            'Latihan',
+            'PTS',
+            'PAS',
+            'UAS',
+            'QUIZ',
+            'Ulangan Harian',
+        ];
+
+
+        foreach ($examsType as $examstype) {
+            $examtype = new Examtype();
+            $examtype->name = $examstype;
+            $examtype->save();
+        }
         foreach ($places as $place) {
             $provinceName = $place->nama;
             if ($onTest && $provinceName !== "Kalimantan Timur")

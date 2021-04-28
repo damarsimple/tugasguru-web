@@ -15,7 +15,7 @@ class CreateQuestionsTable extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher')->index()->constrained();
+            $table->foreignId('teacher_id')->index()->constrained();
             $table->enum('type', ['MULTI_CHOICE', 'ESSAY', 'FILLER']);
             $table->longText('content');
             $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');

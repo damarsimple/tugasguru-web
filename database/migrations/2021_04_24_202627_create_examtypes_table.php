@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAttachmentsTable extends Migration
+class CreateExamtypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreateAttachmentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('attachments', function (Blueprint $table) {
+        Schema::create('examtypes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
             $table->string('name');
-            $table->string('mime')->nullable();
-            $table->unsignedBigInteger('attachable_id')->nullable();
-            $table->string('attachable_type')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +27,6 @@ class CreateAttachmentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('attachments');
+        Schema::dropIfExists('examtypes');
     }
 }

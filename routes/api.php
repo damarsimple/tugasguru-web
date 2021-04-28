@@ -1,11 +1,17 @@
 <?php
 
+use App\Actions\Attachment\Upload;
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureTeacher;
+use App\Models\Answer;
+use App\Models\Attachment;
 use App\Models\City;
 use App\Models\Classtype;
 use App\Models\District;
+use App\Models\Exam;
+use App\Models\Examtype;
 use App\Models\Province;
+use App\Models\Question;
 use App\Models\School;
 use App\Models\Schooltype;
 use App\Models\Subject;
@@ -58,7 +64,48 @@ Route::post("/register", [ApiAuthController::class, "register"]);
 Route::middleware('auth:sanctum')->get("/user", [ApiAuthController::class, 'profile']);
 Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'refresh']);
 
+Route::get('/attachments/{id}', fn ($id) => Attachment::findOrFail($id));
+
+Route::get('/questions', function (Request $request) {
+    $questions = (new Question())->with('classtypes', 'classtypes.schooltype', 'subjects');
+
+    if ($request->classtypes) {
+        return  $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes))->get();
+    }
+    if ($request->subjects) {
+        $questions =  $questions->whereHas('subjects', fn ($q) => $q->whereIn('subject_id', $request->subjects));
+    }
+
+    if ($request->schooltypes) {
+        $questions =  $questions->whereHas('classtypes.schooltype', fn ($q) => $q->whereIn('schooltype_id', $request->schooltypes));
+    }
+
+    return $questions->paginate(10);
+});
+
+
+
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
+
+
+
+    Route::group(['prefix' => 'attachments'], function () {
+
+        Route::post('/temp', function (Request $request) {
+
+            $files = $request->file('file');
+
+            $attachment =  Upload::handle($files);
+
+            return $attachment;
+        });
+    });
+
+    Route::group(['prefix' => 'schooltypes'], function () {
+        Route::get('/', function (Request $request) {
+            return Schooltype::all();
+        });
+    });
 
 
     Route::group(['prefix' => 'classtypes'], function () {
@@ -68,7 +115,122 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
     });
 
+
+    Route::group(['prefix' => 'exams'], function () {
+
+        Route::post('/create', function (Request $request) {
+
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+
+            $exam = new Exam();
+
+            $exam->name = $request->name;
+            $exam->description = $request->description;
+            $exam->code = $request->code;
+            $exam->kkm = $request->kkm;
+            $exam->hint = $request->hint;
+            $exam->time_limit = $request->time_limit;
+            $exam->allow_show_result = $request->allow_show_result;
+            $exam->shuffle = $request->shuffle;
+
+            $teacher->save($exam);
+
+            $exam->questions()->attach($request->questions);
+            $exam->classrooms()->attach($request->questions);
+            $exam->subjects()->attach($request->questions);
+
+            return ['message' => 'success', 'exam' => $exam];
+        });
+
+        Route::get('/type', fn () => Examtype::all());
+    });
+
+
+    Route::group(['prefix' => 'schools'], function () {
+
+        Route::get('/fulltime', function (Request $request) {
+        });
+    });
+
+    Route::group(['prefix' => 'clasrooms'], function () {
+
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            return $teacher->school->classrooms;
+        });
+    });
+
+
+
+    Route::group(['prefix' => 'questions'], function () {
+
+        Route::get('/', function (Request $request) {
+            $questions = (new Question())->with('classtypes', 'classtypes.schooltype', 'subjects', 'attachments', 'answers');
+
+            if ($request->classtypes) {
+                $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes));
+            }
+            if ($request->subjects) {
+                $questions =  $questions->whereHas('subjects', fn ($q) => $q->whereIn('subject_id', $request->subjects));
+            }
+
+            if ($request->schooltypes) {
+                $questions =  $questions->whereHas('classtypes.schooltype', fn ($q) => $q->whereIn('schooltype_id', $request->schooltypes));
+            }
+
+            return $questions->paginate(10);
+        });
+
+
+        Route::post('/create', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            foreach ($request->questions as $questionData) {
+                $question = new Question();
+
+                $question->content = $questionData['content'];
+
+                $question->visibility = $questionData['visibility'];
+
+                $question->type = $questionData['type'];
+
+                $teacher->questions()->save($question);
+
+                $answers = [];
+                foreach ($questionData['answers'] as $i => $answerData) {
+                    $answer = new Answer();
+                    $answer->is_correct = $i == $questionData['correctanswer'];
+                    $answer->content = $answerData['content'] ?? '';
+                    $answers[] = $answer;
+                }
+
+                $question->answers()->saveMany($answers);
+
+                $question->subjects()->attach($questionData['subjects']);
+
+                $question->classtypes()->attach($questionData['classtypes']);
+
+                foreach (Attachment::whereIn('id', $questionData['attachments'])->get() as $attachment) {
+                    $attachment->attachable()->associate($question)->save();
+                }
+            }
+
+            return ['message' => 'success'];
+        });
+    });
+
+
     Route::group(['prefix' => 'subjects'], function () {
+
+        Route::get('/all', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            return Subject::all();
+        });
 
         Route::get('/', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */

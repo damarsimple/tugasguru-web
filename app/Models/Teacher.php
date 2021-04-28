@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Teacher extends Model
 {
@@ -25,5 +26,10 @@ class Teacher extends Model
     public function subjects(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Subject');
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany('App\Models\Question');
     }
 }

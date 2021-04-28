@@ -28,14 +28,19 @@ class Question extends Model
         return $this->hasOne('App\Models\Answer')->where('is_correct', true);
     }
 
+    public function attachments()
+    {
+        return $this->morphMany('App\Models\Attachment', 'attachable');
+    }
 
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany('Appp\Models\Subject');
+        return $this->belongsToMany('App\Models\Subject');
     }
 
     public function classtypes(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Classtype');
     }
+    
 }
