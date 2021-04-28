@@ -17,8 +17,13 @@ class Teacher extends Model
         return $this->belongsTo('App\Models\School');
     }
 
-    public function schools() : BelongsToMany
+    public function schools(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\School');
+    }
+
+    public function subjects(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Subject');
     }
 }

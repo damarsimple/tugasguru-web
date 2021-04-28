@@ -134,7 +134,8 @@ class SeedData extends Command
         $subjectsData = [
             "Pendidikan Agama",
             "Pendidikan Kewarganegaraan",
-            "Bahasa Indonesia, Matematika",
+            "Bahasa Indonesia",
+            "Matematika",
             "Ilmu Pengetahuan Alam",
             "Ilmu Pengetahuan Sosial",
             "Bahasa Inggris",

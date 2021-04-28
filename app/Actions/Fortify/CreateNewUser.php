@@ -33,10 +33,10 @@ class CreateNewUser implements CreatesNewUsers
             ],
             'password' => $this->passwordRules(),
             'province_id' => ['required'],
-            'city_id' => ['required', 'integer'],
-            'district_id' => ['required', 'integer'],
-            'gender' => ['required', 'integer'],
-            'phone' => ['required', 'integer'],
+            'city_id' => ['required', 'numeric'],
+            'district_id' => ['required', 'numeric'],
+            'gender' => ['required', 'numeric'],
+            'phone' => ['required', 'numeric'],
             'roles' => ['required', 'in:TEACHER,STUDENT,TEACHER_BIMBEL,GUARDIAN'],
         ];
 
@@ -44,11 +44,11 @@ class CreateNewUser implements CreatesNewUsers
             case 'TEACHER_BIMBEL':
                 break;
             case 'TEACHER':
-                $validationArray['school_id'] = ['required', 'integer'];
+                $validationArray['school_id'] = ['required', 'numeric'];
                 break;
             case 'STUDENT':
-                $validationArray['school_id'] = ['required', 'integer'];
-                $validationArray['nisn'] = ['required', 'integer'];
+                $validationArray['school_id'] = ['required', 'numeric'];
+                $validationArray['nisn'] = ['required', 'numeric'];
                 break;
             default:
                 break;

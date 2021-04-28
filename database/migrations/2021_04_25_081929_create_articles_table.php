@@ -19,7 +19,7 @@ class CreateArticlesTable extends Migration
             $table->string('name');
             $table->string('code');
             $table->longText('content');
-            $table->integer('visibility')->default(0);
+            $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIC');
             $table->timestamp('visible_at');
             $table->timestamps();
         });
