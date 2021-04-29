@@ -270,7 +270,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
                 $question->content = $questionData['content'];
 
-                $question->visibility = $questionData['visibility'];
+                $question->visibility = $request['visibility'];
 
                 $question->type = $questionData['type'];
 
@@ -286,9 +286,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
                 $question->answers()->saveMany($answers);
 
-                $question->subjects()->attach($questionData['subjects']);
+                $question->subjects()->attach($request['subjects']);
 
-                $question->classtypes()->attach($questionData['classtypes']);
+                $question->classtypes()->attach($request['classtypes']);
 
                 foreach (Attachment::whereIn('id', $questionData['attachments'])->get() as $attachment) {
                     $attachment->attachable()->associate($question)->save();
