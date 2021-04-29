@@ -18,6 +18,11 @@ class Teacher extends Model
         return $this->belongsTo('App\Models\School');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\User');
+    }
+
     public function schools(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\School');
@@ -31,5 +36,15 @@ class Teacher extends Model
     public function questions(): HasMany
     {
         return $this->hasMany('App\Models\Question');
+    }
+
+    public function classrooms(): HasMany
+    {
+        return $this->hasMany('App\Models\Classroom', 'homeroom_id');
+    }
+
+    public function classroomteachersubjects(): HasMany
+    {
+        return $this->hasMany('App\Models\ClassroomTeacherSubject');
     }
 }

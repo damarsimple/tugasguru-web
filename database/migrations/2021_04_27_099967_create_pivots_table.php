@@ -13,14 +13,6 @@ class CreatePivotsTable extends Migration
      */
     public function up()
     {
-        Schema::create('classroom_teacher_subject', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');;
-            $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');;
-            $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');;
-            $table->timestamps();
-        });
-
         Schema::create('teacher_school', function (Blueprint $table) {
             $table->id();
             $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');;

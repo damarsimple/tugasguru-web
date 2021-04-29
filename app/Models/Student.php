@@ -16,12 +16,17 @@ class Student extends Model
         return $this->belongsTo('App\Models\School');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\User');
+    }
+
     public function classroom(): BelongsTo
     {
         return $this->belongsTo('App\Models\ClassRoom');
     }
 
-    public function parent() : BelongsTo
+    public function parent(): BelongsTo
     {
         return $this->belongsTo('App\Models\User', 'parent_id');
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 
@@ -32,7 +33,7 @@ class ApiAuthController extends Controller
             'password' => 'required'
         ]);
         $user = User::where("email", $request->email)->first();
-        if(!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -55,7 +56,16 @@ class ApiAuthController extends Controller
     }
     public function profile(Request $request)
     {
-        return response()->json(['user' => $request->user()]);
+        $user = $request->user();
+        switch ($user->roles) {
+            case 'TEACHER';
+                $user = $user->load('teacher', 'teacher.school');
+                break;
+            case 'STUDENT';
+                $user = $user->load('student', 'student.school');
+                break;
+        }
+        return response()->json(['user' => $user]);
     }
     public function refresh(Request $request)
     {

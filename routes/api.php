@@ -6,6 +6,8 @@ use App\Http\Middleware\EnsureTeacher;
 use App\Models\Answer;
 use App\Models\Attachment;
 use App\Models\City;
+use App\Models\Classroom;
+use App\Models\ClassroomTeacherSubject;
 use App\Models\Classtype;
 use App\Models\District;
 use App\Models\Exam;
@@ -89,6 +91,16 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
 
+    Route::get('/finishinit', function (Request $request) {
+        /**  @var App/Models/Teacher $teacher  */
+        $teacher = $request->user()->teacher;
+
+        $teacher->is_init = true;
+
+        $teacher->save();
+        return response('finish', 200);
+    });
+
     Route::group(['prefix' => 'attachments'], function () {
 
         Route::post('/temp', function (Request $request) {
@@ -107,13 +119,19 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
     });
 
-
     Route::group(['prefix' => 'classtypes'], function () {
 
         Route::get('/', function () {
+
             return Classtype::all();
         });
+        Route::get('/myschool', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            return $teacher->school->classtypes;
+        });
     });
+
 
 
     Route::group(['prefix' => 'exams'], function () {
@@ -154,13 +172,64 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
     });
 
-    Route::group(['prefix' => 'clasrooms'], function () {
+
+
+    Route::group(['prefix' => 'classroomteachersubjects'], function () {
+
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            return $teacher->classroomteachersubjects()->with(
+                'subject',
+                'classroom',
+                'teacher.user'
+            )->get();
+        });
+        Route::post('/add', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            return ClassroomTeacherSubject::firstOrCreate([
+                'teacher_id' => $teacher->id,
+                'subject_id' => $request->subject_id,
+                'classroom_id' => $request->classroom_id,
+            ]);
+        });
+    });
+
+    Route::group(['prefix' => 'classrooms'], function () {
 
         Route::get('/', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
 
+            return $teacher->classrooms;
+        });
+
+        Route::get('/all', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
             return $teacher->school->classrooms;
+        });
+
+        Route::get('/nohomeroom', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            return $teacher->school->classrooms()->whereNull('homeroom_id')->get();
+        });
+
+        Route::post('/subject/add', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            /**  @var App/Models/School $school  */
+            $school = $teacher->school;
+
+            $classroom = new Classroom();
+            $classroom->name = "Kelas " . $request->classtype_level . " " .  $request->name;
+            $classroom->classtype_id = $request->classtype_id;
+            $classroom->homeroom_id = $teacher->id;
+            $school->classrooms()->save($classroom);
         });
     });
 
@@ -184,6 +253,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             return $questions->paginate(10);
         });
+
 
 
         Route::post('/create', function (Request $request) {
@@ -230,6 +300,12 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/all', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
             return Subject::all();
+        });
+
+        Route::get('/notin', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            return Subject::whereNotIn('id', $teacher->subjects->map(fn ($e) => $e->id))->get();
         });
 
         Route::get('/', function (Request $request) {

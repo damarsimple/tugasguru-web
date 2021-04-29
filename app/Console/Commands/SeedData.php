@@ -377,17 +377,17 @@ class SeedData extends Command
 
                         $schoolModel->classtypes()->attach($classtypesIds);
 
-                        $classrooms = [];
-                        foreach ($schoolModel->classtypes as $classtype) {
-                            for ($i = 0; $i < 3; $i++) {
-                                $classroom = new Classroom();
-                                $classroom->classtype_id = $classtype->id;
-                                $classroom->name = "Kelas " . $classtype->level . " " . chr($i + 65);
-                                $classrooms[] = $classroom;
-                            }
-                        }
+                        // $classrooms = [];
+                        // foreach ($schoolModel->classtypes as $classtype) {
+                        //     for ($i = 0; $i < 3; $i++) {
+                        //         $classroom = new Classroom();
+                        //         $classroom->classtype_id = $classtype->id;
+                        //         $classroom->name = "Kelas " . $classtype->level . " " . chr($i + 65);
+                        //         $classrooms[] = $classroom;
+                        //     }
+                        // }
 
-                        $schoolModel->classrooms()->saveMany($classrooms);
+                        // $schoolModel->classrooms()->saveMany($classrooms);
                         print($schoolModel->id . PHP_EOL);
                     } catch (\Throwable $th) {
                         print($th->getMessage() . PHP_EOL);
