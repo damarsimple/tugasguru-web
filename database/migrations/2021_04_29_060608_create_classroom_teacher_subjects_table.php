@@ -15,9 +15,9 @@ class CreateClassroomTeacherSubjectsTable extends Migration
     {
         Schema::create('classroom_teacher_subjects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');;
-            $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');;
-            $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');;
+            $table->foreignId('teacher_id')->index()->onDelete('cascade');
+            $table->foreignId('classroom_id')->index()->onDelete('cascade');
+            $table->foreignId('subject_id')->index()->onDelete('cascade');
             $table->timestamps();
         });
     }

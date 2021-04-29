@@ -186,6 +186,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             )->get();
         });
         Route::post('/add', function (Request $request) {
+
+
+            if (!$request->subject_id || !$request->classroom_id)
+                return response('invalid', 422);
+
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
             return ClassroomTeacherSubject::firstOrCreate([
