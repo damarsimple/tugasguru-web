@@ -11,6 +11,7 @@ use App\Models\ClassroomTeacherSubject;
 use App\Models\Classtype;
 use App\Models\District;
 use App\Models\Exam;
+use App\Models\ExamSession;
 use App\Models\Examtype;
 use App\Models\Province;
 use App\Models\Question;
@@ -19,6 +20,7 @@ use App\Models\Schooltype;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,7 +117,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'schooltypes'], function () {
         Route::get('/', function (Request $request) {
-            return Schooltype::all();
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            return [$teacher->school->schooltype];
         });
     });
 
@@ -145,16 +149,33 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $exam = new Exam();
 
             $exam->name = $request->name;
-            $exam->description = $request->description;
+            $exam->examtype_id = $request->examtype;
             $exam->code = $request->code;
             $exam->kkm = $request->kkm;
             $exam->hint = $request->hint;
-            $exam->time_limit = $request->time_limit;
-            $exam->allow_show_result = $request->allow_show_result;
-            $exam->shuffle = $request->shuffle;
+            $exam->code = $request->code;
+            $exam->description = $request->description;
 
-            $teacher->save($exam);
+            $educationyear = explode('/', $request->educationyear);
+            $exam->education_year_start = $educationyear[0];
+            $exam->education_year_end =  $educationyear[1];
+            $exam->is_odd_semester = $request->is_odd_semester;
+            $exam->allow_show_result = $request->allow_show_result ?? false;
+            $exam->shuffle = $request->shuffle ?? false;
 
+            $teacher->exams()->save($exam);
+
+            $examsessions = [];
+            foreach ($request->examsessions as $examsession) {
+                $examsession = new ExamSession();
+                $examsession->name = $examsession['name'];
+                $examsession->open_at = Carbon::parse($examsession['open_at']);
+                $examsession->close_at =  Carbon::parse($examsession['close_at']);
+                $examsession->token = $examsession['token'];
+                $examsessions[] = $examsession;
+            }
+
+            $exam->examsessions()->attach($examsessions);
             $exam->questions()->attach($request->questions);
             $exam->classrooms()->attach($request->questions);
             $exam->subjects()->attach($request->questions);
@@ -169,6 +190,12 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'schools'], function () {
 
         Route::get('/fulltime', function (Request $request) {
+        });
+
+        Route::get('/teachers', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            return $teacher->school->teachers()->with('user')->get();
         });
     });
 
@@ -243,7 +270,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'questions'], function () {
 
         Route::get('/', function (Request $request) {
-            $questions = (new Question())->with('classtypes', 'classtypes.schooltype', 'subjects', 'attachments', 'answers');
+            $questions = (new Question())->with('classtypes', 'classtypes.schooltype', 'subjects', 'attachments', 'answers', 'answers.attachment');
 
             if ($request->classtypes) {
                 $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes));
@@ -255,6 +282,19 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             if ($request->schooltypes) {
                 $questions =  $questions->whereHas('classtypes.schooltype', fn ($q) => $q->whereIn('schooltype_id', $request->schooltypes));
             }
+
+            if ($request->type) {
+                $questions =  $questions->where('type', $request->type);
+            }
+
+            if ($request->visibility) {
+                if ($request->visibility == "SELECTPEOPLE") {
+                } else if ($request->visibility == "") {
+                } else {
+                    $questions =  $questions->where('visibility', $request->visibility);
+                }
+            }
+
 
             return $questions->paginate(10);
         });
@@ -285,6 +325,14 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 }
 
                 $question->answers()->saveMany($answers);
+
+                // $answers  = $question->answers;
+
+                foreach ($questionData['answerattachments'] as $i => $attachment) {
+                    if (!empty($attachment)) {
+                        Attachment::find($attachment)->attachable()->associate($answers[$i])->save();
+                    }
+                }
 
                 $question->subjects()->attach($request['subjects']);
 

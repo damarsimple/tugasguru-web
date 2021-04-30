@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Answer extends Model
 {
@@ -15,5 +16,9 @@ class Answer extends Model
         return $this->belongsTo('App\Models\Question');
     }
 
+    public function attachment() : MorphOne
+    {
+        return $this->morphOne('App\Models\Attachment', 'attachable');
+    }
     
 }

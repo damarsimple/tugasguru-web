@@ -14,7 +14,7 @@ class Exam extends Model
 
     public function examsessions(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Teacher', 'exam_supervisor', 'teacher_id');
+        return $this->belongsToMany('App\Models\ExamSession');
     }
 
     public function questions(): BelongsToMany
@@ -32,6 +32,19 @@ class Exam extends Model
     {
         return $this->belongsToMany('App\Models\Clasroom');
     }
+
+    public function supervisors(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            'App\Models\Teacher',
+            'exam_supervisor',
+            'supervisor_id',
+            'exam_id',
+            'id',
+            'id'
+        );
+    }
+
 
     public function examtype(): BelongsTo
     {

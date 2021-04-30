@@ -38,6 +38,11 @@ class Teacher extends Model
         return $this->hasMany('App\Models\Question');
     }
 
+    public function exams(): HasMany
+    {
+        return $this->hasMany('App\Models\Exam');
+    }
+
     public function classrooms(): HasMany
     {
         return $this->hasMany('App\Models\Classroom', 'homeroom_id');
