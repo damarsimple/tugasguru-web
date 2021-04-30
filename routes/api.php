@@ -11,7 +11,7 @@ use App\Models\ClassroomTeacherSubject;
 use App\Models\Classtype;
 use App\Models\District;
 use App\Models\Exam;
-use App\Models\ExamSession;
+use App\Models\Examsession;
 use App\Models\Examtype;
 use App\Models\Province;
 use App\Models\Question;
@@ -166,16 +166,17 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $teacher->exams()->save($exam);
 
             $examsessions = [];
-            foreach ($request->examsessions as $examsession) {
-                $examsession = new ExamSession();
-                $examsession->name = $examsession['name'];
-                $examsession->open_at = Carbon::parse($examsession['open_at']);
-                $examsession->close_at =  Carbon::parse($examsession['close_at']);
-                $examsession->token = $examsession['token'];
+            foreach ($request->examsessions as $examsessionData) {
+                // Sat May 01 2021 01:44:50 GMT+0700 (Waktu Indonesia Barat)
+                $examsession = new Examsession();
+                $examsession->name = $examsessionData['name'];
+                $examsession->open_at = Carbon::createFromFormat('D M d Y H:i:s e+',  $examsessionData['open_at']);
+                $examsession->close_at = Carbon::createFromFormat('D M d Y H:i:s e+',  $examsessionData['close_at']);
+                $examsession->token = $examsessionData['token'];
                 $examsessions[] = $examsession;
             }
 
-            $exam->examsessions()->attach($examsessions);
+            $exam->examsessions()->saveMany($examsessions);
             $exam->questions()->attach($request->questions);
             $exam->classrooms()->attach($request->questions);
             $exam->subjects()->attach($request->questions);

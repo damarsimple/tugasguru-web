@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 
-class CreateExamSessionsTable extends Migration
+class CreateExamsessionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,11 +14,12 @@ class CreateExamSessionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('exam_sessions', function (Blueprint $table) {
+        Schema::create('examsessions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->timestamp('open_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('closed_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
+            $table->foreignId('exam_id')->constrained();
+            $table->timestamp('open_at')->nullable();
+            $table->timestamp('close_at')->nullable();
             $table->string('token');
             $table->timestamps();
         });

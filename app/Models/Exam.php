@@ -12,9 +12,9 @@ class Exam extends Model
 {
     use HasFactory;
 
-    public function examsessions(): BelongsToMany
+    public function examsessions(): HasMany
     {
-        return $this->belongsToMany('App\Models\ExamSession');
+        return $this->hasMany('App\Models\Examsession');
     }
 
     public function questions(): BelongsToMany
@@ -28,9 +28,9 @@ class Exam extends Model
     }
 
 
-    public function clasrooms(): BelongsToMany
+    public function classrooms(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Clasroom');
+        return $this->belongsToMany('App\Models\Classroom');
     }
 
     public function supervisors(): BelongsToMany
