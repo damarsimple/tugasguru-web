@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Teacher extends Model
 {
@@ -51,5 +52,10 @@ class Teacher extends Model
     public function classroomteachersubjects(): HasMany
     {
         return $this->hasMany('App\Models\ClassroomTeacherSubject');
+    }
+
+    public function mysubjectclassrooms(): HasManyThrough
+    {
+        return $this->hasManyThrough('App\Models\Classroom', 'App\Models\ClassroomTeacherSubject');
     }
 }

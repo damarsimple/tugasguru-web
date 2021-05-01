@@ -62,7 +62,7 @@ class ApiAuthController extends Controller
                 $user = $user->load('teacher', 'teacher.school');
                 break;
             case 'STUDENT';
-                $user = $user->load('student', 'student.school');
+                $user = $user->load('student.classroom',  'student.school');
                 break;
         }
         return response()->json(['user' => $user]);

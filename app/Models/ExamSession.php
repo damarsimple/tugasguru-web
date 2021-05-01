@@ -11,6 +11,12 @@ class Examsession extends Model
 {
     use HasFactory;
 
+    protected $hidden = ['token'];
+
+    protected $casts = [
+        'open_at' => 'datetime',
+        'close_at' => 'datetime'
+    ];
     public function exam(): BelongsTo
     {
         return $this->belongsTo('App\Models\Exam');
@@ -20,5 +26,4 @@ class Examsession extends Model
     {
         return $this->hasMany('App\Models\ExamSupervisor');
     }
-
 }

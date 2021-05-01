@@ -2,6 +2,7 @@
 
 use App\Actions\Attachment\Upload;
 use App\Http\Controllers\ApiAuthController;
+use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
 use App\Models\Answer;
 use App\Models\Attachment;
@@ -17,6 +18,7 @@ use App\Models\Province;
 use App\Models\Question;
 use App\Models\School;
 use App\Models\Schooltype;
+use App\Models\StudentAnswer;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -89,6 +91,147 @@ Route::get('/questions', function (Request $request) {
 
 
 
+Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' => 'students'], function () {
+
+    Route::group(['prefix' => 'classroom'], function () {
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            return $student->classroom()->with(
+                'students.user',
+                'homeroomteacher.user',
+                'classroomteachersubjects.teacher.user',
+                'classroomteachersubjects.subject',
+            )->first();
+        });
+        Route::post('/join', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            $student->classroom_id = $request->classroom;
+
+            $student->save();
+
+            return $student->classroom;
+        });
+
+        Route::get('/all', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            return $student->school->classrooms;
+        });
+    });
+    Route::group(['prefix' => 'schools'], function () {
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            return $student->school()->with(
+                'schooltype',
+                'students.user.province',
+                'teachers.user.province',
+                'teachers.school'
+            )->first();
+        });
+    });
+    Route::group(['prefix' => 'exams'], function () {
+
+        Route::get('{id}', function (Request $request, $id) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+
+            $exam = Exam::findOrFail($id);
+
+            $check = false;
+
+            foreach ($exam->classrooms as $classroom) {
+                if ($classroom->students()->where('id', $student->id)->exists()) {
+                    $check = true;
+                    break;
+                }
+            }
+
+            if (!$check) {
+                return response(['message' => 'Anda Tidak Memiliki Akses ulangan ini !'], 401);
+            }
+
+            $exam = $exam
+                ->with(
+                    'questions.answers',
+                    'subjects',
+                    'supervisors.user',
+                    'teacher.user',
+                    'examtype',
+                    'examsessions'
+                )
+                ->where('id', $exam->id)->first();
+            return ['exam' => $exam];
+        });
+        Route::post('/checktoken', function (Request $request) {
+            // /**  @var App/Models/Student $student  */
+            // $student = $request->user()->student;
+
+            $examsession = Examsession::findOrFail($request->examsession);
+
+            if (!now()->between($examsession->open_at, $examsession->close_at)) {
+                return ['message' => 'session is over'];
+            }
+
+            if ($examsession->token == $request->token) {
+                return ['message' => 'ok'];
+            } else {
+                return ['message' => 'wrong'];
+            }
+        });
+
+        Route::post('/submitanswer', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+            $examsession = Examsession::findOrFail($request->examsession);
+            if (!now()->between($examsession->open_at, $examsession->close_at)) {
+                return ['message' => 'session is over'];
+            }
+
+            if (!$examsession->token == $request->token) {
+                return ['message' => 'wrong'];
+            }
+
+            $answer  = StudentAnswer::firstOrCreate([
+                'question_id' => $request->question,
+                'student_id' => $student->id,
+                'exam_id' => $request->exam,
+                'examsession_id' => $request->examsession,
+            ]);
+
+            /**
+             * Grading Code
+             */
+
+            $question = Question::with('correctanswer')->findOrFail($request->question);
+
+            if ($question->type == "MULTI_CHOICE") {
+                $answer->grade = $question->correctanswer->id == $request->answer['id'] ? 100 : 0;
+                $answer->is_correct = $question->correctanswer->id == $request->answer['id'];
+                $answer->answer_id = $request->answer['id'];
+                $answer->is_proccessed = true;
+            } else {
+                $answercontent = strip_tags($request->answer);
+                similar_text($answercontent, strip_tags($question->correctanswer->content), $percentage);
+                $answer->is_correct = $percentage > 75;
+                $answer->grade = $percentage;
+                $answer->is_proccessed = false;
+                $answer->content = $request->answer;
+            }
+
+            $answer->save();
+
+            return ['message' => 'saved and graded'];
+        });
+    });
+});
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
 
 
@@ -228,11 +371,16 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::post('/add', function (Request $request) {
 
 
+
             if (!$request->subject_id || !$request->classroom_id)
                 return response('invalid', 422);
 
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
+
+            if (!$teacher->is_init) {
+                $teacher->is_init = true;
+            }
             return ClassroomTeacherSubject::firstOrCreate([
                 'teacher_id' => $teacher->id,
                 'subject_id' => $request->subject_id,
@@ -248,13 +396,12 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $teacher = $request->user()->teacher;
 
             return $teacher
-                ->classrooms()
+                ->classroomteachersubjects()
                 ->with(
-                    'homeroomteacher.user',
-                    'classroomteachersubjects.teacher.user',
-                    'classroomteachersubjects.subject',
-                    'students',
-                )->get();
+                    'classroom.homeroomteacher.user',
+                    'classroom.students.user',
+                    'classroom.students.user',
+                )->get()->map(fn ($e) => $e->classroom);
         });
 
         Route::get('/all', function (Request $request) {
@@ -348,7 +495,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $answers = [];
                 foreach ($questionData['answers'] as $i => $answerData) {
                     $answer = new Answer();
-                    $answer->is_correct = $i == $questionData['correctanswer'];
+
+                    if ($questionData['type'] !== 'MULTI_CHOICE') {
+                        $answer->is_correct = true;
+                    } else {
+                        $answer->is_correct = $i == $questionData['correctanswer'];
+                    }
+
                     $answer->content = $answerData['content'] ?? '';
                     $answers[] = $answer;
                 }

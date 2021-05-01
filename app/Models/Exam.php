@@ -50,4 +50,10 @@ class Exam extends Model
     {
         return $this->belongsTo('App\Models\Exam');
     }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Teacher');
+    }
+
 }
