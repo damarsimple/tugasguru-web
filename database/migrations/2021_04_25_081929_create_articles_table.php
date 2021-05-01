@@ -17,10 +17,9 @@ class CreateArticlesTable extends Migration
             $table->id();
             $table->foreignId('user_id')->index()->constrained();
             $table->string('name');
-            $table->string('code');
             $table->longText('content');
+            $table->boolean('is_paid')->default(false);
             $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');
-            $table->timestamp('visible_at');
             $table->timestamps();
         });
     }

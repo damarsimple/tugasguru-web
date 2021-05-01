@@ -26,7 +26,7 @@ class Student extends Model
         return $this->belongsTo('App\Models\ClassRoom');
     }
 
-    public function parent(): BelongsTo
+    public function guardian(): BelongsTo
     {
         return $this->belongsTo('App\Models\User', 'parent_id');
     }
