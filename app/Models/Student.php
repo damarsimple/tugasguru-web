@@ -6,6 +6,7 @@ use App\Trait\TeacherFollowable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Student extends Model
 {
@@ -29,5 +30,10 @@ class Student extends Model
     public function guardian(): BelongsTo
     {
         return $this->belongsTo('App\Models\User', 'parent_id');
+    }
+
+    public function events(): MorphMany
+    {
+        return $this->morphMany('App\Models\Event', 'eventable');
     }
 }
