@@ -321,8 +321,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $exam->examsessions()->saveMany($examsessions);
             $exam->questions()->attach($request->questions);
-            $exam->classrooms()->attach($request->questions);
-            $exam->subjects()->attach($request->questions);
+            $exam->classrooms()->attach($request->classrooms);
+            $exam->subjects()->attach($request->subjects);
 
             return ['message' => 'success', 'exam' => $exam];
         });
