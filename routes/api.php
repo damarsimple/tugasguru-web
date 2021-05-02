@@ -11,6 +11,7 @@ use App\Models\Classroom;
 use App\Models\Classtype;
 use App\Models\District;
 use App\Models\Exam;
+use App\Models\Examresult;
 use App\Models\Examsession;
 use App\Models\Examtype;
 use App\Models\Province;
@@ -140,10 +141,116 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         Route::get('/', function (Request $request) {
             /**  @var App/Models/Student $student  */
             $student = $request->user()->student;
+
+
+            $events  = collect([]);
+
+            $now = now();
+            foreach ($student->classrooms()->has('exams')->get() as $classroom) {
+                $checkexam = $classroom->exams()
+                    ->whereHas(
+                        'examsessions',
+                        fn ($e) => $e->where('close_at', '>', $now)
+                    );
+
+                if ($checkexam->exists()) {
+                    foreach ($checkexam->get() as $exam) {
+                        $events  = $events->merge($exam->examsessions()->with(
+                            'exam.teacher.user',
+                            'exam.subject'
+                        )->get());
+                    }
+                }
+            }
+
+            return $events->all();
         });
     });
     Route::group(['prefix' => 'exams'], function () {
 
+        Route::post('{id}/reportbegin', function (Request $request, $id) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+
+            $exam = Exam::findOrFail($id);
+
+            $check = false;
+
+            foreach ($exam->classrooms as $classroom) {
+                if ($classroom->students()->where('students.id', $student->id)->exists()) {
+                    $check = true;
+                    break;
+                }
+            }
+
+            if (!$check) {
+                return response(['message' => 'Anda Tidak Memiliki Akses ulangan ini !'], 401);
+            }
+
+            $examsession = Examsession::findOrFail($request->examsession);
+
+            if (!now()->between($examsession->open_at, $examsession->close_at)) {
+                return ['message' => 'session is over'];
+            }
+
+            if (!$examsession->token == $request->token) {
+                return ['message' => 'wrong'];
+            }
+            if ($examresult = Examresult::where('examsession_id', $request->examsession)
+                ->where('student_id', $student->id)
+                ->where('exam_id', $exam->id)->exists()
+            ) {
+                return ['message' => 'already reported'];
+            }
+
+            $examresult = new Examresult();
+
+            $examresult->examsession_id = $examsession->id;
+
+            $examresult->start_at = now();
+
+            $examresult->student_id = $student->id;
+
+            $examresult->exam_id = $exam->id;
+
+            $examresult->save();
+
+            return ['message' => 'saved'];
+        });
+        Route::post('{id}/finish', function (Request $request, $id) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+
+            $exam = Exam::findOrFail($id);
+
+            $examsession = Examsession::findOrFail($request->examsession);
+
+            if (!now()->between($examsession->open_at, $examsession->close_at)) {
+                return ['message' => 'session is over'];
+            }
+
+            if (!$examsession->token == $request->token) {
+                return ['message' => 'wrong'];
+            }
+
+            $studentAnswer = StudentAnswer::where('examsession_id', $request->examsession)
+                ->where('student_id', $student->id)
+                ->where('exam_id', $exam->id);
+
+            $examresult = Examresult::where('examsession_id', $request->examsession)
+                ->where('student_id', $student->id)
+                ->where('exam_id', $exam->id)->firstOrFail();
+
+            $studentAnswer->update(['examresult_id' => $examresult->id]);
+
+            $examresult->finish_at = now();
+            $examresult->grade = $studentAnswer->sum('grade') / $exam->questions()->count();
+
+            $examresult->save();
+            return ['message' => 'graded'];
+        });
         Route::get('{id}', function (Request $request, $id) {
             /**  @var App/Models/Student $student  */
             $student = $request->user()->student;
@@ -154,7 +261,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $check = false;
 
             foreach ($exam->classrooms as $classroom) {
-                if ($classroom->students()->where('id', $student->id)->exists()) {
+                if ($classroom->students()->where('students.id', $student->id)->exists()) {
                     $check = true;
                     break;
                 }
@@ -167,15 +274,17 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $exam = $exam
                 ->with(
                     'questions.answers',
-                    'subjects',
+                    'subject',
                     'supervisors.user',
                     'teacher.user',
                     'examtype',
                     'examsessions'
                 )
                 ->where('id', $exam->id)->first();
+
             return ['exam' => $exam];
         });
+
         Route::post('/checktoken', function (Request $request) {
             // /**  @var App/Models/Student $student  */
             // $student = $request->user()->student;
@@ -192,6 +301,27 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                 return ['message' => 'wrong'];
             }
         });
+
+
+        Route::get('/{id}/result', function (Request $request, $id) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            return Examresult::where('student_id', $student->id)
+                ->where('exam_id', $id)
+                ->with(
+                    'exam.teacher.user',
+                    'exam.subject',
+                    'exam.examtype',
+                    'exam.supervisors.user',
+                    'studentanswers.question.answers',
+                    'studentanswers.answer',
+                    'student',
+                    'examsession'
+                )
+                ->firstOrFail();
+        });
+
 
         Route::post('/submitanswer', function (Request $request) {
             /**  @var App/Models/Student $student  */
@@ -300,6 +430,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $exam->allow_show_result = $request->allow_show_result ?? false;
             $exam->shuffle = $request->shuffle ?? false;
 
+            $exam->subject_id = $request->subject;
             $teacher->exams()->save($exam);
 
             $examsessions = [];
@@ -316,7 +447,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $exam->examsessions()->saveMany($examsessions);
             $exam->questions()->attach($request->questions);
             $exam->classrooms()->attach($request->classrooms);
-            $exam->subjects()->attach($request->subjects);
 
             return ['message' => 'success', 'exam' => $exam];
         });

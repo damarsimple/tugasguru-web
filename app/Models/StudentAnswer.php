@@ -16,7 +16,8 @@ class StudentAnswer extends Model
         'question_id',
         'student_id',
         'exam_id',
-        'examsession_id'
+        'examsession_id',
+        'examresult_id'
     ];
 
     public function answer(): BelongsTo
@@ -40,5 +41,10 @@ class StudentAnswer extends Model
     public function exam(): BelongsTo
     {
         return $this->belongsTo('App\Models\Exam');
+    }
+
+    public function examresult(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Examresult');
     }
 }

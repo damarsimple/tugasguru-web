@@ -17,16 +17,20 @@ class Exam extends Model
         return $this->hasMany('App\Models\Examsession');
     }
 
+    public function examresults(): HasMany
+    {
+        return $this->hasMany('App\Models\Examresult');
+    }
+
     public function questions(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Question');
     }
 
-    public function subjects(): BelongsToMany
+    public function subject(): BelongsTo
     {
-        return $this->belongsToMany('App\Models\Subject');
+        return $this->belongsTo('App\Models\Subject');
     }
-
 
     public function classrooms(): BelongsToMany
     {
@@ -55,5 +59,4 @@ class Exam extends Model
     {
         return $this->belongsTo('App\Models\Teacher');
     }
-
 }

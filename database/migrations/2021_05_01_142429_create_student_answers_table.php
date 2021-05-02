@@ -16,6 +16,7 @@ class CreateStudentAnswersTable extends Migration
         Schema::create('student_answers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('answer_id')->nullable()->constrained();
+            $table->foreignId('examresult_id')->nullable()->constrained();
             $table->foreignId('question_id')->constrained();
             $table->foreignId('student_id')->constrained();
             $table->foreignId('exam_id')->constrained();

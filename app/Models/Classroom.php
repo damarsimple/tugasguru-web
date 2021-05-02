@@ -26,4 +26,9 @@ class Classroom extends Model
     {
         return $this->belongsTo('App\Models\Subject');
     }
+
+    public function exams(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Exam');
+    }
 }

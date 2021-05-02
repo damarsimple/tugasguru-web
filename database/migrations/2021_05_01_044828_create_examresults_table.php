@@ -18,9 +18,10 @@ class CreateExamresultsTable extends Migration
             $table->foreignId('exam_id')->constrained();
             $table->foreignId('student_id')->constrained();
             $table->foreignId('examsession_id')->constrained();
-            $table->float('grade', unsigned: true);
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('finish_at')->nullable();
+            $table->float('grade', unsigned: true)->default(0);
             $table->boolean('is_proccessed')->default(false);
-            $table->boolean('is_graded')->default(false);
             $table->timestamps();
         });
     }
