@@ -13,6 +13,8 @@ class Question extends Model
 {
     use HasFactory;
 
+    public $with = ['attachments', 'answers'];
+
     public function teacher(): BelongsTo
     {
         return $this->belongsTo('App\Models\Teacher');
@@ -33,14 +35,13 @@ class Question extends Model
         return $this->morphMany('App\Models\Attachment', 'attachable');
     }
 
-    public function subjects(): BelongsToMany
+    public function subject(): BelongsTo
     {
-        return $this->belongsToMany('App\Models\Subject');
+        return $this->belongsTo('App\Models\Subject');
     }
 
     public function classtypes(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Classtype');
     }
-    
 }

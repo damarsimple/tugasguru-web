@@ -10,15 +10,16 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class Answer extends Model
 {
     use HasFactory;
+
+    public $with = ['attachment'];
     
-    public function question() : BelongsTo
+    public function question(): BelongsTo
     {
         return $this->belongsTo('App\Models\Question');
     }
 
-    public function attachment() : MorphOne
+    public function attachment(): MorphOne
     {
         return $this->morphOne('App\Models\Attachment', 'attachable');
     }
-    
 }

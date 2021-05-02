@@ -12,6 +12,7 @@ class StudentAnswer extends Model
 
     use HasFactory;
 
+    public $with = ['question', 'question.answers'];
     protected $fillable = [
         'question_id',
         'student_id',

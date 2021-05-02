@@ -87,14 +87,6 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
-
-        Schema::create('question_subject', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('question_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
-
         Schema::create('classtype_subject', function (Blueprint $table) {
             $table->id();
             $table->foreignId('classtype_id')->index()->constrained()->onDelete('cascade');
@@ -128,6 +120,13 @@ class CreatePivotsTable extends Migration
             $table->id();
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('packagequestion_question', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('packagequestion_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('question_id')->index()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
 

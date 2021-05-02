@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateQuestionsTable extends Migration
+class CreatePackagequestionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateQuestionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('questions', function (Blueprint $table) {
+        Schema::create('packagequestions', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
             $table->foreignId('teacher_id')->index()->constrained();
             $table->foreignId('subject_id')->index()->constrained();
-            $table->enum('type', ['MULTI_CHOICE', 'ESSAY', 'FILLER']);
-            $table->longText('content');
             $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');
             $table->timestamps();
         });
@@ -31,6 +30,6 @@ class CreateQuestionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('questions');
+        Schema::dropIfExists('packagequestions');
     }
 }

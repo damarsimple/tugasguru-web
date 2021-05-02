@@ -14,6 +14,7 @@ use App\Models\Exam;
 use App\Models\Examresult;
 use App\Models\Examsession;
 use App\Models\Examtype;
+use App\Models\Packagequestion;
 use App\Models\Province;
 use App\Models\Question;
 use App\Models\School;
@@ -99,8 +100,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $student = $request->user()->student;
 
             return $student->classrooms()->with(
-                'students.user',
-                'teacher.user',
+                'students',
+                'teacher',
                 'subject',
             )->get();
         });
@@ -129,8 +130,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             return $student->school()->with(
                 'schooltype',
-                'students.user.province',
-                'teachers.user.province',
+                'students.province',
+                'teachers.province',
                 'teachers.school'
             )->first();
         });
@@ -156,7 +157,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                 if ($checkexam->exists()) {
                     foreach ($checkexam->get() as $exam) {
                         $events  = $events->merge($exam->examsessions()->with(
-                            'exam.teacher.user',
+                            'exam.teacher',
                             'exam.subject'
                         )->get());
                     }
@@ -273,10 +274,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $exam = $exam
                 ->with(
-                    'questions.answers',
+                    'questions',
                     'subject',
-                    'supervisors.user',
-                    'teacher.user',
+                    'supervisors',
+                    'teacher',
                     'examtype',
                     'examsessions'
                 )
@@ -310,12 +311,12 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             return Examresult::where('student_id', $student->id)
                 ->where('exam_id', $id)
                 ->with(
-                    'exam.teacher.user',
+                    'exam.teacher',
                     'exam.subject',
                     'exam.examtype',
-                    'exam.supervisors.user',
-                    'studentanswers.question.answers',
-                    'studentanswers.answer',
+                    'exam.supervisors',
+                    'studentanswers',
+                    'studentanswers',
                     'student',
                     'examsession'
                 )
@@ -472,8 +473,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return $teacher->school()->with(
                 'teachers.school',
                 'students.school',
-                'teachers.user.province',
-                'students.user.province',
+                'teachers.province',
+                'students.province',
                 'schooltype',
             )->get();
         });
@@ -487,9 +488,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             if ($request->withExtra) {
                 return $teacher->classrooms()->with(
-                    'teacher.user',
+                    'teacher',
                     'subject',
-                    'students.user',
+                    'students',
                 )->get();
             } else {
                 return $teacher->classrooms;
@@ -502,9 +503,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             if ($request->withExtra) {
                 return $teacher->school->classrooms()->with(
-                    'teacher.user',
+                    'teacher',
                     'subject',
-                    'students.user',
+                    'students',
                 )->get();
             } else {
                 return $teacher->school->classrooms;
@@ -531,7 +532,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'questions'], function () {
 
         Route::get('/', function (Request $request) {
-            $questions = (new Question())->with('classtypes', 'classtypes.schooltype', 'subjects', 'attachments', 'answers', 'answers.attachment');
+            $questions = (new Question())->with('classtypes', 'classtypes.schooltype', 'subjects', 'attachments', 'answers', 'answers');
 
             if ($request->classtypes) {
                 $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes));
@@ -566,6 +567,12 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
 
+
+
+
+           
+
+            $questionIds = [];
             foreach ($request->questions as $questionData) {
                 $question = new Question();
 
@@ -575,7 +582,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
                 $question->type = $questionData['type'];
 
+
+                $question->subject_id = $request['subject'];
+
+
                 $teacher->questions()->save($question);
+
+                $questionIds[] = $question->id;
 
                 $answers = [];
                 foreach ($questionData['answers'] as $i => $answerData) {
@@ -601,14 +614,25 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                     }
                 }
 
-                $question->subjects()->attach($request['subjects']);
-
                 $question->classtypes()->attach($request['classtypes']);
 
                 foreach (Attachment::whereIn('id', $questionData['attachments'])->get() as $attachment) {
                     $attachment->attachable()->associate($question)->save();
                 }
             }
+
+            if ($request->packagequestion) {
+                $packagequestion = new Packagequestion();
+                $packagequestion->name = $request->packagequestion;
+                $packagequestion->subject_id = $request['subject'];
+                $packagequestion->teacher_id = $teacher->id;
+                $packagequestion->visibility = $request['visibility'];
+                $packagequestion->save();
+
+                $packagequestion->questions()->attach($questionIds);
+              
+            }
+
 
             return ['message' => 'success'];
         });
