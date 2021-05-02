@@ -12,18 +12,18 @@ class Classroom extends Model
 {
     use HasFactory;
 
-    public function homeroomteacher(): BelongsTo
+    public function students(): BelongsToMany
     {
-        return $this->belongsTo('App\Models\Teacher', 'homeroom_id');
+        return $this->belongsToMany('App\Models\Student');
     }
 
-    public function students(): HasMany
+    public function teacher(): BelongsTo
     {
-        return $this->hasMany('App\Models\Student');
+        return $this->belongsTo('App\Models\Teacher');
     }
 
-    public function classroomteachersubjects(): HasMany
+    public function subject(): BelongsTo
     {
-        return $this->hasMany('App\Models\ClassroomTeacherSubject');
+        return $this->belongsTo('App\Models\Subject');
     }
 }

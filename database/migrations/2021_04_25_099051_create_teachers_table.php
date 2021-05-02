@@ -21,7 +21,6 @@ class CreateTeachersTable extends Migration
             $table->string('academic_degree')->nullable();
             $table->boolean('is_bimbel')->default(false);
             $table->boolean('is_bk')->default(false);
-            $table->boolean('is_init')->default(false);
             $table->timestamps();
         });
     }

@@ -46,16 +46,6 @@ class Teacher extends Model
 
     public function classrooms(): HasMany
     {
-        return $this->hasMany('App\Models\Classroom', 'homeroom_id');
-    }
-
-    public function classroomteachersubjects(): HasMany
-    {
-        return $this->hasMany('App\Models\ClassroomTeacherSubject');
-    }
-
-    public function mysubjectclassrooms(): HasManyThrough
-    {
-        return $this->hasManyThrough('App\Models\Classroom', 'App\Models\ClassroomTeacherSubject');
+        return $this->hasMany('App\Models\Classroom');
     }
 }

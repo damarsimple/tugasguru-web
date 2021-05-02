@@ -6,6 +6,7 @@ use App\Trait\TeacherFollowable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Student extends Model
@@ -22,9 +23,9 @@ class Student extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function classroom(): BelongsTo
+    public function classrooms(): BelongsToMany
     {
-        return $this->belongsTo('App\Models\ClassRoom');
+        return $this->belongsToMany('App\Models\Classroom');
     }
 
     public function guardian(): BelongsTo

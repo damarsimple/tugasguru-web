@@ -38,8 +38,17 @@ class CreatePivotsTable extends Migration
             $table->id();
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('school_id')->index()->constrained()->onDelete('cascade');
+            $table->float('kkm')->default(75);
             $table->timestamps();
         });
+
+        Schema::create('classroom_student', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('student_id')->index()->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+
 
         Schema::create('assigment_subject', function (Blueprint $table) {
             $table->id();
