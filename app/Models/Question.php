@@ -13,7 +13,7 @@ class Question extends Model
 {
     use HasFactory;
 
-    public $with = ['attachments', 'answers'];
+    public $with = ['attachments', 'answers', 'subject'];
 
     public function teacher(): BelongsTo
     {

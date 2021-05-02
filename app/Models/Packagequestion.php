@@ -11,6 +11,13 @@ class Packagequestion extends Model
 {
     use HasFactory;
 
+    public $with = [
+        'teacher',
+        'subject',
+        'questions.answers.attachment',
+        'questions.attachments'
+    ];
+
     public function questions(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Question');

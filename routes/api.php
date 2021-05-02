@@ -532,13 +532,17 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'questions'], function () {
 
         Route::get('/', function (Request $request) {
-            $questions = (new Question())->with('classtypes', 'classtypes.schooltype', 'subjects', 'attachments', 'answers', 'answers');
+
+            $questions = (new Question())->with(
+                'classtypes',
+                'classtypes.schooltype',
+            );
 
             if ($request->classtypes) {
                 $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes));
             }
-            if ($request->subjects) {
-                $questions =  $questions->whereHas('subjects', fn ($q) => $q->whereIn('subject_id', $request->subjects));
+            if ($request->subject) {
+                $questions =  $questions->where('subject_id', $request->subject);
             }
 
             if ($request->schooltypes) {
@@ -561,6 +565,40 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return $questions->paginate(10);
         });
 
+        Route::get('/package', function (Request $request) {
+
+            $packagequestions = (new Packagequestion())->with(
+                'questions.classtypes',
+                'questions.classtypes.schooltype',
+            );
+
+            if ($request->classtypes) {
+                $packagequestions =  $packagequestions->whereHas('questions.classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes));
+            }
+            if ($request->subject) {
+                $packagequestions =  $packagequestions->where('subject_id', $request->subject);
+            }
+
+            if ($request->schooltypes) {
+                $packagequestions =  $packagequestions->whereHas('questions.classtypes.schooltype', fn ($q) => $q->whereIn('schooltype_id', $request->schooltypes));
+            }
+
+            if ($request->type) {
+                $packagequestions =  $packagequestions->where('questions.type', $request->type);
+            }
+
+            if ($request->visibility) {
+                if ($request->visibility == "SELECTPEOPLE") {
+                } else if ($request->visibility == "") {
+                } else {
+                    $packagequestions =  $packagequestions->where('visibility', $request->visibility);
+                }
+            }
+
+
+            return $packagequestions->paginate(10);
+        });
+
 
 
         Route::post('/create', function (Request $request) {
@@ -570,7 +608,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
 
-           
+
 
             $questionIds = [];
             foreach ($request->questions as $questionData) {
@@ -630,7 +668,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $packagequestion->save();
 
                 $packagequestion->questions()->attach($questionIds);
-              
             }
 
 
