@@ -28,6 +28,6 @@ class Examresult extends Model
 
     public function studentanswers(): HasMany
     {
-        return $this->hasMany('App\Models\Studentanswer');
+        return $this->hasMany('App\Models\StudentAnswer');
     }
 }
