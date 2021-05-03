@@ -661,7 +661,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $question->type = $questionData['type'];
 
 
-                $question->subject_id = $request['subject'];
+                $question->subject_id = $request['subject']['id'];
 
 
                 $teacher->questions()->save($question);
