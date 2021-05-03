@@ -147,20 +147,23 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $events  = collect([]);
 
             $now = now();
-            foreach ($student->classrooms()->has('exams')->get() as $classroom) {
-                $checkexam = $classroom->exams()
-                    ->whereHas(
-                        'examsessions',
-                        fn ($e) => $e->where('close_at', '>', $now)
-                    );
+            $classrooms =  $classrooms = $student->classrooms()->whereHas(
+                'exams.examsessions',
+                fn ($e) => $e->where('close_at', '>', $now)
+            );
+            foreach ($classrooms->get() as $classroom) {
 
-                if ($checkexam->exists()) {
-                    foreach ($checkexam->get() as $exam) {
-                        $events  = $events->merge($exam->examsessions()->with(
-                            'exam.teacher',
-                            'exam.subject'
-                        )->get());
-                    }
+                $checkexam = $classroom->exams()->whereHas(
+                    'examsessions',
+                    fn ($e) => $e->where('close_at', '>', $now)
+                );
+
+                foreach ($checkexam->get() as $exam) {
+                    $events  = $events->merge(
+                        $exam->examsessions()
+                            ->with('exam.teacher', 'exam.subject', 'exam.classrooms')
+                            ->get()
+                    );
                 }
             }
 
@@ -370,6 +373,43 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     });
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
+
+    Route::group(['prefix' => 'events'], function () {
+
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+
+            $events  = collect([]);
+
+            $now = now();
+
+            $classrooms = $teacher->classrooms()->whereHas(
+                'exams.examsessions',
+                fn ($e) => $e->where('close_at', '>', $now)
+            );
+
+            foreach ($classrooms->get() as $classroom) {
+
+                $checkexam = $classroom->exams()->whereHas(
+                    'examsessions',
+                    fn ($e) => $e->where('close_at', '>', $now)
+                );
+
+                foreach ($checkexam->get() as $exam) {
+                    $events  = $events->merge(
+                        $exam->examsessions()
+                            ->with('exam.teacher', 'exam.subject', 'exam.classrooms')
+                            ->get()
+                    );
+                }
+            }
+
+            return $events->all();
+        });
+    });
+
 
     Route::group(['prefix' => 'attachments'], function () {
 
