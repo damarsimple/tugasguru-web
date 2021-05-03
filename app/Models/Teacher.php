@@ -15,7 +15,7 @@ class Teacher extends Model
     use HasFactory, TeacherFollowable;
 
     public $with = ['user'];
-    
+
     public function school(): BelongsTo
     {
         return $this->belongsTo('App\Models\School');
@@ -49,5 +49,10 @@ class Teacher extends Model
     public function classrooms(): HasMany
     {
         return $this->hasMany('App\Models\Classroom');
+    }
+
+    public function packagequestions(): HasMany
+    {
+        return $this->hasMany('App\Models\Packagequestion');
     }
 }
