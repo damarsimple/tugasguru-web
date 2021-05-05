@@ -18,6 +18,7 @@ class CreatePackagequestionsTable extends Migration
             $table->string('name')->nullable();
             $table->foreignId('teacher_id')->index()->constrained();
             $table->foreignId('subject_id')->index()->constrained();
+            $table->boolean('editable')->default(true);
             $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');
             $table->timestamps();
         });

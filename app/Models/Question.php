@@ -13,6 +13,8 @@ class Question extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['editable'];
+    
     public $with = ['attachments', 'answers', 'subject'];
 
     public function teacher(): BelongsTo

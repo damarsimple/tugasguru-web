@@ -497,6 +497,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'exams'], function () {
 
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            return $teacher->exams()->paginate(10);
+        });
         Route::post('/create', function (Request $request) {
 
             /**  @var App/Models/Teacher $teacher  */
@@ -531,8 +536,17 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $examsessions[] = $examsession;
             }
 
+
+            if ($request->packagequestions) {
+                Packagequestion::whereIn('id', $request->packagequestions)->update(['editable' => false]);
+            }
+
+
             $exam->examsessions()->saveMany($examsessions);
             $exam->questions()->attach($request->questions);
+
+            $exam->questions()->update(['editable' => false]);
+
 
             return ['message' => 'success', 'exam' => $exam];
         });

@@ -17,6 +17,7 @@ class CreateQuestionsTable extends Migration
             $table->id();
             $table->foreignId('teacher_id')->index()->constrained();
             $table->foreignId('subject_id')->index()->constrained();
+            $table->boolean('editable')->default(true);
             $table->enum('type', ['MULTI_CHOICE', 'ESSAY', 'FILLER']);
             $table->longText('content');
             $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');
