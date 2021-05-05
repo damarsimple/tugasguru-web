@@ -28,9 +28,9 @@ class Classroom extends Model
         return $this->belongsTo('App\Models\Subject');
     }
 
-    public function exams(): BelongsToMany
+    public function exams(): HasMany
     {
-        return $this->belongsToMany('App\Models\Exam');
+        return $this->hasMany('App\Models\Exam');
     }
 
     public function classtype(): BelongsTo

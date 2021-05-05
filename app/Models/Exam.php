@@ -12,7 +12,7 @@ class Exam extends Model
 {
     use HasFactory;
 
-    public $with = ['teacher', 'subject', 'examtype'];
+    public $with = ['teacher', 'subject', 'examtype', 'classroom'];
     
     public function examsessions(): HasMany
     {
