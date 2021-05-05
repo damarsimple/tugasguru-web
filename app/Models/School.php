@@ -45,7 +45,7 @@ class School extends Model
 
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');
+        return $this->belongsToMany('App\Models\Subject');
     }
 
     public function classtypes(): BelongsToMany

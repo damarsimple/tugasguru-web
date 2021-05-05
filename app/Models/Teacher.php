@@ -33,7 +33,7 @@ class Teacher extends Model
 
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Subject');
+        return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
     }
 
     public function questions(): HasMany

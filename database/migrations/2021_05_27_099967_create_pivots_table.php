@@ -38,7 +38,6 @@ class CreatePivotsTable extends Migration
             $table->id();
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('school_id')->index()->constrained()->onDelete('cascade');
-            $table->float('kkm')->default(75);
             $table->timestamps();
         });
 
@@ -111,6 +110,7 @@ class CreatePivotsTable extends Migration
             $table->id();
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
+            $table->float('kkm')->default(75);
             $table->timestamps();
         });
 

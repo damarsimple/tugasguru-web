@@ -567,20 +567,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             )->get();
         });
 
-
-        Route::put('/subjects/{id}', function (Request $request, $id) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-
-            $subject = $teacher->school->subjects()->where('subjects.id', $id)->firstOrFail();
-
-            $subject->pivot->kkm = $request->kkm;
-
-            $subject->pivot->save();
-
-            return ['message' => 'success'];
-        });
-
         Route::get('/subjects/{id}', function (Request $request, $id) {
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
@@ -841,6 +827,19 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 }
             }
             return ['message' => 'success', 'ids' => $request->ids];
+        });
+
+        Route::put('/{id}', function (Request $request, $id) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            $subject = $teacher->school->subjects()->where('subjects.id', $id)->firstOrFail();
+
+            $subject->pivot->kkm = $request->kkm;
+
+            $subject->pivot->save();
+
+            return ['message' => 'success'];
         });
     });
 });
