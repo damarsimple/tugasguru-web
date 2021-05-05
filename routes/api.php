@@ -514,6 +514,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $exam->name = $request->name;
             $exam->examtype_id = $request->examtype;
             $exam->hint = $request->hint;
+            $exam->classroom_id = $request->classroom;
             $exam->description = $request->description;
             $exam->time_limit = $request->time_limit ?? 120;
             $educationyear = explode('/', $request->educationyear);
@@ -538,7 +539,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $exam->examsessions()->saveMany($examsessions);
             $exam->questions()->attach($request->questions);
-            $exam->classrooms()->attach($request->classrooms);
 
             return ['message' => 'success', 'exam' => $exam];
         });
