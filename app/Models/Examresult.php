@@ -11,6 +11,11 @@ class Examresult extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'examsession_id',
+        'student_id',
+        'exam_id'
+    ];
     public function exam(): BelongsTo
     {
         return $this->belongsTo('App\Models\Exam');

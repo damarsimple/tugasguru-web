@@ -13,6 +13,7 @@ use App\Models\District;
 use App\Models\Exam;
 use App\Models\Examresult;
 use App\Models\Examsession;
+use App\Models\Examtracker;
 use App\Models\Examtype;
 use App\Models\Packagequestion;
 use App\Models\Province;
@@ -21,6 +22,7 @@ use App\Models\School;
 use App\Models\Schooltype;
 use App\Models\StudentAnswer;
 use App\Models\Subject;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
@@ -65,6 +67,7 @@ Route::get('/cities/{id}/schools', function (Request $request, $id) {
 Route::get('/test', fn () => Schooltype::withCount('schools')->get());
 
 
+
 Route::post("/token", [ApiAuthController::class, "token"]);
 Route::post("/login", [ApiAuthController::class, "login"]);
 Route::post("/register", [ApiAuthController::class, "register"]);
@@ -91,6 +94,17 @@ Route::get('/questions', function (Request $request) {
 });
 
 
+Route::get('/{id}/rank', function (Request $request, $id) {
+    /**  @var App/Models/Student $student  */
+
+    return Examresult::where('exam_id', $id)
+        ->orderBy('grade', 'DESC')
+        ->with(
+            'student',
+        )
+        ->get();
+});
+
 
 Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' => 'students'], function () {
 
@@ -109,7 +123,12 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             /**  @var App/Models/Student $student  */
             $student = $request->user()->student;
 
-            $student->classrooms()->attach(Classroom::findOrFail($request->classroom));
+            $classroom = Classroom::findOrFail($request->classroom);
+
+            if (!$student->classrooms()->where('classrooms.id', $classroom->id)->exists()) {
+                $student->classrooms()->attach($classroom);
+            }
+
 
             return $student->classrooms;
         });
@@ -147,27 +166,23 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $events  = collect([]);
 
             $now = now();
-            $classrooms =  $classrooms = $student->classrooms()->whereHas(
-                'exams.examsessions',
-                fn ($e) => $e->where('close_at', '>', $now)
-            );
+
+            $classrooms = $student->classrooms();
+
             foreach ($classrooms->get() as $classroom) {
 
-                $checkexam = $classroom->exams()->whereHas(
-                    'examsessions',
-                    fn ($e) => $e->where('close_at', '>', $now)
-                );
 
-                foreach ($checkexam->get() as $exam) {
-                    $events  = $events->merge(
-                        $exam->examsessions()
-                            ->with('exam.teacher', 'exam.subject', 'exam.classrooms')
-                            ->get()
-                    );
-                }
+
+                $data = $classroom->exams()->with(["examsessions" => function ($q) use ($now) {
+                    $q->where('close_at', '>', $now);
+                }])->get();
+
+                // return ;
+
+                $events->push($data->map(fn ($e) => $e->examsessions)->flatten());
             }
 
-            return $events->all();
+            return $events->flatten();
         });
     });
     Route::group(['prefix' => 'exams'], function () {
@@ -201,26 +216,59 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             if (!$examsession->token == $request->token) {
                 return ['message' => 'wrong'];
             }
+
+            $examtracker = Examtracker::firstOrCreate([
+                'exam_id' => $exam->id,
+                'student_id' => $student->id,
+                'examsession_id' => $examsession->id,
+            ]);
+
             if ($examresult = Examresult::where('examsession_id', $request->examsession)
                 ->where('student_id', $student->id)
                 ->where('exam_id', $exam->id)->exists()
             ) {
-                return ['message' => 'already reported'];
+                return ['message' => 'already reported', 'examtracker' => $examtracker];
             }
 
-            $examresult = new Examresult();
-
-            $examresult->examsession_id = $examsession->id;
-
-            $examresult->start_at = now();
-
-            $examresult->student_id = $student->id;
-
-            $examresult->exam_id = $exam->id;
+            $examresult = Examresult::firstOrCreate([
+                'examsession_id' => $examsession->id,
+                'student_id' => $student->id,
+                'exam_id' => $exam->id
+            ]);
 
             $examresult->save();
 
-            return ['message' => 'saved'];
+
+
+            return ['message' => 'saved', 'examtracker' => Examtracker::find($examtracker->id)];
+        });
+
+        Route::post('{id}/heartbeat', function (Request $request, $id) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+
+
+            $exam = Exam::findOrFail($id);
+
+            $examsession = Examsession::findOrFail($request->examsession);
+
+
+            $examtracker = Examtracker::firstOrCreate([
+                'exam_id' =>   $exam->id,
+                'student_id' =>   $student->id,
+                'examsession_id' =>   $examsession->id,
+            ]);
+
+            $now = now();
+
+            $examtracker->increment('minute_passed');
+
+            $examtracker->last_activity = $now;
+
+            $examtracker->save();
+
+            return ['message' => 'recorded', 'examtracker' => $examtracker];
         });
         Route::post('{id}/finish', function (Request $request, $id) {
             /**  @var App/Models/Student $student  */
@@ -319,7 +367,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                     'exam.examtype',
                     'exam.supervisors',
                     'studentanswers',
-                    'studentanswers',
                     'student',
                     'examsession'
                 )
@@ -327,22 +374,39 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
 
 
+
+
+
         Route::post('/submitanswer', function (Request $request) {
             /**  @var App/Models/Student $student  */
             $student = $request->user()->student;
+
             $examsession = Examsession::findOrFail($request->examsession);
+
+            $exam = $examsession->exam;
+
+            $examtracker = Examtracker::where([
+                'exam_id' =>  $request->exam,
+                'student_id' =>   $student->id,
+                'examsession_id' =>   $examsession->id,
+            ])->firstOrFail();
+
             if (!now()->between($examsession->open_at, $examsession->close_at)) {
-                return ['message' => 'session is over'];
+                return ['message' => 'Sesi elah berakhir'];
             }
 
             if (!$examsession->token == $request->token) {
-                return ['message' => 'wrong'];
+                return ['message' => 'Token salah'];
+            }
+
+            if ($examtracker->minute_passed > $exam->time_limit) {
+                return ['message' => 'Waktu anda sudah habis !'];
             }
 
             $answer  = StudentAnswer::firstOrCreate([
                 'question_id' => $request->question,
                 'student_id' => $student->id,
-                'exam_id' => $request->exam,
+                'exam_id' => $exam->id,
                 'examsession_id' => $request->examsession,
             ]);
 
@@ -385,28 +449,19 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $now = now();
 
-            $classrooms = $teacher->classrooms()->whereHas(
-                'exams.examsessions',
-                fn ($e) => $e->where('close_at', '>', $now)
-            );
+            $classrooms = $teacher->classrooms();
 
             foreach ($classrooms->get() as $classroom) {
+                $data = $classroom->exams()->with(["examsessions" => function ($q) use ($now) {
+                    $q->latest()->where('close_at', '>', $now);
+                }])->get();
 
-                $checkexam = $classroom->exams()->whereHas(
-                    'examsessions',
-                    fn ($e) => $e->where('close_at', '>', $now)
-                );
+                // return ;
 
-                foreach ($checkexam->get() as $exam) {
-                    $events  = $events->merge(
-                        $exam->examsessions()
-                            ->with('exam.teacher', 'exam.subject', 'exam.classrooms')
-                            ->get()
-                    );
-                }
+                $events->push($data->map(fn ($e) => $e->examsessions)->flatten());
             }
 
-            return $events->all();
+            return $events->flatten();
         });
     });
 
@@ -458,12 +513,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $exam->name = $request->name;
             $exam->examtype_id = $request->examtype;
-            $exam->code = $request->code;
-            $exam->kkm = $request->kkm;
             $exam->hint = $request->hint;
-            $exam->code = $request->code;
             $exam->description = $request->description;
-
+            $exam->time_limit = $request->time_limit ?? 120;
             $educationyear = explode('/', $request->educationyear);
             $exam->education_year_start = $educationyear[0];
             $exam->education_year_end =  $educationyear[1];
@@ -476,11 +528,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $examsessions = [];
             foreach ($request->examsessions as $examsessionData) {
-                // Sat May 01 2021 01:44:50 GMT+0700 (Waktu Indonesia Barat)
                 $examsession = new Examsession();
                 $examsession->name = $examsessionData['name'];
-                $examsession->open_at = Carbon::createFromFormat('D M d Y H:i:s e+',  $examsessionData['open_at']);
-                $examsession->close_at = Carbon::createFromFormat('D M d Y H:i:s e+',  $examsessionData['close_at']);
+                $examsession->open_at = Carbon::createFromFormat("Y-m-d H:i",  $examsessionData['open_at']);
+                $examsession->close_at = Carbon::createFromFormat("Y-m-d H:i",  $examsessionData['close_at']);
                 $examsession->token = $examsessionData['token'];
                 $examsessions[] = $examsession;
             }
@@ -511,12 +562,29 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
             return $teacher->school()->with(
-                'teachers.school',
-                'students.school',
-                'teachers.province',
-                'students.province',
-                'schooltype',
+                'teachers',
+                'students',
             )->get();
+        });
+
+
+        Route::put('/subjects/{id}', function (Request $request, $id) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            $subject = $teacher->school->subjects()->where('subjects.id', $id)->firstOrFail();
+
+            $subject->pivot->kkm = $request->kkm;
+
+            $subject->pivot->save();
+
+            return ['message' => 'success'];
+        });
+
+        Route::get('/subjects/{id}', function (Request $request, $id) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+            return $teacher->school()->subjects()->where('subjects.id', $id)->firstOrFail();
         });
     });
 
@@ -526,15 +594,20 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
 
+            $classrooms =  $teacher->classrooms();
             if ($request->withExtra) {
-                return $teacher->classrooms()->with(
+                $classrooms = $classrooms->with(
                     'teacher',
                     'subject',
                     'students',
-                )->get();
-            } else {
-                return $teacher->classrooms;
+                );
             }
+
+            if ($request->subjects) {
+                $classrooms = $classrooms->where('subject_id', $request->subject);
+            }
+
+            return $classrooms->get();
         });
 
         Route::get('/all', function (Request $request) {
@@ -573,6 +646,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::get('/', function (Request $request) {
 
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
             $questions = (new Question())->with(
                 'classtypes',
                 'classtypes.schooltype',
@@ -580,6 +656,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             if ($request->classtypes) {
                 $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes));
+            } else {
+                $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $teacher->school->classtypes->map(fn ($e) => $e->id)));
             }
             if ($request->subject) {
                 $questions =  $questions->where('subject_id', $request->subject);

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateExamresultsTable extends Migration
+class CreateExamtrackersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,13 @@ class CreateExamresultsTable extends Migration
      */
     public function up()
     {
-        Schema::create('examresults', function (Blueprint $table) {
+        Schema::create('examtrackers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('exam_id')->constrained();
             $table->foreignId('student_id')->constrained();
             $table->foreignId('examsession_id')->constrained();
-            $table->timestamp('start_at')->useCurrent();
-            $table->timestamp('finish_at')->nullable();
-            $table->float('grade', unsigned: true)->default(0);
-            $table->boolean('is_proccessed')->default(false);
+            $table->timestamp('last_activity')->useCurrent();
+            $table->unsignedBigInteger('minute_passed')->default(0);
             $table->timestamps();
         });
     }
@@ -33,6 +31,6 @@ class CreateExamresultsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('examresults');
+        Schema::dropIfExists('examtrackers');
     }
 }

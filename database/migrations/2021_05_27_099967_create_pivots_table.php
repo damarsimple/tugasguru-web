@@ -71,15 +71,6 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
-
-        Schema::create('classroom_exam', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('exam_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
-
-
         Schema::create('exam_question', function (Blueprint $table) {
             $table->id();
             $table->foreignId('exam_id')->index()->constrained()->onDelete('cascade');

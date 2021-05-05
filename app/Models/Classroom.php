@@ -12,6 +12,7 @@ class Classroom extends Model
 {
     use HasFactory;
 
+    public $with = ['classtype'];
     public function students(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Student');
@@ -30,5 +31,10 @@ class Classroom extends Model
     public function exams(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Exam');
+    }
+
+    public function classtype(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Classtype');
     }
 }

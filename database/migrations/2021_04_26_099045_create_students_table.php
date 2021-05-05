@@ -16,7 +16,7 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->index()->constrained();
-            $table->foreignId('paprent_id')
+            $table->foreignId('parent_id')
                 ->nullable()
                 ->constrained()
                 ->references('id')

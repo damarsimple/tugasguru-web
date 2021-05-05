@@ -12,6 +12,8 @@ class School extends Model
 {
     use HasFactory;
 
+    public $with = ['subjects', 'schooltype'];
+
     public function teachers(): HasMany
     {
         return $this->hasMany('App\Models\Teacher');
@@ -43,7 +45,7 @@ class School extends Model
 
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Subject');
+        return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');
     }
 
     public function classtypes(): BelongsToMany

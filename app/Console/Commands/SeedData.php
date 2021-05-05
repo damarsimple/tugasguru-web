@@ -66,6 +66,7 @@ class SeedData extends Command
             'UAS',
             'QUIZ',
             'Ulangan Harian',
+            'Remedial'
         ];
 
 

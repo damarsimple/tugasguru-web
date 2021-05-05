@@ -12,6 +12,8 @@ class Exam extends Model
 {
     use HasFactory;
 
+    public $with = ['teacher', 'subject', 'examtype'];
+    
     public function examsessions(): HasMany
     {
         return $this->hasMany('App\Models\Examsession');
@@ -32,9 +34,9 @@ class Exam extends Model
         return $this->belongsTo('App\Models\Subject');
     }
 
-    public function classrooms(): BelongsToMany
+    public function classroom(): BelongsTo
     {
-        return $this->belongsToMany('App\Models\Classroom');
+        return $this->belongsTo('App\Models\Classroom');
     }
 
     public function supervisors(): BelongsToMany
@@ -52,7 +54,7 @@ class Exam extends Model
 
     public function examtype(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Exam');
+        return $this->belongsTo('App\Models\Examtype');
     }
 
     public function teacher(): BelongsTo
