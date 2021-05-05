@@ -833,7 +833,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
 
-            $subject = $teacher->school->subjects()->where('subjects.id', $id)->firstOrFail();
+            $subject = $teacher->subjects()->where('subjects.id', $id)->firstOrFail();
 
             $subject->pivot->kkm = $request->kkm;
 
