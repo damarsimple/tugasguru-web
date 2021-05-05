@@ -386,7 +386,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             ])->firstOrFail();
 
             if (!now()->between($examsession->open_at, $examsession->close_at)) {
-                return ['message' => 'Sesi elah berakhir'];
+                return ['message' => 'Sesi telah berakhir atau belum dibuka'];
             }
 
             if (!$examsession->token == $request->token) {
