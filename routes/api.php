@@ -194,16 +194,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $exam = Exam::findOrFail($id);
 
-            $check = false;
-
-            foreach ($exam->classrooms as $classroom) {
-                if ($classroom->students()->where('students.id', $student->id)->exists()) {
-                    $check = true;
-                    break;
-                }
-            }
-
-            if (!$check) {
+            if (!$exam->classroom->students()->where('students.id', $student->id)->exists()) {
                 return response(['message' => 'Anda Tidak Memiliki Akses ulangan ini !'], 401);
             }
 
