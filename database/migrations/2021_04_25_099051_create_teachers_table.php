@@ -15,8 +15,8 @@ class CreateTeachersTable extends Migration
     {
         Schema::create('teachers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index()->constrained();
-            $table->foreignId('school_id')->nullable()->index()->constrained();
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('school_id')->nullable()->index()->constrained()->onDelete('cascade');
             $table->string('specialty')->nullable();
             $table->string('academic_degree')->nullable();
             $table->boolean('is_bimbel')->default(false);

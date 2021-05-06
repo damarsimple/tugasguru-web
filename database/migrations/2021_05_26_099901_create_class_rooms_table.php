@@ -15,10 +15,10 @@ class CreateClassRoomsTable extends Migration
     {
         Schema::create('classrooms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher_id')->constrained();
-            $table->foreignId('classtype_id')->constrained();
-            $table->foreignId('school_id')->constrained();
-            $table->foreignId('subject_id')->constrained();
+            $table->foreignId('teacher_id')->constrained()->onDelete('cascade');
+            $table->foreignId('classtype_id')->constrained()->onDelete('cascade');
+            $table->foreignId('school_id')->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->timestamps();
         });

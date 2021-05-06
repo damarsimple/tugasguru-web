@@ -15,14 +15,14 @@ class CreateStudentsTable extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index()->constrained();
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('parent_id')
                 ->nullable()
-                ->constrained()
+                ->constrained()->onDelete('cascade')
                 ->references('id')
                 ->on('users');
             $table->bigInteger('nisn');
-            $table->foreignId('school_id')->index()->constrained();
+            $table->foreignId('school_id')->index()->constrained()->onDelete('cascade');
             $table->string('specialty')->nullable();
             $table->string('academic_degree')->nullable();
             $table->timestamps();

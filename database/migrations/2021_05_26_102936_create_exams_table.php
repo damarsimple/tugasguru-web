@@ -16,10 +16,10 @@ class CreateExamsTable extends Migration
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('subject_id')->constrained();
-            $table->foreignId('examtype_id')->constrained();
-            $table->foreignId('classroom_id')->constrained();
-            $table->foreignId('teacher_id')->constrained();
+            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
+            $table->foreignId('examtype_id')->constrained()->onDelete('cascade');
+            $table->foreignId('classroom_id')->constrained()->onDelete('cascade');
+            $table->foreignId('teacher_id')->constrained()->onDelete('cascade');
             $table->longText('description')->nullable();
             $table->longText('hint')->nullable();
             $table->boolean('is_odd_semester')->default(true);

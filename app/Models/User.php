@@ -80,9 +80,14 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Models\Teacher');
     }
-    
+
     public function attachments(): HasMany
     {
         return $this->hasMany('App\Models\Attachment');
+    }
+
+    public function articles(): HasMany
+    {
+        return $this->hasMany('App\Models\Article');
     }
 }

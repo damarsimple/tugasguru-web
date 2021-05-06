@@ -55,4 +55,9 @@ class Teacher extends Model
     {
         return $this->hasMany('App\Models\Packagequestion');
     }
+
+    public function articles(): HasMany
+    {
+        return $this->hasMany('App\Models\Article');
+    }
 }

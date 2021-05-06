@@ -19,9 +19,9 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->longText('address')->nullable();
-            $table->foreignId('province_id')->index()->constrained();
-            $table->foreignId('city_id')->index()->constrained();
-            $table->foreignId('district_id')->index()->constrained();
+            $table->foreignId('province_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('city_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('district_id')->index()->constrained()->onDelete('cascade');
             $table->string('phone')->nullable();
             $table->integer('gender')->nullable();
             $table->string('password');

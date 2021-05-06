@@ -15,8 +15,8 @@ class CreateQuestionsTable extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher_id')->index()->constrained();
-            $table->foreignId('subject_id')->index()->constrained();
+            $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->boolean('editable')->default(true);
             $table->enum('type', ['MULTI_CHOICE', 'ESSAY', 'FILLER']);
             $table->longText('content');

@@ -15,10 +15,14 @@ class CreateArticlesTable extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index()->constrained();
+            $table->foreignId('user_id')->nullable()->index()->constrained()->onDelete('cascade');
+            $table->foreignId('school_id')->nullable()->index()->constrained()->onDelete('cascade');
+            $table->foreignId('teacher_id')->nullable()->index()->constrained()->onDelete('cascade');
             $table->string('name');
+            $table->string('slug')->nullable();
             $table->longText('content');
             $table->boolean('is_paid')->default(false);
+            $table->string('role')->nullable();
             $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');
             $table->timestamps();
         });

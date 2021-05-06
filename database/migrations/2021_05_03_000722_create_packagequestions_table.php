@@ -16,8 +16,8 @@ class CreatePackagequestionsTable extends Migration
         Schema::create('packagequestions', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->foreignId('teacher_id')->index()->constrained();
-            $table->foreignId('subject_id')->index()->constrained();
+            $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->boolean('editable')->default(true);
             $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');
             $table->timestamps();

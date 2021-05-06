@@ -16,7 +16,7 @@ class CreateAnswersTable extends Migration
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
             $table->longText('content');
-            $table->foreignId('question_id')->constrained();
+            $table->foreignId('question_id')->constrained()->onDelete('cascade');
             $table->boolean('is_correct')->default(false);
             $table->timestamps();
         });

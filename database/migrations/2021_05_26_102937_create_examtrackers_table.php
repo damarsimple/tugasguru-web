@@ -15,9 +15,9 @@ class CreateExamtrackersTable extends Migration
     {
         Schema::create('examtrackers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('exam_id')->constrained();
-            $table->foreignId('student_id')->constrained();
-            $table->foreignId('examsession_id')->constrained();
+            $table->foreignId('exam_id')->constrained()->onDelete('cascade');
+            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            $table->foreignId('examsession_id')->constrained()->onDelete('cascade');
             $table->timestamp('last_activity')->useCurrent();
             $table->unsignedBigInteger('minute_passed')->default(0);
             $table->timestamps();

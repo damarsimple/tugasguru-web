@@ -15,12 +15,12 @@ class CreateStudentAnswersTable extends Migration
     {
         Schema::create('student_answers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('answer_id')->nullable()->constrained();
-            $table->foreignId('examresult_id')->nullable()->constrained();
-            $table->foreignId('question_id')->constrained();
-            $table->foreignId('student_id')->constrained();
-            $table->foreignId('exam_id')->constrained();
-            $table->foreignId('examsession_id')->constrained();
+            $table->foreignId('answer_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('examresult_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('question_id')->constrained()->onDelete('cascade');
+            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            $table->foreignId('exam_id')->constrained()->onDelete('cascade');
+            $table->foreignId('examsession_id')->constrained()->onDelete('cascade');
             $table->string('content')->nullable();
             $table->boolean('is_correct')->default(false);
             $table->boolean('is_proccessed')->default(false);

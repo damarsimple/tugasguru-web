@@ -17,7 +17,7 @@ class CreateExamsessionsTable extends Migration
         Schema::create('examsessions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('exam_id')->constrained();
+            $table->foreignId('exam_id')->constrained()->onDelete('cascade');
             $table->timestamp('open_at')->nullable();
             $table->timestamp('close_at')->nullable();
             $table->string('token');

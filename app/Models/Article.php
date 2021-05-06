@@ -6,14 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Article extends Model
 {
     use HasFactory;
 
+    public const THUMBNAIL = 'THUMBNAIL';
+    public const ANNOUNCEMENT = 'ANNOUNCEMENT';
+    public const THEORY = 'THEORY';
+
+    public $with = ['user', 'teacher', 'subjects', 'classtypes', 'price', 'thumbnail'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo('App\Models\User');
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Teacher');
     }
 
     public function price()
@@ -23,7 +35,7 @@ class Article extends Model
 
     public function thumbnail()
     {
-        return $this->morphOne('App\Models\Attachment', 'attachable');
+        return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::THUMBNAIL);
     }
 
     public function subjects(): BelongsToMany

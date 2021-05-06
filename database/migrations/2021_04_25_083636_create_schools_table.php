@@ -18,10 +18,10 @@ class CreateSchoolsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('npsn')->unique();
-            $table->foreignId('province_id')->index()->constrained();
-            $table->foreignId('city_id')->index()->constrained();
-            $table->foreignId('district_id')->index()->constrained();
-            $table->foreignId('schooltype_id')->index()->constrained();
+            $table->foreignId('province_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('city_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('district_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('schooltype_id')->index()->constrained()->onDelete('cascade');
             $table->string('address');
             $table->longText('description')->nullable();
             $table->string('latitude')->nullable();

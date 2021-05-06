@@ -5,6 +5,7 @@ use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
 use App\Models\Answer;
+use App\Models\Article;
 use App\Models\Attachment;
 use App\Models\City;
 use App\Models\Classroom;
@@ -16,6 +17,7 @@ use App\Models\Examsession;
 use App\Models\Examtracker;
 use App\Models\Examtype;
 use App\Models\Packagequestion;
+use App\Models\Price;
 use App\Models\Province;
 use App\Models\Question;
 use App\Models\School;
@@ -76,21 +78,8 @@ Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'r
 
 Route::get('/attachments/{id}', fn ($id) => Attachment::findOrFail($id));
 
-Route::get('/questions', function (Request $request) {
-    $questions = (new Question())->with('classtypes', 'classtypes.schooltype', 'subjects');
-
-    if ($request->classtypes) {
-        return  $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes))->get();
-    }
-    if ($request->subjects) {
-        $questions =  $questions->whereHas('subjects', fn ($q) => $q->whereIn('subject_id', $request->subjects));
-    }
-
-    if ($request->schooltypes) {
-        $questions =  $questions->whereHas('classtypes.schooltype', fn ($q) => $q->whereIn('schooltype_id', $request->schooltypes));
-    }
-
-    return $questions->paginate(10);
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'articles'], function () {
+    Route::get('{slug}', fn ($slug) => Article::where('slug', $slug)->firstOrFail());
 });
 
 
@@ -463,6 +452,49 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
     });
 
+    Route::group(['prefix' => 'theories'], function () {
+
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            // $teacher = $request->user()->teacher;
+            return Article::latest()->where('role', Article::THEORY)->paginate(10);
+        });
+        Route::post('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+            $article = new Article();
+            $article->name = $request->name;
+            $article->content = $request->content;
+            $article->is_paid = $request->is_paid;
+            $article->visibility = $request->visibility;
+            $article->user_id = $user->id;
+            $article->role = Article::THEORY;
+            $article->school_id = $request?->school ?? $teacher?->school?->id;
+            $teacher->articles()->save($article);
+
+            if ($article->is_paid) {
+                $price = new Price();
+                $price->price = $request->price;
+
+                $article->price()->save($price);
+            }
+
+
+            $thumbnail = Attachment::findOrFail($request->thumbnail);
+
+            $thumbnail->role = Article::THUMBNAIL;
+
+            $thumbnail->attachable()->associate($article)->save();
+
+            $thumbnail->save();
+
+            return ['message' => 'ok'];
+        });
+    });
+
+
+
     Route::group(['prefix' => 'schooltypes'], function () {
         Route::get('/', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
@@ -548,7 +580,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'schools'], function () {
 
-        Route::get('/fulltime', function (Request $request) {
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            return $teacher->schools;
         });
 
         Route::get('/teachers', function (Request $request) {
@@ -560,10 +596,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/myschool', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
-            return $teacher->school()->with(
-                'teachers',
-                'students',
-            )->get();
+            return $teacher->school;
         });
 
         Route::get('/subjects/{id}', function (Request $request, $id) {
@@ -622,6 +655,29 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $classroom->classtype_id = $request->classtype_id;
             $classroom->subject_id = $request->subject_id;
             $school->classrooms()->save($classroom);
+        });
+
+        Route::delete('/{id}', function (Request $request, $id) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            $teacher->classrooms()->where('id', $id)->firstOrFail()->delete();
+
+            return ['message' => 'ok'];
+        });
+        Route::put('/{id}', function (Request $request, $id) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            $classroom = $teacher->classrooms()->where('id', $id)->firstOrFail();
+
+            $classroom->name = $request->name;
+
+            $classroom->subject_id = $request->subject;
+
+            $classroom->save();
+
+            return ['message' => 'ok'];
         });
     });
 
@@ -837,6 +893,16 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $subject->pivot->kkm = $request->kkm;
 
             $subject->pivot->save();
+
+            return ['message' => 'success'];
+        });
+
+
+        Route::delete('/{id}', function (Request $request, $id) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            $teacher->subjects()->detach([$id]);
 
             return ['message' => 'success'];
         });
