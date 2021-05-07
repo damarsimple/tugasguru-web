@@ -702,8 +702,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/School $school  */
             $school = $teacher->school;
 
+
+            if (Classroom::where(['teacher_id' => $teacher->id, 'name' => $request->name])->exists()) {
+                return ['message' => 'exists'];
+            }
+
             $classroom = new Classroom();
-            $classroom->name = "Kelas " . $request->classtype_level . " " .  $request->name;
+            $classroom->name = $request->name;
             $classroom->teacher_id = $teacher->id;
             $classroom->classtype_id = $request->classtype_id;
             $classroom->subject_id = $request->subject_id;
@@ -724,11 +729,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $classroom = $teacher->classrooms()->where('id', $id)->firstOrFail();
 
-            $classroom->name = $request->name;
-
             $classroom->subject_id = $request->subject;
 
-            $classroom->save();
+            $classroom->name = $request->name;
+
+            $classroom->save(); 
 
             return ['message' => 'ok'];
         });

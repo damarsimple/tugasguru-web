@@ -37,4 +37,9 @@ class Classroom extends Model
     {
         return $this->belongsTo('App\Models\Classtype');
     }
+
+    public function getNameFormattedAttribute()
+    {
+        return "Kelas "  . $this->classtype->level . " $this->name";
+    }
 }
