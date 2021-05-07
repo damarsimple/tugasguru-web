@@ -51,6 +51,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public const PROFILEPICTURE = 'PROFILEPICTURE';
+
     public function province(): BelongsTo
     {
         return $this->belongsTo('App\Models\Province');
@@ -89,5 +91,31 @@ class User extends Authenticatable
     public function articles(): HasMany
     {
         return $this->hasMany('App\Models\Article');
+    }
+
+
+    // public function getEmailAttribute()
+    // {
+    //     $hiddenAttribute = json_decode($this->hidden_attribute);
+
+    //     if (!$hiddenAttribute || !is_array($hiddenAttribute)) return $this->email;
+
+    //     if (in_array('EMAIL', $hiddenAttribute)) return null;
+
+    //     return $this->email;
+    // }
+    // public function getPhoneAttribute()
+    // {
+    //     $hiddenAttribute = json_decode($this->hidden_attribute);
+
+    //     if (!$hiddenAttribute || !is_array($hiddenAttribute)) return $this->phone;
+
+    //     if (in_array('PHONE', $hiddenAttribute)) return null;
+
+    //     return $this->phone;
+    // }
+    public function profilepicture()
+    {
+        return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::PROFILEPICTURE);
     }
 }

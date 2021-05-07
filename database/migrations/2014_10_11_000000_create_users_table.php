@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->integer('gender')->nullable();
             $table->string('password');
             $table->string('roles');
+            $table->json('hidden_attribute')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

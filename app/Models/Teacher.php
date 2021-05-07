@@ -60,4 +60,24 @@ class Teacher extends Model
     {
         return $this->hasMany('App\Models\Article');
     }
+
+    public function followerstudents(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Student')->wherePivot('is_accepted', true);
+    }
+
+    public function requestfollowerstudents(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Student')->wherePivot('is_accepted', false);
+    }
+
+
+    public function followerteachers(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Teacher ')->wherePivot('is_accepted', true);
+    }
+    public function requestfollowerteachers(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Teacher ')->wherePivot('is_accepted', true);
+    }
 }

@@ -127,7 +127,6 @@ class CreatePivotsTable extends Migration
                 $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
                 $table->foreignId('student_id')->index()->constrained()->onDelete('cascade');
                 $table->boolean('is_accepted')->default(false);
-                $table->boolean('is_rejected')->default(false);
                 $table->timestamps();
             });
         }

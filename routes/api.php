@@ -25,6 +25,7 @@ use App\Models\Schooltype;
 use App\Models\StudentAnswer;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
@@ -94,9 +95,56 @@ Route::get('/{id}/rank', function (Request $request, $id) {
         ->get();
 });
 
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], function () {
 
+    Route::put('/settings', function (Request $request) {
+        /**  @var App/Models/User $user  */
+        $user = $request->user;
+        $user->name = $request->name;
+        $user->address = $request->address;
+        $user->phone = $request->phone;
+        $user->gender = $request->gender;
+
+        if ($request->hidden_attribute) {
+            $user->hidden_attribute = json_encode($request->hidden_attribute);
+        }
+
+        if ($request->profilepicture) {
+
+            $user->profilepicture?->delete();
+
+            $profilepicture = Attachment::findOrFail($request->profilepicture);
+            $profilepicture->role = User::PROFILEPICTURE;
+            $user->profilepicture()->save($profilepicture);
+        }
+
+
+        $user->save();
+    });
+});
 Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' => 'students'], function () {
 
+    Route::group(['prefix' => 'posts'], function () {
+
+        Route::get('/', function (Request $request) {
+            return  Article::latest()->where('role', Article::POST)->paginate(10);
+        });
+
+        Route::post('/', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $user = $request->user();
+            $student = $user->student;
+            $article = new Article();
+            $article->name = $request->name;
+            $article->content = $request->content;
+            $article->visibility = 'PUBLIK';
+            $article->user_id = $user->id;
+            $article->role = Article::POST;
+            $article->school_id = $request?->school ?? $student?->school?->id;
+            $student->articles()->save($article);
+            return ['message' => 'ok'];
+        });
+    });
     Route::group(['prefix' => 'classrooms'], function () {
         Route::get('/', function (Request $request) {
             /**  @var App/Models/Student $student  */
@@ -131,6 +179,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             return $student->school->classrooms;
         });
     });
+
     Route::group(['prefix' => 'schools'], function () {
         Route::get('/', function (Request $request) {
             /**  @var App/Models/Student $student  */
@@ -297,10 +346,15 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $exam = Exam::findOrFail($id);
 
             $check = $exam->classroom->students()->where('students.id', $student->id)->exists();
+            $examresult = Examresult::where('student_id', $student->id)
+                ->where('exam_id', $exam->id)->first();
 
+            if ($examresult?->finish_at) {
+                return response(['message' => 'Anda sudah mengerjakan ujian ini'], 401);
+            }
 
             if (!$check) {
-                return response(['message' => 'Anda Tidak Memiliki Akses ulangan ini !'], 401);
+                return response(['message' => 'Anda Tidak Memiliki Akses ujian ini !'], 401);
             }
 
             $exam = $exam
@@ -418,6 +472,81 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
 
+
+    Route::group(['prefix' => 'follows'], function () {
+
+        Route::get('/myfollower', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            return $teacher->followerstudents->merge($teacher->followerteachers);
+        });
+
+        Route::post('/accept', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            if ($request->candidatestudent) {
+                $reqstudents = $teacher->requestfollowerstudents();
+
+                if (is_array($request->candidatestudent)) {
+                    $reqstudents = $reqstudents->whereIn('id', $request->candidatestudent);
+                } else {
+                    $reqstudents = $reqstudents->where('id', $request->candidatestudent);
+                }
+                $reqstudents->update(['is_accepted' => true]);
+            }
+
+            $reqstudents->update(['is_accepted' => true]);
+
+            if ($request->candidateteacher) {
+                $reqteacher = $teacher->requestfollowerteachers();
+                if (is_array($request->candidateteacher)) {
+                    $reqteacher = $reqteacher->whereIn('id', $request->candidateteacher);
+                } else {
+                    $reqteacher = $reqteacher->where('id', $request->candidateteacher);
+                }
+                $reqteacher->update(['is_accepted' => true]);
+            }
+
+            return ['message' => 'ok'];
+        });
+
+
+        Route::get('/reqfollower', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+            return $teacher->requestfollowerstudents->merge($teacher->requestfollowerteachers);
+        });
+    });
+
+
+    Route::group(['prefix' => 'posts'], function () {
+
+        Route::get('/', function (Request $request) {
+            return  Article::latest()->where('role', Article::POST)->paginate(10);
+        });
+
+        Route::post('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+            $article = new Article();
+            $article->name = $request->name;
+            $article->content = $request->content;
+            $article->visibility = 'PUBLIK';
+            $article->user_id = $user->id;
+            $article->role = Article::POST;
+            $article->school_id = $request?->school ?? $teacher?->school?->id;
+            $teacher->articles()->save($article);
+            return ['message' => 'ok'];
+        });
+    });
+
+
     Route::group(['prefix' => 'events'], function () {
 
         Route::get('/', function (Request $request) {
@@ -463,20 +592,24 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/User $teacher  */
             $teacher = $request->user()->teacher;
             return Article::latest()
-                ->where('school_id', $request->school ?? $teacher->school->id)
-                ->orWhere('role', Article::ANNOUNCEMENT)
-                ->orWhere('role', Article::THEORY)
+                ->where('role', Article::POST)
                 ->paginate(10);
         });
     });
+
+
 
     Route::group(['prefix' => 'announcements'], function () {
 
         Route::get('/', function (Request $request) {
             /**  @var App/Models/User $teacher  */
             $teacher = $request->user()->teacher;
-            return Article::latest()->where('school_id', $teacher->school->id)->where('role', Article::ANNOUNCEMENT)->paginate(10);
+            return Article::latest()
+                ->where('school_id', $teacher?->school?->id)
+                ->where('role', Article::ANNOUNCEMENT)
+                ->paginate(10);
         });
+
         Route::post('/', function (Request $request) {
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
@@ -733,7 +866,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $classroom->name = $request->name;
 
-            $classroom->save(); 
+            $classroom->save();
 
             return ['message' => 'ok'];
         });
@@ -753,8 +886,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 'classtypes.schooltype',
             );
 
-            if ($request->classtypes) {
-                $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes));
+            if ($request->classtype) {
+                $questions =  $questions->whereHas('classtypes', fn ($q) => $q->where('classtype_id', $request->classtype));
             } else {
                 $questions =  $questions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $teacher->school->classtypes->map(fn ($e) => $e->id)));
             }
@@ -784,26 +917,31 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::get('/package', function (Request $request) {
 
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+
             $packagequestions = (new Packagequestion())->with(
                 'questions.classtypes',
                 'questions.classtypes.schooltype',
             );
 
-            if ($request->classtypes) {
-                $packagequestions =  $packagequestions->whereHas('questions.classtypes', fn ($q) => $q->whereIn('classtype_id', $request->classtypes));
+            if ($request->classtype) {
+                $packagequestions =  $packagequestions->whereHas('classtypes', fn ($q) => $q->where('classtype_id', $request->classtype));
+            } else {
+                $packagequestions =  $packagequestions->whereHas('classtypes', fn ($q) => $q->whereIn('classtype_id', $teacher->school->classtypes->map(fn ($e) => $e->id)));
             }
             if ($request->subject) {
                 $packagequestions =  $packagequestions->where('subject_id', $request->subject);
             }
 
             if ($request->schooltypes) {
-                $packagequestions =  $packagequestions->whereHas('questions.classtypes.schooltype', fn ($q) => $q->whereIn('schooltype_id', $request->schooltypes));
+                $packagequestions =  $packagequestions->whereHas('classtypes.schooltype', fn ($q) => $q->whereIn('schooltype_id', $request->schooltypes));
             }
 
             if ($request->type) {
-                $packagequestions =  $packagequestions->where('questions.type', $request->type);
+                $packagequestions =  $packagequestions->where('type', $request->type);
             }
-
             if ($request->visibility) {
                 if ($request->visibility == "SELECTPEOPLE") {
                 } else if ($request->visibility == "") {

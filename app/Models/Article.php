@@ -15,10 +15,11 @@ class Article extends Model
     public const THUMBNAIL = 'THUMBNAIL';
     public const ANNOUNCEMENT = 'ANNOUNCEMENT';
     public const THEORY = 'THEORY';
+    public const POST = 'POST';
 
     public $with = ['user', 'teacher', 'subjects', 'classtypes', 'price', 'thumbnail'];
 
-    public function user(): BelongsTo
+    public function user(): BelongsTo   
     {
         return $this->belongsTo('App\Models\User');
     }

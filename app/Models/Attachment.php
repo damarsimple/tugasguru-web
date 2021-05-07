@@ -20,4 +20,9 @@ class Attachment extends Model
     {
         return request()->getSchemeAndHttpHost() . '/attachments/' . $this->name;
     }
+
+    public function getFilePathAttribute()
+    {
+        
+    }
 }
