@@ -474,8 +474,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::get('/', function (Request $request) {
             /**  @var App/Models/User $teacher  */
-            // $teacher = $request->user()->teacher;
-            return Article::latest()->where('role', Article::ANNOUNCEMENT)->paginate(10);
+            $teacher = $request->user()->teacher;
+            return Article::latest()->where('school_id', $teacher->school->id)->where('role', Article::ANNOUNCEMENT)->paginate(10);
         });
         Route::post('/', function (Request $request) {
             /**  @var App/Models/User $teacher  */
