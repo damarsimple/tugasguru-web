@@ -490,13 +490,16 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $article->school_id = $request?->school ?? $teacher?->school?->id;
             $teacher->articles()->save($article);
 
-            $thumbnail = Attachment::findOrFail($request->thumbnail);
+            if ($request->thumbnail) {
+                $thumbnail = Attachment::findOrFail($request->thumbnail);
+                $thumbnail->role = Article::THUMBNAIL;
 
-            $thumbnail->role = Article::THUMBNAIL;
+                $thumbnail->attachable()->associate($article)->save();
 
-            $thumbnail->attachable()->associate($article)->save();
+                $thumbnail->save();
+            }
 
-            $thumbnail->save();
+
 
             return ['message' => 'ok'];
         });
