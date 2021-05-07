@@ -13,6 +13,8 @@ class Classroom extends Model
     use HasFactory;
 
     public $with = ['classtype'];
+
+    public $appends = ['name_formatted'];
     public function students(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Student');
