@@ -42,8 +42,8 @@ class Question extends Model
         return $this->belongsTo('App\Models\Subject');
     }
 
-    public function classtypes(): BelongsToMany
+    public function classtype(): BelongsTo
     {
-        return $this->belongsToMany('App\Models\Classtype');
+        return $this->belongsTo('App\Models\Classtype');
     }
 }

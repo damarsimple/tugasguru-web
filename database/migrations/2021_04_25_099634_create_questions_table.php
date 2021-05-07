@@ -17,6 +17,7 @@ class CreateQuestionsTable extends Migration
             $table->id();
             $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('classtype_id')->index()->constrained()->onDelete('cascade');
             $table->boolean('editable')->default(true);
             $table->enum('type', ['MULTI_CHOICE', 'ESSAY', 'FILLER']);
             $table->longText('content');

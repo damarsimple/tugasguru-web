@@ -10,8 +10,15 @@ class Classtype extends Model
 {
     use HasFactory;
 
+    protected $appends = ['name'];
+    
     public function schooltype() : BelongsTo
     {
         return $this->belongsTo('App\Models\Schooltype');
+    }
+
+    public function getNameAttribute()
+    {
+        return "Kelas " . $this->level;
     }
 }

@@ -32,4 +32,9 @@ class Packagequestion extends Model
     {
         return $this->belongsTo('App\Models\Subject');
     }
+
+    public function classtype(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Classtype');
+    }
 }
