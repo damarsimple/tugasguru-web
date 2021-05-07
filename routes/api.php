@@ -140,7 +140,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                 'schooltype',
                 'students.province',
                 'teachers.province',
-                'teachers.school'
+                'teachers'
             )->first();
         });
     });
@@ -207,7 +207,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                 ->where('student_id', $student->id)
                 ->where('exam_id', $exam->id)->exists()
             ) {
-                return ['message' => 'already reported', 'examtracker' => $examtracker];
+
+                $studentanswers = StudentAnswer::where([
+                    'student_id' => $student->id,
+                    'examsession_id' => $examsession->id,
+                    'exam_id' => $exam->id
+                ])->get();
+                return ['message' => 'already reported', 'examtracker' => $examtracker, 'studentanswers' => $studentanswers];
             }
 
             $examresult = Examresult::firstOrCreate([
@@ -397,7 +403,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                 $answer->is_proccessed = true;
             } else {
                 $answercontent = strip_tags($request->answer);
-                similar_text($answercontent, strip_tags($question->correctanswer->content), $percentage);
+                similar_text(strtolower($answercontent), strtolower(strip_tags($question->correctanswer->content)), $percentage);
                 $answer->is_correct = $percentage > 75;
                 $answer->grade = $percentage;
                 $answer->is_proccessed = false;
@@ -449,6 +455,50 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $attachment =  Upload::handle($files);
 
             return $attachment;
+        });
+    });
+
+    Route::group(['prefix' => 'feeds'], function () {
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $teacher = $request->user()->teacher;
+            return Article::latest()
+                ->where('school_id', $request->school ?? $teacher->school->id)
+                ->orWhere('role', Article::ANNOUNCEMENT)
+                ->orWhere('role', Article::THEORY)
+                ->paginate(10);
+        });
+    });
+
+    Route::group(['prefix' => 'announcements'], function () {
+
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            // $teacher = $request->user()->teacher;
+            return Article::latest()->where('role', Article::ANNOUNCEMENT)->paginate(10);
+        });
+        Route::post('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+            $article = new Article();
+            $article->name = $request->name;
+            $article->content = $request->content;
+            $article->visibility = 'PUBLIK';
+            $article->user_id = $user->id;
+            $article->role = Article::ANNOUNCEMENT;
+            $article->school_id = $request?->school ?? $teacher?->school?->id;
+            $teacher->articles()->save($article);
+
+            $thumbnail = Attachment::findOrFail($request->thumbnail);
+
+            $thumbnail->role = Article::THUMBNAIL;
+
+            $thumbnail->attachable()->associate($article)->save();
+
+            $thumbnail->save();
+
+            return ['message' => 'ok'];
         });
     });
 
@@ -596,7 +646,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/myschool', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
-            return $teacher->school;
+            return $teacher->school()->with('students', 'teachers')->first();
         });
 
         Route::get('/subjects/{id}', function (Request $request, $id) {

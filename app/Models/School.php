@@ -12,7 +12,7 @@ class School extends Model
 {
     use HasFactory;
 
-    public $with = ['subjects', 'schooltype', 'students', 'teachers'];
+    public $with = ['subjects', 'schooltype'];
 
     public function teachers(): HasMany
     {
