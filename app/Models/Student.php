@@ -13,7 +13,7 @@ class Student extends Model
 {
     use HasFactory, TeacherFollowable;
 
-    public $with = ['user'];
+    public $with = ['user', 'school'];
 
     public function school(): BelongsTo
     {

@@ -61,23 +61,13 @@ class Teacher extends Model
         return $this->hasMany('App\Models\Article');
     }
 
-    public function followerstudents(): BelongsToMany
+    public function followers(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Student')->wherePivot('is_accepted', true);
+        return $this->belongsToMany('App\Models\User')->where('is_accepted', true);
     }
 
-    public function requestfollowerstudents(): BelongsToMany
+    public function requestfollow(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Student')->wherePivot('is_accepted', false);
-    }
-
-
-    public function followerteachers(): BelongsToMany
-    {
-        return $this->belongsToMany('App\Models\Teacher ')->wherePivot('is_accepted', true);
-    }
-    public function requestfollowerteachers(): BelongsToMany
-    {
-        return $this->belongsToMany('App\Models\Teacher ')->wherePivot('is_accepted', true);
+        return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
     }
 }

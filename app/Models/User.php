@@ -51,6 +51,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = ['is_followed'];
     public const PROFILEPICTURE = 'PROFILEPICTURE';
 
     public function province(): BelongsTo
@@ -93,6 +94,16 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Article');
     }
 
+    public function getIsFollowedAttribute()
+    {
+        if (!request()?->user()) return false;
+
+        if (request()?->user()?->id == $this->id) return true;
+
+        if ($this->roles == "TEACHER") {
+            return  $this->teacher()->followers()->wherePivot('user_id', request()?->user()?->id)->exists();
+        }
+    }
 
     // public function getEmailAttribute()
     // {

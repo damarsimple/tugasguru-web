@@ -473,14 +473,14 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
 
 
-    Route::group(['prefix' => 'follows'], function () {
+    Route::group(['prefix' => 'followers'], function () {
 
         Route::get('/myfollower', function (Request $request) {
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
             $teacher = $user->teacher;
 
-            return $teacher->followerstudents->merge($teacher->followerteachers);
+            return $teacher->followers;
         });
 
         Route::post('/accept', function (Request $request) {
@@ -488,38 +488,38 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $user = $request->user();
             $teacher = $user->teacher;
 
-            if ($request->candidatestudent) {
-                $reqstudents = $teacher->requestfollowerstudents();
-
-                if (is_array($request->candidatestudent)) {
-                    $reqstudents = $reqstudents->whereIn('id', $request->candidatestudent);
-                } else {
-                    $reqstudents = $reqstudents->where('id', $request->candidatestudent);
-                }
-                $reqstudents->update(['is_accepted' => true]);
-            }
-
-            $reqstudents->update(['is_accepted' => true]);
-
-            if ($request->candidateteacher) {
-                $reqteacher = $teacher->requestfollowerteachers();
-                if (is_array($request->candidateteacher)) {
-                    $reqteacher = $reqteacher->whereIn('id', $request->candidateteacher);
-                } else {
-                    $reqteacher = $reqteacher->where('id', $request->candidateteacher);
-                }
-                $reqteacher->update(['is_accepted' => true]);
-            }
+            $teacher->requestfollow()->whereIn('user_id', $request->acceptIds)->update(['is_accepted' => true]);
 
             return ['message' => 'ok'];
         });
 
-
-        Route::get('/reqfollower', function (Request $request) {
+        Route::post('/deny', function (Request $request) {
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
             $teacher = $user->teacher;
-            return $teacher->requestfollowerstudents->merge($teacher->requestfollowerteachers);
+
+            $teacher->requestfollow()->detach($request->userId);
+
+            return ['message' => 'ok'];
+        });
+
+        Route::post('/request', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            $candidate = Teacher::find($request->teacher);
+
+            $candidate->requestfollow()->attach($teacher?->user?->id);
+
+            return ['message' => 'ok'];
+        });
+
+        Route::get('/myrequests', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+            return $teacher->requestfollow()->with('teacher', 'student', 'province')->get();
         });
     });
 
@@ -782,6 +782,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/myschool', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
+
             return $teacher->school()->with('students', 'teachers')->first();
         });
 
