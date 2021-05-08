@@ -22,6 +22,7 @@ use App\Models\Province;
 use App\Models\Question;
 use App\Models\School;
 use App\Models\Schooltype;
+use App\Models\Student;
 use App\Models\StudentAnswer;
 use App\Models\Subject;
 use App\Models\Teacher;
@@ -230,6 +231,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
     });
     Route::group(['prefix' => 'classrooms'], function () {
+
         Route::get('/', function (Request $request) {
             /**  @var App/Models/Student $student  */
             $student = $request->user()->student;
@@ -240,6 +242,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                 'subject',
             )->get();
         });
+
         Route::post('/join', function (Request $request) {
             /**  @var App/Models/Student $student  */
             $student = $request->user()->student;
@@ -917,6 +920,29 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     });
 
     Route::group(['prefix' => 'classrooms'], function () {
+
+
+
+
+        Route::post('/admit', function (Request $request) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+            $student = User::findOrFail($request->student)->student;
+
+            if (!$student) {
+                return ['message' => 'Siswa tidak ditemukan'];
+            }
+
+            $classroom = $teacher->classrooms()->findOrFail($request->classroom);
+
+            if (!$student->classrooms()->where('classrooms.id', $classroom->id)->exists()) {
+                $student->classrooms()->attach($classroom);
+            }
+
+            return  ['message' => 'ok'];
+        });
+
 
         Route::get('/', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
