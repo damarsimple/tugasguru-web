@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -51,9 +52,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['is_followed'];
     public const PROFILEPICTURE = 'PROFILEPICTURE';
 
+    protected $appends = ['following_count'];
+    
     public function province(): BelongsTo
     {
         return $this->belongsTo('App\Models\Province');
@@ -94,16 +96,22 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Article');
     }
 
-    public function getIsFollowedAttribute()
+
+    function followingteachers(): BelongsToMany
     {
-        if (!request()?->user()) return false;
-
-        if (request()?->user()?->id == $this->id) return true;
-
-        if ($this->roles == "TEACHER") {
-            return  $this->teacher()->followers()->wherePivot('user_id', request()?->user()?->id)->exists();
-        }
+        return $this->belongsToMany('App\Models\Teacher')->where('is_accepted', true);
     }
+
+    function followingstudents(): belongsToMany
+    {
+        return $this->belongsToMany('App\Models\Student')->where('is_accepted', true);
+    }
+
+    public function getFollowingCountAttribute()
+    {
+        return $this->followingteachers()->count() + $this->followingstudents()->count();
+    }
+
 
     // public function getEmailAttribute()
     // {

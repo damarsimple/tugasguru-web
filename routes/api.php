@@ -124,6 +124,90 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' => 'students'], function () {
 
+
+    Route::group(['prefix' => 'followers'], function () {
+
+        Route::get('/myfollowing', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            return array_merge($student->followingteachers->pluck('user_id'), $student->followingstudents->pluck('user_id'));
+        });
+
+        Route::get('/myfollower', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            return $student->followers;
+        });
+
+        Route::post('/accept', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            $teacher->requestfollow()->whereIn('user_id', $request->acceptIds)->update(['is_accepted' => true]);
+
+            return ['message' => 'ok'];
+        });
+
+        Route::post('/deny', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            $student->requestfollow()->detach($request->userId);
+
+            return ['message' => 'ok'];
+        });
+
+        Route::post('/unfollow', function (Request $request) {
+            $student = $request->user();
+
+            if ($student->roles == "TEACHER") {
+                $student->followingteachers()->detach($request->user);
+            } else {
+                $student->followingstudents()->detach($request->user);
+            }
+
+            return ['message' => 'ok'];
+        });
+
+
+        Route::post('/request', function (Request $request) {
+            $user = $request->user();
+            /**  @var App/Models/Student $student  */
+            $student = $request->user()->student;
+
+            if ($user->id == $request->user) {
+                return ['message' => 'Anda tidak bisa mengikuti diri sendiri'];
+            }
+
+            $candidate = User::findOrFail($request->user);
+
+            if (
+                $candidate->roles == "TEACHER" &&
+                !$student->school->teachers->pluck('user_id')->contains($request->user)
+            ) {
+                return ['message' => 'Guru tidak ada di sekolah'];
+            }
+
+            if ($candidate->roles == "TEACHER") {
+                $candidate->teacher->requestfollow()->attach($student?->user?->id);
+            } else {
+                $candidate->student->requestfollow()->attach($student?->user?->id);
+            }
+
+            return ['message' => 'ok'];
+        });
+
+        Route::get('/myrequests', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+            return $teacher->requestfollow()->with('teacher', 'student', 'province')->get();
+        });
+    });
+
     Route::group(['prefix' => 'posts'], function () {
 
         Route::get('/', function (Request $request) {
@@ -171,12 +255,24 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
 
         Route::get('/all', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $student = $request->user();
+
+            $user = User::with('followingteachers.classrooms')->find($student->id);
+
+
+            $classrooms  = [];
+
+
+            foreach ($user->followingteachers as $teacher) {
+                foreach ($teacher->classrooms as $classroom) {
+                    $classrooms[] = $classroom;
+                }
+            }
 
             // TODO : CHECK FOLLOW
 
-            return $student->school->classrooms;
+
+            return $classrooms;
         });
     });
 
@@ -187,9 +283,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             return $student->school()->with(
                 'schooltype',
-                'students.province',
-                'teachers.province',
-                'teachers'
+                'students.user.province',
+                'teachers.user.province',
             )->first();
         });
     });
@@ -475,6 +570,27 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'followers'], function () {
 
+        Route::get('/myfollowing', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            return $teacher->followingteachers;
+        });
+
+        Route::post('/unfollow', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+
+            if ($user->roles == "TEACHER") {
+                $user->followingteachers()->detach($request->user);
+            } else {
+                $user->followingstudents()->detach($request->user);
+            }
+
+            return ['message' => 'ok'];
+        });
+
         Route::get('/myfollower', function (Request $request) {
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
@@ -508,9 +624,17 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $user = $request->user();
             $teacher = $user->teacher;
 
-            $candidate = Teacher::find($request->teacher);
+            if ($user->id == $request->user) {
+                return ['message' => 'you cannot follow yourself'];
+            }
+            $candidate = User::findOrFail($request->user);
 
-            $candidate->requestfollow()->attach($teacher?->user?->id);
+
+            if ($candidate->roles !== "TEACHER" || !$candidate->teacher) {
+                return ['message' => 'invalid follow target'];
+            }
+
+            $candidate->teacher->requestfollow()->attach($teacher?->user?->id);
 
             return ['message' => 'ok'];
         });
@@ -782,7 +906,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/myschool', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
-
             return $teacher->school()->with('students', 'teachers')->first();
         });
 

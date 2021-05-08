@@ -39,4 +39,14 @@ class Student extends Model
     {
         return $this->morphMany('App\Models\Event', 'eventable');
     }
+
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\User')->where('is_accepted', true);
+    }
+
+    public function requestfollow(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
+    }
 }
