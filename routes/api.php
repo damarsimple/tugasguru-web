@@ -960,7 +960,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $school = $teacher->school;
 
 
-            if (Classroom::where(['teacher_id' => $teacher->id, 'name' => $request->name])->exists()) {
+            if (Classroom::where(['teacher_id' => $teacher->id, 'name' => $request->name, 'classtype_id' => $request->classtype_id])->exists()) {
                 return ['message' => 'exists'];
             }
 
@@ -980,6 +980,34 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             return ['message' => 'ok'];
         });
+
+        Route::put('/{id}/detach/{studentId}/to/{toId}', function (Request $request, $id, $studentId, $toId) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+
+            $classroom = Classroom::findOrFail($id);
+
+            $newClassroom = Classroom::findOrFail($toId);
+
+            $classroom->students()->detach($studentId);
+            $newClassroom->students()->attach($studentId);
+
+            return ['message' => 'ok'];
+        });
+
+        Route::delete('/{id}/detach/{studentId}', function (Request $request, $id, $studentId) {
+            /**  @var App/Models/Teacher $teacher  */
+            $teacher = $request->user()->teacher;
+
+
+            $classroom = Classroom::findOrFail($id);
+
+            $classroom->students()->detach($studentId);
+
+            return ['message' => 'ok'];
+        });
+
         Route::put('/{id}', function (Request $request, $id) {
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
