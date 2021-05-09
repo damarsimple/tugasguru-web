@@ -25,11 +25,6 @@ class Classroom extends Model
         return $this->belongsTo('App\Models\Teacher');
     }
 
-    public function subject(): BelongsTo
-    {
-        return $this->belongsTo('App\Models\Subject');
-    }
-
     public function exams(): HasMany
     {
         return $this->hasMany('App\Models\Exam');

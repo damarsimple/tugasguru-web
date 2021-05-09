@@ -18,7 +18,6 @@ class CreateClassRoomsTable extends Migration
             $table->foreignId('teacher_id')->constrained()->onDelete('cascade');
             $table->foreignId('classtype_id')->constrained()->onDelete('cascade');
             $table->foreignId('school_id')->constrained()->onDelete('cascade');
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->timestamps();
         });

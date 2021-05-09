@@ -14,7 +14,7 @@ class Teacher extends Model
 {
     use HasFactory, TeacherFollowable;
 
-    public $with = ['user', 'school'];
+    public $with = ['user', 'school', 'subjects'];
 
     public function school(): BelongsTo
     {

@@ -18,6 +18,7 @@ class CreateSubjectsTable extends Migration
             $table->string('name');
             $table->string('abbreviation')->nullable();
             $table->longText('description')->nullable();
+            $table->string('type')->default('GENERAL'); //VOCATIONAL , LOCAL CONTENT, SPECIAL DEVELOPMENT
             $table->timestamps();
         });
     }

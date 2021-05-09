@@ -239,7 +239,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             return $student->classrooms()->with(
                 'students',
                 'teacher',
-                'subject',
             )->get();
         });
 
@@ -952,13 +951,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             if ($request->withExtra) {
                 $classrooms = $classrooms->with(
                     'teacher',
-                    'subject',
                     'students',
                 );
-            }
-
-            if ($request->subjects) {
-                $classrooms = $classrooms->where('subject_id', $request->subject);
             }
 
             return $classrooms->get();
@@ -971,7 +965,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             if ($request->withExtra) {
                 return $teacher->school->classrooms()->with(
                     'teacher',
-                    'subject',
                     'students',
                 )->get();
             } else {
@@ -994,7 +987,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $classroom->name = $request->name;
             $classroom->teacher_id = $teacher->id;
             $classroom->classtype_id = $request->classtype_id;
-            $classroom->subject_id = $request->subject_id;
             $school->classrooms()->save($classroom);
         });
 
@@ -1027,7 +1019,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $teacher = $request->user()->teacher;
 
 
-            $classroom = Classroom::findOrFail($id);
+            $classroom = $teacher->classrooms()->findOrFail($id);
 
             $classroom->students()->detach($studentId);
 
@@ -1039,8 +1031,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $teacher = $request->user()->teacher;
 
             $classroom = $teacher->classrooms()->where('id', $id)->firstOrFail();
-
-            $classroom->subject_id = $request->subject;
 
             $classroom->name = $request->name;
 
