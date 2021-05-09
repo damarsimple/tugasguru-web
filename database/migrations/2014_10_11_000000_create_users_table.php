@@ -17,12 +17,13 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->timestamp('dob')->useCurrent();
             $table->timestamp('email_verified_at')->nullable();
             $table->longText('address')->nullable();
             $table->foreignId('province_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('city_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('district_id')->index()->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('phone')->unique();
+            $table->string('phone')->unique();
             $table->integer('gender')->nullable();
             $table->string('password');
             $table->string('roles');

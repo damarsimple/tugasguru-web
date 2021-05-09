@@ -78,6 +78,54 @@ Route::post("/register", [ApiAuthController::class, "register"]);
 Route::middleware('auth:sanctum')->get("/user", [ApiAuthController::class, 'profile']);
 Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'refresh']);
 
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
+    Route::put('/', function (Request $request) {
+        $user = $request->user();
+
+        $user->name = $request->name;
+        $user->gender = $request->gender;
+        $user->phone = $request->phone;
+        $user->email = $request->email;
+        $user->dob = Carbon::parse($request->dob);
+        $user->gender = $request->gender;
+        $user->address = $request->address;
+
+        $user->save();
+
+        if ($request->has('profilepicture')) {
+            $newPicture = Attachment::findOrFail($request->profilepicture);
+            $newPicture->role = User::PROFILEPICTURE;
+            $newPicture->save();
+            $user->profilepicture()->delete();
+            $user->profilepicture()->save($newPicture);
+        }
+        if ($user->roles == "TEACHER") {
+            $teacher = $user->teacher;
+            $teacher->specialty = $request->specialty;
+            $teacher->academic_degree = $request->academic_degree;
+            $teacher->save();
+        } else {
+            $student = $user->student;
+            $student->specialty = $request->specialty;
+            $student->academic_degree = $request->academic_degree;
+            $student->save();
+        }
+
+        return ['message' => 'ok'];
+    });
+
+    Route::group(['prefix' => 'attachments'], function () {
+
+        Route::post('/temp', function (Request $request) {
+
+            $files = $request->file('file');
+
+            $attachment =  Upload::handle($files);
+
+            return $attachment;
+        });
+    });
+});
 Route::get('/attachments/{id}', fn ($id) => Attachment::findOrFail($id));
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'articles'], function () {
@@ -697,19 +745,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             }
 
             return $events->flatten();
-        });
-    });
-
-
-    Route::group(['prefix' => 'attachments'], function () {
-
-        Route::post('/temp', function (Request $request) {
-
-            $files = $request->file('file');
-
-            $attachment =  Upload::handle($files);
-
-            return $attachment;
         });
     });
 

@@ -55,7 +55,9 @@ class User extends Authenticatable
     public const PROFILEPICTURE = 'PROFILEPICTURE';
 
     protected $appends = ['following_count'];
-    
+
+    protected $with = ['profilepicture'];
+
     public function province(): BelongsTo
     {
         return $this->belongsTo('App\Models\Province');
