@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->foreignId('province_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('city_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('district_id')->index()->constrained()->onDelete('cascade');
-            $table->string('phone')->nullable();
+            $table->unsignedBigInteger('phone')->unique();
             $table->integer('gender')->nullable();
             $table->string('password');
             $table->string('roles');

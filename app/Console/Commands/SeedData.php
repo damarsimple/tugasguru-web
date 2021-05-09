@@ -11,10 +11,13 @@ use App\Models\Examtype;
 use App\Models\Province;
 use App\Models\School;
 use App\Models\Schooltype;
+use App\Models\Student;
 use App\Models\Subject;
+use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Faker\Factory;
-
+use Illuminate\Support\Facades\Hash;
 
 use function Safe\file_get_contents;
 
@@ -401,6 +404,65 @@ class SeedData extends Command
 
 
 
+        $user = new User();
+        $user->name = "Damar Albaribin Guru 1";
+        $user->email = "damaralbaribin@gmail.com";
+        $user->password = Hash::make("we5n9t5ReNV8gNE");
+        $user->city_id = 1;
+        $user->province_id = 1;
+        $user->district_id = 1;
+        $user->gender = 1;
+        $user->phone = "08987181017";
+        $user->roles = "TEACHER";
+
+        $user->save();
+
+        $teacher = new Teacher();
+        $teacher->specialty = "any";
+        $teacher->academic_degree = "any";
+        $teacher->is_bimbel = false;
+        $teacher->school_id = 1;
+        $user->teacher()->save($teacher);
+
+        $user = new User();
+        $user->name = "Damar Albaribin Guru 2";
+        $user->email = "damaralbaribin2@gmail.com";
+        $user->password = Hash::make("we5n9t5ReNV8gNE");
+        $user->city_id = 1;
+        $user->province_id = 1;
+        $user->district_id = 1;
+        $user->gender = 1;
+        $user->phone = "08987181012";
+        $user->roles = "TEACHER";
+
+        $user->save();
+
+        $teacher = new Teacher();
+        $teacher->specialty = "any";
+        $teacher->academic_degree = "any";
+        $teacher->is_bimbel = false;
+        $teacher->school_id = 1;
+        $user->teacher()->save($teacher);
+
+
+        $user = new User();
+        $user->name = "Damar Albaribin Siswa";
+        $user->email = "damara1@gmail.com";
+        $user->password = Hash::make("123456789");
+        $user->city_id = 1;
+        $user->province_id = 1;
+        $user->district_id = 1;
+        $user->gender = 1;
+        $user->phone = "08987181014";
+        $user->roles = "STUDENT";
+
+        $user->save();
+
+        $student = new Student();
+        $student->nisn = 1234568123;
+        $student->academic_degree = "any";
+        $student->school_id = 1;
+        $user->student()->save($student);
 
 
         print("finish at " . time() - $start . PHP_EOL);
