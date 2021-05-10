@@ -21,6 +21,7 @@ class CreateStudentsTable extends Migration
                 ->constrained()->onDelete('cascade')
                 ->references('id')
                 ->on('users');
+            $table->foreignId('classtype_id')->nullable()->index()->constrained()->onDelete('cascade');
             $table->bigInteger('nisn');
             $table->foreignId('school_id')->index()->constrained()->onDelete('cascade');
             $table->string('specialty')->nullable();

@@ -462,8 +462,21 @@ class SeedData extends Command
         $student->nisn = 1234568123;
         $student->academic_degree = "any";
         $student->school_id = 1;
+        $student->classtype_id = 1;
         $user->student()->save($student);
 
+
+        $school = School::first();
+
+        $classroom = new Classroom();
+        $classroom->name =  "Test";
+        $classroom->teacher_id = $teacher->id;
+        $classroom->classtype_id = 1;
+        $school->classrooms()->save($classroom);
+
+        // $teacher->user->followingteachers()->attach($student->user->id);
+
+        // $classroom->students()->save($student);
 
         print("finish at " . time() - $start . PHP_EOL);
         return 0;

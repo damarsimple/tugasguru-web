@@ -296,6 +296,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $classroom = Classroom::findOrFail($request->classroom);
 
+            if (!$student->classtype_id) {
+                $student->classtype_id = $classroom->classtype_id;
+                $student->save();
+            }   
+
             if (!$student->classrooms()->where('classrooms.id', $classroom->id)->exists()) {
                 $student->classrooms()->attach($classroom);
             }
@@ -305,22 +310,26 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
 
         Route::get('/all', function (Request $request) {
-            $student = $request->user();
+            $user = $request->user();
 
-            $user = User::with('followingteachers.classrooms')->find($student->id);
-
+            $user = User::find($user->id);
 
             $classrooms  = [];
 
+            $student = $user->student;
 
             foreach ($user->followingteachers as $teacher) {
-                foreach ($teacher->classrooms as $classroom) {
+
+                if ($student->classtype_id) {
+                    $candidateclasrooms = $teacher->classrooms()->where('classtype_id', $student->classtype_id);
+                } else {
+                    $candidateclasrooms = $teacher->classrooms();
+                }
+
+                foreach ($candidateclasrooms->get() as $classroom) {
                     $classrooms[] = $classroom;
                 }
             }
-
-            // TODO : CHECK FOLLOW
-
 
             return $classrooms;
         });
@@ -997,13 +1006,15 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
 
+            $classrooms = $teacher->school->classrooms();
+
             if ($request->withExtra) {
-                return $teacher->school->classrooms()->with(
+                return $classrooms->with(
                     'teacher',
                     'students',
                 )->get();
             } else {
-                return $teacher->school->classrooms;
+                return $classrooms->get();
             }
         });
 
@@ -1152,11 +1163,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::post('/create', function (Request $request) {
             /**  @var App/Models/Teacher $teacher  */
             $teacher = $request->user()->teacher;
-
-
-
-
-
 
             $questionIds = [];
             foreach ($request->questions as $questionData) {
