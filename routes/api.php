@@ -250,10 +250,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
 
         Route::get('/myrequests', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
+            /**  @var App/Models/User $student  */
             $user = $request->user();
-            $teacher = $user->teacher;
-            return $teacher->requestfollow()->with('teacher', 'student', 'province')->get();
+            $student = $user->student;
+            return $student->requestfollow()->with('teacher', 'student', 'province')->get();
         });
     });
 
