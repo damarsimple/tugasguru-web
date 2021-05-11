@@ -114,27 +114,11 @@ class User extends Authenticatable
         return $this->followingteachers()->count() + $this->followingstudents()->count();
     }
 
+    public function rooms(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Room')->withPivot('is_administrator');
+    }
 
-    // public function getEmailAttribute()
-    // {
-    //     $hiddenAttribute = json_decode($this->hidden_attribute);
-
-    //     if (!$hiddenAttribute || !is_array($hiddenAttribute)) return $this->email;
-
-    //     if (in_array('EMAIL', $hiddenAttribute)) return null;
-
-    //     return $this->email;
-    // }
-    // public function getPhoneAttribute()
-    // {
-    //     $hiddenAttribute = json_decode($this->hidden_attribute);
-
-    //     if (!$hiddenAttribute || !is_array($hiddenAttribute)) return $this->phone;
-
-    //     if (in_array('PHONE', $hiddenAttribute)) return null;
-
-    //     return $this->phone;
-    // }
     public function profilepicture()
     {
         return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::PROFILEPICTURE);

@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Attachment\Upload;
+use App\Events\NewPrivateMessageEvent;
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
@@ -16,8 +17,10 @@ use App\Models\Examresult;
 use App\Models\Examsession;
 use App\Models\Examtracker;
 use App\Models\Examtype;
+use App\Models\Message;
 use App\Models\Packagequestion;
 use App\Models\Price;
+use App\Models\PrivateRoom;
 use App\Models\Province;
 use App\Models\Question;
 use App\Models\School;
@@ -30,6 +33,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +50,7 @@ use Carbon\Carbon;
 //     return $request->user();
 // });
 
+Broadcast::routes(['middleware' => ['api', 'auth:sanctum']]);
 
 Route::get('me', fn (Request $request) => $request->user());
 
@@ -123,6 +128,87 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             $attachment =  Upload::handle($files);
 
             return $attachment;
+        });
+    });
+
+    Route::group(['prefix' => 'messages'], function () {
+
+        Route::group(['prefix' => 'private'], function () {
+
+            Route::get('/targets', function (Request $request) {
+                $sender = $request->user();
+
+                if ($sender->roles == "TEACHER") {
+                    $y = $sender->teacher;
+                } else {
+                    $y = $sender->student;
+                }
+
+                $y = $y->school;
+
+                return array_merge($y->teachers->toArray(), $y->students->toArray());
+            });
+            Route::get('rooms', function (Request $request) {
+
+                $sender = $request->user();
+
+                return PrivateRoom::where('first_id', $sender->id)->orWhere('second_id', $sender->id)->latest('updated_at')->get();
+            });
+            Route::get('rooms/{id}', function (Request $request, $id) {
+
+                $sender = $request->user();
+
+                $privateroom = PrivateRoom::with('messages')->findOrFail($id);
+
+                if (!in_array($sender->id, [$privateroom->first_id, $privateroom->second_id])) {
+                    return ['message' => 'unauthorized'];
+                }
+
+                return $privateroom;
+            });
+
+            Route::post('rooms/{id}', function (Request $request, $id) {
+
+                $sender = $request->user();
+
+                $message = new Message();
+
+                $message->content = $request->content;
+
+                $message->user_id = $sender->id;
+
+                $privateroom = PrivateRoom::findOrFail($id);
+
+                if (!in_array($sender->id, [$privateroom->first_id, $privateroom->second_id])) {
+                    return ['message' => 'unauthorized'];
+                }
+
+                $privateroom->updated_at = now();
+
+                $privateroom->save();
+
+                $privateroom->messages()->save($message);
+
+
+                broadcast(new NewPrivateMessageEvent($message));
+
+                return ['message' => 'ok'];
+            });
+
+            Route::post('create', function (Request $request) {
+                $sender = $request->user();
+
+                $participants = [$sender->id, $request->receiver];
+
+                sort($participants);
+
+                [$first, $second] = $participants;
+
+                return PrivateRoom::firstOrCreate([
+                    'first_id' => $first,
+                    'second_id' => $second
+                ]);
+            });
         });
     });
 });
@@ -299,7 +385,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             if (!$student->classtype_id) {
                 $student->classtype_id = $classroom->classtype_id;
                 $student->save();
-            }   
+            }
 
             if (!$student->classrooms()->where('classrooms.id', $classroom->id)->exists()) {
                 $student->classrooms()->attach($classroom);
