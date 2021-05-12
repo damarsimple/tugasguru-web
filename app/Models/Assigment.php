@@ -17,14 +17,13 @@ class Assigment extends Model
         return $this->belongsTo('App\Models\Teacher');
     }
 
-    public function subjects(): BelongsToMany
+    public function subject(): belongsTo
     {
-        return $this->belongsToMany('Appp\Models\Subject');
+        return $this->belongsTo('Appp\Models\Subject');
     }
 
-    public function classroomschools(): BelongsToMany
+    public function classroom(): belongsTo
     {
-        return $this->belongsToMany('App\Models\ClassRoomSchool');
+        return $this->belongsTo('App\Models\Classroom');
     }
-
 }

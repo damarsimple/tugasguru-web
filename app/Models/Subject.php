@@ -17,4 +17,8 @@ class Subject extends Model
         return $this->belongsToMany('App\Models\School');
     }
 
+    public function meetings(): HasMany
+    {
+        return $this->hasMany('App\Models\Meeting');
+    }
 }

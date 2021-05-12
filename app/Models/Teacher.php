@@ -70,4 +70,9 @@ class Teacher extends Model
     {
         return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
     }
+
+    public function meetings(): HasMany
+    {
+        return $this->hasMany('App\Models\Meeting');
+    }
 }

@@ -39,4 +39,14 @@ class Classroom extends Model
     {
         return "Kelas "  . $this->classtype->level . " $this->name";
     }
+
+    public function meetings(): HasMany
+    {
+        return $this->hasMany('App\Models\Meeting');
+    }
+
+    public function assigments(): HasMany
+    {
+        return $this->hasMany('App\Models\Assigment');
+    }
 }

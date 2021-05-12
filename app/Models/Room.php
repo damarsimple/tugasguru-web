@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Room extends Model
 {
@@ -18,5 +19,10 @@ class Room extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\User')->withPivot('is_administrator');
+    }
+
+    public function roomable(): MorphTo
+    {
+        return $this->morphTo();
     }
 }

@@ -20,6 +20,9 @@ class CreateAttachmentsTable extends Migration
             $table->string('mime')->nullable();
             $table->unsignedBigInteger('attachable_id')->nullable();
             $table->string('attachable_type')->nullable();
+            $table->boolean('is_proccessed')->default(false);
+            $table->string('original_size')->nullable();
+            $table->string('compressed_size')->nullable();
             $table->string('role')->nullable();
             $table->timestamps();
         });

@@ -2,8 +2,10 @@
 
 namespace App\Observers;
 
+use App\Events\NewMessageEvent;
 use App\Events\NewPrivateMessageEvent;
 use App\Models\Message;
+use App\Models\Room;
 
 class MessageObserver
 {
@@ -17,6 +19,10 @@ class MessageObserver
     {
         if ($message->messageable_type == PrivateRoom::class) {
             broadcast(new NewPrivateMessageEvent($message));
+        }
+
+        if ($message->messageable_type == Room::class) {
+            broadcast(new NewMessageEvent($message));
         }
     }
 

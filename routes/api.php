@@ -17,12 +17,14 @@ use App\Models\Examresult;
 use App\Models\Examsession;
 use App\Models\Examtracker;
 use App\Models\Examtype;
+use App\Models\Meeting;
 use App\Models\Message;
 use App\Models\Packagequestion;
 use App\Models\Price;
 use App\Models\PrivateRoom;
 use App\Models\Province;
 use App\Models\Question;
+use App\Models\Room;
 use App\Models\School;
 use App\Models\Schooltype;
 use App\Models\Student;
@@ -82,6 +84,62 @@ Route::post("/login", [ApiAuthController::class, "login"]);
 Route::post("/register", [ApiAuthController::class, "register"]);
 Route::middleware('auth:sanctum')->get("/user", [ApiAuthController::class, 'profile']);
 Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'refresh']);
+
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], function () {
+    Route::get('/{id}', function (Request $request, $id) {
+
+        $user = $request->user();
+
+        if ($user->roles == "TEACHER") {
+            $teacher = $user->teacher;
+
+            return $teacher->meetings()->with('classroom.students')->findOrFail($id);
+
+            // $teacher->save();
+        } else {
+            $student = $user->student;
+
+            $meeting = Meeting::with('classroom.students')->findOrFail($id);
+
+            $meeting->rooms = $meeting->rooms()->whereHas('users', fn ($e) => $e->where('user_id', $user->id))->get();
+
+            return $meeting;
+            // $student->save();
+        }
+        return;
+    });
+});
+
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function () {
+    Route::get('/{id}', function (Request $request, $id) {
+        $user = $request->user();
+        return  $user->rooms()->find($id)->messages;
+    });
+    Route::post('/{id}', function (Request $request, $id) {
+
+        $sender = $request->user();
+
+        $message = new Message();
+
+        $message->content = $request->content;
+
+        $message->user_id = $sender->id;
+
+        $room = Room::findOrFail($id);
+
+        // if (!in_array($sender->id, [$room->first_id, $room->second_id])) {
+        //     return ['message' => 'unauthorized'];
+        // }
+
+        $room->updated_at = now();
+
+        $room->save();
+
+        $room->messages()->save($message);
+
+        return ['message' => 'ok'];
+    });
+});
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
     Route::put('/', function (Request $request) {
@@ -156,6 +214,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             });
             Route::get('rooms/{id}', function (Request $request, $id) {
 
+                if ($id == 'undefined') return ['message' => 'ok'];
+
                 $sender = $request->user();
 
                 $privateroom = PrivateRoom::with('messages')->findOrFail($id);
@@ -188,9 +248,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
                 $privateroom->save();
 
                 $privateroom->messages()->save($message);
-
-
-                broadcast(new NewPrivateMessageEvent($message));
 
                 return ['message' => 'ok'];
             });
@@ -789,6 +846,108 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $user = $request->user();
             $teacher = $user->teacher;
             return $teacher->requestfollow()->with('teacher', 'student', 'province')->get();
+        });
+    });
+
+    Route::group(['prefix' => 'meetings'], function () {
+
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+            return $teacher->meetings()->latest()->whereDate('finish_at', '>=', now())->get();
+        });
+
+        Route::get('{id}', function (Request $request, $id) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            return $teacher->meetings()->firstOrFail($id);
+        });
+
+        Route::delete('{id}', function (Request $request, $id) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            return $teacher->meetings()->firstOrFail($id)->delete();
+        });
+
+        Route::put('{id}', function (Request $request, $id) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            $meeting =  $teacher->meetings()->firstOrFail($id);
+
+            $meeting->name = $request->name;
+            $meeting->data = $request->data;
+            $meeting->subject_id = $request->subject_id;
+            $meeting->article_id = $request->article_id;
+
+            $meeting->save();
+            return ['message' => 'ok'];
+        });
+
+        Route::put('{meetingId}/{roomId}', function (Request $request, $meetingId, $roomId) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            $meeting =  $teacher->meetings()->firstOrFail($meetingId);
+
+            $room = $meeting->rooms()->firstOrFail($roomId);
+
+            $room->name = $request->name;
+
+            $room->users()->sync($request->participants ?? []);
+
+            $room->save();
+            return ['message' => 'ok'];
+        });
+
+        Route::post('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+
+            $teacher = $user->teacher;
+
+            $meeting = new Meeting();
+
+            $meeting->name = $request->name;
+
+            $meeting->finish_at = $request->finish_at;
+
+            $meeting->subject_id = $request->subject;
+            $meeting->data = $request->data;
+            $meeting->article_id = $request->article ?? null;
+            $meeting->teacher_id = $teacher->id;
+
+            $meeting->start_at = Carbon::createFromFormat("Y-m-d H:i",  $request->open_at);
+            $meeting->finish_at = Carbon::createFromFormat("Y-m-d H:i",  $request->close_at);
+
+            $classroom = Classroom::findOrFail($request->classroom);
+
+            $classroom->meetings()->save($meeting);
+
+            if ($request->rooms) {
+                foreach ($request->rooms as $roomData) {
+                    $room = new Room();
+                    $room->name = $roomData['name'];
+                    $room->identifier = 'meeting.' . $meeting->id;
+                    $meeting->rooms()->save($room);
+
+                    $participants = [];
+
+                    foreach ($roomData['users'] as $user) {
+                        $participants[] = $user['id'];
+                    }
+
+                    $room->users()->attach(array_merge([$teacher->user->id], $participants));
+                }
+            }
+            return ['message' => 'ok'];
         });
     });
 

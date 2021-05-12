@@ -27,3 +27,26 @@ Broadcast::channel('private.{id}', function ($user, $id) {
 
     return false;
 });
+
+Broadcast::channel('meeting.{id}', function ($user, $id) {
+
+    return $user;
+
+    if (true) {
+        return $user;
+    }
+
+    return false;
+});
+
+
+Broadcast::channel('room.{id}', function ($user, $id) {
+
+    return $user;
+
+    if (true) {
+        return $user;
+    }
+
+    return false;
+});

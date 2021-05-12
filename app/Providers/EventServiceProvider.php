@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Models\Article;
 use App\Models\Attachment;
+use App\Models\Meeting;
 use App\Models\Message;
 use App\Observers\ArticleObserver;
 use App\Observers\AttachmentObserver;
+use App\Observers\MeetingObserver;
 use App\Observers\MessageObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -36,5 +38,7 @@ class EventServiceProvider extends ServiceProvider
         Article::observe(ArticleObserver::class);
         Attachment::observe(AttachmentObserver::class);
         Message::observe(MessageObserver::class);
+        Meeting::observe(MeetingObserver::class);
+        Attachment::observe(AttachmentObserver::class);
     }
 }

@@ -48,4 +48,9 @@ class Article extends Model
     {
         return $this->belongsToMany('App\Models\Classtype');
     }
+
+    public function meetings(): HasMany
+    {
+        return $this->hasMany('App\Models\Meeting');
+    }
 }

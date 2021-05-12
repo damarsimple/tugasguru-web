@@ -15,6 +15,12 @@ class CreateAssigmentsTable extends Migration
     {
         Schema::create('assigments', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('finish_at')->nullable();
+            $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

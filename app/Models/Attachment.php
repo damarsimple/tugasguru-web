@@ -23,6 +23,20 @@ class Attachment extends Model
 
     public function getFilePathAttribute()
     {
-        
+        return public_path('attachments')  . '/' . $this->name;
+    }
+
+    public function getTempFilePathAttribute()
+    {
+        return public_path('attachments')  . '/temp.' . $this->name;
+    }
+
+    public function getExtAttribute()
+    {
+        try {
+            return explode('.', $this->name)[1];
+        } catch (\Throwable $th) {
+            return null;
+        }
     }
 }

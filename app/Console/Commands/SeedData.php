@@ -8,7 +8,9 @@ use App\Models\Classtype;
 use App\Models\District;
 use App\Models\Exam;
 use App\Models\Examtype;
+use App\Models\Meeting;
 use App\Models\Province;
+use App\Models\Room;
 use App\Models\School;
 use App\Models\Schooltype;
 use App\Models\Student;
@@ -424,6 +426,8 @@ class SeedData extends Command
         $teacher->school_id = 1;
         $user->teacher()->save($teacher);
 
+        $teacher->subjects()->attach(Subject::first());
+
         $user = new User();
         $user->name = "Damar Albaribin Guru 2";
         $user->email = "damaralbaribin2@gmail.com";
@@ -444,6 +448,8 @@ class SeedData extends Command
         $teacher->school_id = 1;
         $user->teacher()->save($teacher);
 
+
+        $teacher->subjects()->attach(Subject::first());
 
         $user = new User();
         $user->name = "Damar Albaribin Siswa";
@@ -470,13 +476,45 @@ class SeedData extends Command
 
         $classroom = new Classroom();
         $classroom->name =  "Test";
-        $classroom->teacher_id = $teacher->id;
+        $classroom->teacher_id = 1;
         $classroom->classtype_id = 1;
         $school->classrooms()->save($classroom);
 
+        $classroom->students()->save($student);
+
+        $classroom = new Classroom();
+        $classroom->name =  "Test";
+        $classroom->teacher_id = 2;
+        $classroom->classtype_id = 1;
+        $school->classrooms()->save($classroom);
+
+
+
         // $teacher->user->followingteachers()->attach($student->user->id);
 
-        // $classroom->students()->save($student);
+        $classroom->students()->save($student);
+
+        $meeting = new Meeting();
+
+        $meeting->subject_id  = Subject::first()->id;
+
+        $meeting->name = "Pertemuan oleh kian santang";
+
+        $meeting->teacher_id = $teacher->id;
+
+        $meeting->finish_at = now()->addHour(4);
+        $meeting->start_at = now();
+
+        $classroom->meetings()->save($meeting);
+
+        foreach (['Umum', 'Kelompok 1', 'Kelompok 2'] as $name) {
+            $room = new Room();
+            $room->name = $name;
+            $room->identifier = "meeeting.chat." . $meeting->id;
+            $meeting->rooms()->save($room);
+
+            $room->users()->attach($teacher->id, ['is_administrator' => true]);
+        }
 
         print("finish at " . time() - $start . PHP_EOL);
         return 0;

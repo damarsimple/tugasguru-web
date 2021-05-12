@@ -123,4 +123,5 @@ class User extends Authenticatable
     {
         return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::PROFILEPICTURE);
     }
+    
 }
