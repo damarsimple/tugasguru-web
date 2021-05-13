@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
 use Symfony\Component\Process\Process;
 use WebPConvert\WebPConvert;
+use Exception;
 
 class ProcessAttachmentJob implements ShouldQueue
 {
@@ -264,18 +265,35 @@ class ProcessAttachmentJob implements ShouldQueue
         }
 
         if (in_array($attachment->ext, $imgExtensions)) {
-            // $optimizerChain = OptimizerChainFactory::create();
-            // $optimizerChain->optimize($attachment->file_path, $attachment->temp_file_path);
-            $compressedPath = str_replace($attachment->ext, "webp", $attachment->temp_file_path);
-            WebPConvert::convert($attachment->file_path, $compressedPath);
-            $this->recordSize(compressedPath: $compressedPath);
-            rename($compressedPath, $attachment->file_path);
-            $this->setTrue();
+
+            try {
+                $compressedPath = str_replace($attachment->ext, "webp", $attachment->temp_file_path);
+                WebPConvert::convert($attachment->file_path, $compressedPath);
+                $this->recordSize(compressedPath: $compressedPath);
+                rename($compressedPath, $attachment->file_path);
+                $this->setTrue();
+            } catch (Exception $e) {
+                $optimizerChain = OptimizerChainFactory::create();
+                $optimizerChain->optimize($attachment->file_path, $attachment->temp_file_path);
+                $this->recordSize(compressedPath: $attachment->temp_file_path);
+                rename($attachment->temp_file_path, $attachment->file_path);
+                $this->setTrue();
+            }
         };
 
 
 
 
+        return 0;
+    }
+
+    public function getCheck(): bool
+    {
         return $this->check;
+    }
+
+    public function failed(Exception $exception)
+    {
+        // print($exception->getMessage());
     }
 }

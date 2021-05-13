@@ -12,7 +12,9 @@ class Meeting extends Model
 {
     use HasFactory;
 
-    public $with = ['rooms', 'classroom', 'subject', 'teacher'];
+    protected $with = ['rooms', 'classroom', 'subject', 'teacher'];
+
+    protected $casts  = ['data' => 'object'];
 
     public function classroom(): BelongsTo
     {
@@ -37,5 +39,10 @@ class Meeting extends Model
     public function rooms(): MorphMany
     {
         return $this->morphMany('App\Models\Room', 'roomable');
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany('App\Models\Attachment', 'attachable');
     }
 }

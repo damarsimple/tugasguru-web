@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Events\MeetingChangeEvent;
 use App\Models\Meeting;
 
 class MeetingObserver
@@ -14,7 +15,7 @@ class MeetingObserver
      */
     public function created(Meeting $meeting)
     {
-        //
+        broadcast(new MeetingChangeEvent($meeting));
     }
 
     /**
@@ -25,7 +26,7 @@ class MeetingObserver
      */
     public function updated(Meeting $meeting)
     {
-        //
+        broadcast(new MeetingChangeEvent($meeting));
     }
 
     /**

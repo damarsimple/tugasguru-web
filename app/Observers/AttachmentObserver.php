@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\ProcessAttachmentJob;
 use App\Models\Attachment;
 
 class AttachmentObserver
@@ -14,7 +15,7 @@ class AttachmentObserver
      */
     public function created(Attachment $attachment)
     {
-        //
+        dispatch(new ProcessAttachmentJob($attachment));
     }
 
     /**

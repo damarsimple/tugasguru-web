@@ -111,6 +111,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function () {
+
     Route::get('/{id}', function (Request $request, $id) {
         $user = $request->user();
         return  $user->rooms()->find($id)->messages;
@@ -879,14 +880,21 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $user = $request->user();
             $teacher = $user->teacher;
 
-            $meeting =  $teacher->meetings()->firstOrFail($id);
+            $meeting =  $teacher->meetings()->findOrFail($id);
 
-            $meeting->name = $request->name;
-            $meeting->data = $request->data;
-            $meeting->subject_id = $request->subject_id;
-            $meeting->article_id = $request->article_id;
+            $meeting->name = $request->name ??  $meeting->name;
+            $meeting->data = $request->data ?? null;
+
+            if ($request?->data['attachment']) {
+                $attachment = Attachment::find($request->data['attachment']['id']);
+                $meeting->attachments()->save($attachment);
+            }
+
+            $meeting->subject_id = $request->subject_id ?? $meeting->subject_id;
+            $meeting->article_id = $request->article_id ?? $meeting->article_id;
 
             $meeting->save();
+
             return ['message' => 'ok'];
         });
 

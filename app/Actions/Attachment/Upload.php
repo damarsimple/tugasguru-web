@@ -20,8 +20,7 @@ class Upload
 
         $file->move('attachments', $attachment->name);
 
-        dispatch(new ProcessAttachmentJob($attachment));
-
         return $attachment;
+        
     }
 }
