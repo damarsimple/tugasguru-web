@@ -17,7 +17,7 @@ class CreateMeetingsTable extends Migration
             $table->id();
             $table->string('name');
             $table->json('data')->nullable();
-            $table->timestamp('start_at')->nullable();
+            $table->timestamp('start_at')->useCurrent();
             $table->string('description')->nullable();
             $table->timestamp('finish_at')->nullable();
             $table->foreignId('article_id')->nullable()->index();

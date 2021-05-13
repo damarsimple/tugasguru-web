@@ -143,6 +143,20 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
+
+    Route::get('mark-read-all', function (Request $request) {
+
+        $request->user()->unreadNotifications->markAsRead();
+
+        return ['message' => 'ok'];
+    });
+
+    Route::get('notifications', function (Request $request) {
+
+        return $request->user()->unreadNotifications;
+    });
+
+
     Route::put('/', function (Request $request) {
         $user = $request->user();
 
@@ -507,18 +521,50 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             foreach ($classrooms->get() as $classroom) {
 
-
-
                 $data = $classroom->exams()->with(["examsessions" => function ($q) use ($now) {
-                    $q->where('close_at', '>', $now);
+                    $q->latest()->where('close_at', '>', $now);
                 }])->get();
 
-                // return ;
+                $data = $data->map(fn ($e) => $e->examsessions)->flatten();
 
-                $events->push($data->map(fn ($e) => $e->examsessions)->flatten());
+                $data = $data->map(function ($e) {
+                    return [
+                        'name' => $e->exam->name,
+                        'subject' => $e->exam->subject,
+                        'classroom' => $e->exam->classroom,
+                        'teacher' => $e->exam->teacher,
+                        'id' => $e->id,
+                        'close_at' => $e->close_at,
+                        'open_at' => $e->open_at,
+                        'created_at' => $e->created_at,
+                        'updated_at' => $e->updated_at,
+                        'type' => 'Exam',
+                    ];
+                });
+
+                $events = $events->merge($data);
+
+                $data = $classroom->meetings()->whereNull('finish_at')->get();
+
+                $data = $data->map(function ($e) use ($classroom) {
+                    return [
+                        'name' => $e->name,
+                        'subject' => $classroom->subject,
+                        'classroom' => $classroom,
+                        'teacher' => $classroom->teacher,
+                        'id' => $e->id,
+                        'close_at' => $e->finish_at,
+                        'open_at' => $e->start_at,
+                        'created_at' => $e->created_at,
+                        'updated_at' => $e->updated_at,
+                        'type' => 'Meeting',
+                    ];
+                });
+
+                $events = $events->merge($data);
             }
 
-            return $events->flatten();
+            return $events;
         });
     });
     Route::group(['prefix' => 'exams'], function () {
@@ -856,7 +902,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
             $teacher = $user->teacher;
-            return $teacher->meetings()->latest()->whereDate('finish_at', '>=', now())->get();
+            return $teacher->meetings()->latest()->whereNull('finish_at')->get();
         });
 
         Route::get('{id}', function (Request $request, $id) {
@@ -885,7 +931,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $meeting->name = $request->name ??  $meeting->name;
             $meeting->data = $request->data ?? null;
 
-            if (array_key_exists('attachment', $request?->data)) {
+            if ($request->finish_at) {
+                $meeting->finish_at = now();
+            }
+
+            if (array_key_exists('attachment', $request?->data ?? [])) {
                 try {
                     $attachment = Attachment::find($request->data['attachment']['id']);
                     $meeting->attachments()->save($attachment);
@@ -936,8 +986,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $meeting->article_id = $request->article ?? null;
             $meeting->teacher_id = $teacher->id;
 
-            $meeting->start_at = Carbon::createFromFormat("Y-m-d H:i",  $request->open_at);
-            $meeting->finish_at = Carbon::createFromFormat("Y-m-d H:i",  $request->close_at);
+            $meeting->start_at = now();
 
             $classroom = Classroom::findOrFail($request->classroom);
 
@@ -959,7 +1008,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                     $room->users()->attach(array_merge([$teacher->user->id], $participants));
                 }
             }
-            return ['message' => 'ok'];
+            return $meeting;
         });
     });
 
@@ -1001,16 +1050,51 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $classrooms = $teacher->classrooms();
 
             foreach ($classrooms->get() as $classroom) {
+
                 $data = $classroom->exams()->with(["examsessions" => function ($q) use ($now) {
                     $q->latest()->where('close_at', '>', $now);
                 }])->get();
 
-                // return ;
+                $data = $data->map(fn ($e) => $e->examsessions)->flatten();
 
-                $events->push($data->map(fn ($e) => $e->examsessions)->flatten());
+                $data = $data->map(function ($e) {
+                    return [
+                        'name' => $e->exam->name,
+                        'subject' => $e->exam->subject,
+                        'classroom' => $e->exam->classroom,
+                        'teacher' => $e->exam->teacher,
+                        'id' => $e->id,
+                        'close_at' => $e->close_at,
+                        'open_at' => $e->open_at,
+                        'created_at' => $e->created_at,
+                        'updated_at' => $e->updated_at,
+                        'type' => 'Exam',
+                    ];
+                });
+
+                $events = $events->merge($data);
+
+                $data = $classroom->meetings()->whereNull('finish_at')->get();
+
+                $data = $data->map(function ($e) use ($classroom) {
+                    return [
+                        'name' => $e->name,
+                        'subject' => $classroom->subject,
+                        'classroom' => $classroom,
+                        'teacher' => $classroom->teacher,
+                        'id' => $e->id,
+                        'close_at' => $e->finish_at,
+                        'open_at' => $e->start_at,
+                        'created_at' => $e->created_at,
+                        'updated_at' => $e->updated_at,
+                        'type' => 'Meeting',
+                    ];
+                });
+
+                $events = $events->merge($data);
             }
 
-            return $events->flatten();
+            return $events;
         });
     });
 

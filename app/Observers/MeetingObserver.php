@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Events\MeetingChangeEvent;
 use App\Models\Meeting;
+use App\Notifications\NewMeeting;
 
 class MeetingObserver
 {
@@ -16,6 +17,10 @@ class MeetingObserver
     public function created(Meeting $meeting)
     {
         broadcast(new MeetingChangeEvent($meeting));
+
+        foreach ($meeting->classroom->students as $student) {
+            $student->user->notify(new NewMeeting($meeting));
+        }
     }
 
     /**

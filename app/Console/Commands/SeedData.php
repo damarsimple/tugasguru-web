@@ -502,7 +502,6 @@ class SeedData extends Command
 
         $meeting->teacher_id = $teacher->id;
 
-        $meeting->finish_at = now()->addHour(4);
         $meeting->start_at = now();
 
         $classroom->meetings()->save($meeting);
@@ -513,7 +512,9 @@ class SeedData extends Command
             $room->identifier = "meeeting.chat." . $meeting->id;
             $meeting->rooms()->save($room);
 
-            $room->users()->attach($teacher->id, ['is_administrator' => true]);
+            $room->users()->attach($teacher->user->id, ['is_administrator' => true]);
+            
+            $room->users()->attach($student->user->id);
         }
 
         print("finish at " . time() - $start . PHP_EOL);
