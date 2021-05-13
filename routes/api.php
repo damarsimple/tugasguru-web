@@ -885,9 +885,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $meeting->name = $request->name ??  $meeting->name;
             $meeting->data = $request->data ?? null;
 
-            if ($request?->data['attachment']) {
-                $attachment = Attachment::find($request->data['attachment']['id']);
-                $meeting->attachments()->save($attachment);
+            if (array_key_exists('attachment', $request?->data)) {
+                try {
+                    $attachment = Attachment::find($request->data['attachment']['id']);
+                    $meeting->attachments()->save($attachment);
+                } catch (\Throwable $th) {
+                    //throw $th;
+                }
             }
 
             $meeting->subject_id = $request->subject_id ?? $meeting->subject_id;
