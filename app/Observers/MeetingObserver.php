@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Events\MeetingChangeEvent;
 use App\Models\Meeting;
+use App\Models\Room;
 use App\Notifications\NewMeeting;
 
 class MeetingObserver
@@ -21,6 +22,15 @@ class MeetingObserver
         foreach ($meeting->classroom->students as $student) {
             $student->user->notify(new NewMeeting($meeting));
         }
+
+        $studentUserIds = $meeting->classroom->students->pluck('user.id');
+
+        $room = new Room();
+        $room->name = 'Umum';
+        $room->identifier = 'meeting.' . $meeting->id;
+        $meeting->rooms()->save($room);
+
+        $room->users()->attach(array_merge([$meeting->teacher->user->id], $studentUserIds->toArray()));
     }
 
     /**

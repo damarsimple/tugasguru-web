@@ -95,16 +95,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
 
             return $teacher->meetings()->with('classroom.students')->findOrFail($id);
 
-            // $teacher->save();
         } else {
-            $student = $user->student;
-
             $meeting = Meeting::with('classroom.students')->findOrFail($id);
 
             $meeting->rooms = $meeting->rooms()->whereHas('users', fn ($e) => $e->where('user_id', $user->id))->get();
 
             return $meeting;
-            // $student->save();
         }
         return;
     });
@@ -197,8 +193,10 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
         Route::post('/temp', function (Request $request) {
 
             $files = $request->file('file');
-
-            $attachment =  Upload::handle($files);
+            $isProcessed = (bool) $request->get('is_proccessed') ?? false;
+            $originalSize = (int) $request->get('original_size') ?? false;
+            $compressedSize = (int) $request->get('compressed_size') ?? false;
+            $attachment =  Upload::handle($files, $isProcessed, $originalSize, $compressedSize);
 
             return $attachment;
         });
@@ -957,17 +955,37 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $user = $request->user();
             $teacher = $user->teacher;
 
-            $meeting =  $teacher->meetings()->firstOrFail($meetingId);
+            $meeting =  $teacher->meetings()->findOrFail($meetingId);
 
-            $room = $meeting->rooms()->firstOrFail($roomId);
+            $room = $meeting->rooms()->findOrFail($roomId);
 
             $room->name = $request->name;
 
             $room->users()->sync($request->participants ?? []);
 
             $room->save();
-            return ['message' => 'ok'];
+
+            return $meeting;
         });
+
+        Route::put('{meetingId}/rooms', function (Request $request, $meetingId,) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            $meeting =  $teacher->meetings()->firstOrFail($meetingId);
+
+            $room = new Room();
+
+            $room->name = $request->name;
+
+            $room->users()->sync($request->participants ?? []);
+
+            $meeting->rooms()->save($room);
+
+            return $meeting;
+        });
+
 
         Route::post('/', function (Request $request) {
             /**  @var App/Models/User $teacher  */

@@ -9,18 +9,24 @@ use Illuminate\Support\Str;
 class Upload
 {
 
-    public static function handle(\Illuminate\Http\UploadedFile $file)
-    {
+    public static function handle(
+        \Illuminate\Http\UploadedFile $file,
+        bool $isProcessed = false,
+        int $originalSize = 0,
+        int $compressedSize = 0,
+    ) {
         $attachment = new Attachment();
 
         $attachment->name = Str::uuid() . "." . $file->getClientOriginalExtension();
-        $attachment->mime = $file->getClientMimeType();
+        $attachment->mime =  $file->getMimeType();
+        $attachment->is_proccessed = $isProcessed;
+        $attachment->original_size = $originalSize;
+        $attachment->compressed_size = $compressedSize;
 
         request()->user()->attachments()->save($attachment);
 
         $file->move('attachments', $attachment->name);
 
         return $attachment;
-        
     }
 }

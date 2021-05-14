@@ -11,6 +11,8 @@ class Room extends Model
 {
     use HasFactory;
 
+    protected $with = ['users'];
+    
     public function messages()
     {
         return $this->morphMany('App\Models\Message', 'messageable');
