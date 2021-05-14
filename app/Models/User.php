@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public const PROFILEPICTURE = 'PROFILEPICTURE';
 
-    protected $appends = ['following_count'];
+    // protected $appends = ['following_count'];
 
     protected $with = ['profilepicture'];
 

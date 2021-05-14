@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Attachment\Upload;
+use App\Events\MeetingChangeEvent;
 use App\Events\NewPrivateMessageEvent;
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureStudent;
@@ -75,10 +76,6 @@ Route::get('/cities/{id}/schools', function (Request $request, $id) {
     }
 });
 
-Route::get('/test', fn () => Schooltype::withCount('schools')->get());
-
-
-
 Route::post("/token", [ApiAuthController::class, "token"]);
 Route::post("/login", [ApiAuthController::class, "login"]);
 Route::post("/register", [ApiAuthController::class, "register"]);
@@ -94,12 +91,10 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
             $teacher = $user->teacher;
 
             return $teacher->meetings()->with('classroom.students')->findOrFail($id);
-
         } else {
-            $meeting = Meeting::with('classroom.students')->findOrFail($id);
-
-            $meeting->rooms = $meeting->rooms()->whereHas('users', fn ($e) => $e->where('user_id', $user->id))->get();
-
+            $meeting = Meeting::with('classroom.students')->with(['rooms' => function ($e) use ($user) {
+                return $e->whereHas('users', fn ($e) => $e->where('user_id', $user->id));
+            }])->findOrFail($id);
             return $meeting;
         }
         return;
@@ -933,6 +928,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $meeting->finish_at = now();
             }
 
+            if ($request->article) {
+                $meeting->article_id = $request->article == 0 ? null : $request->article;
+            }
+
             if (array_key_exists('attachment', $request?->data ?? [])) {
                 try {
                     $attachment = Attachment::find($request->data['attachment']['id']);
@@ -968,22 +967,23 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return $meeting;
         });
 
-        Route::put('{meetingId}/rooms', function (Request $request, $meetingId,) {
+        Route::post('{meetingId}/rooms', function (Request $request, $meetingId,) {
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
             $teacher = $user->teacher;
-
-            $meeting =  $teacher->meetings()->firstOrFail($meetingId);
+            $meeting =  $teacher->meetings()->findOrFail($meetingId);
 
             $room = new Room();
 
             $room->name = $request->name;
 
-            $room->users()->sync($request->participants ?? []);
+            $room->identifier = 'meeting.' . $meeting->id;
 
             $meeting->rooms()->save($room);
 
-            return $meeting;
+            $room->users()->sync([$user->id]);
+
+            return Meeting::find($meeting->id);
         });
 
 
@@ -1196,14 +1196,15 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             }
 
 
-            $thumbnail = Attachment::findOrFail($request->thumbnail);
+            if ($request->thumbnail) {
+                $thumbnail = Attachment::findOrFail($request->thumbnail);
 
-            $thumbnail->role = Article::THUMBNAIL;
+                $thumbnail->role = Article::THUMBNAIL;
 
-            $thumbnail->attachable()->associate($article)->save();
+                $thumbnail->attachable()->associate($article)->save();
 
-            $thumbnail->save();
-
+                $thumbnail->save();
+            }
             return ['message' => 'ok'];
         });
     });
