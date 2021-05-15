@@ -17,6 +17,7 @@ return [
 
     'paths' => [
         'api/*',
+        'attachments/*',
         'graphql',
         'login',
         'logout',
