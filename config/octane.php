@@ -172,7 +172,7 @@ return [
         'bootstrap',
         'config',
         'database',
-        'public',
+        // 'public',
         'resources',
         'routes',
         'composer.lock',
