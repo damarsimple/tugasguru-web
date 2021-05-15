@@ -51,6 +51,11 @@ class Teacher extends Model
         return $this->hasMany('App\Models\Classroom');
     }
 
+    public function assigments(): HasMany
+    {
+        return $this->hasMany('App\Models\Assigment');
+    }
+
     public function packagequestions(): HasMany
     {
         return $this->hasMany('App\Models\Packagequestion');

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Assigment;
 use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
@@ -513,9 +514,23 @@ class SeedData extends Command
             $meeting->rooms()->save($room);
 
             $room->users()->attach($teacher->user->id, ['is_administrator' => true]);
-            
+
             $room->users()->attach($student->user->id);
         }
+
+        $assigment = new Assigment();
+
+        $assigment->name = "Test Assigment";
+
+        $assigment->content = "Test";
+
+        $assigment->classroom_id = $classroom->id;
+
+        $assigment->subject_id = 1;
+
+        $assigment->close_at = now()->addHour(4);
+
+        $teacher->assigments()->save($assigment);
 
         print("finish at " . time() - $start . PHP_EOL);
         return 0;

@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
 use App\Models\Answer;
 use App\Models\Article;
+use App\Models\Assigment;
 use App\Models\Attachment;
 use App\Models\City;
 use App\Models\Classroom;
@@ -30,6 +31,7 @@ use App\Models\School;
 use App\Models\Schooltype;
 use App\Models\Student;
 use App\Models\StudentAnswer;
+use App\Models\StudentAssigment;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\User;
@@ -37,6 +39,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Broadcast;
+use Laravel\Octane\Facades\Octane;
 
 /*
 |--------------------------------------------------------------------------
@@ -144,7 +147,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
     Route::get('notifications', function (Request $request) {
 
-        return $request->user()->unreadNotifications;
+        return $request->user()->notifications;
     });
 
 
@@ -296,6 +299,48 @@ Route::get('/{id}/rank', function (Request $request, $id) {
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], function () {
+
+    Route::group(['prefix' => 'assigments'], function () {
+        Route::post('/{id}', function (Request $request, $id) {
+            $user = $request->user();
+
+            $assigment = Assigment::findOrFail($id);
+
+            $student = $user->student;
+
+            $studentAssigment = StudentAssigment::firstOrCreate([
+                'assigment_id' => $assigment->id,
+                'student_id' => $student->id,
+            ]);
+
+            $studentAssigment->content = $request->content;
+
+            $studentAssigment->external_url = $request->external_url;
+
+            $studentAssigment->attachments()->saveMany(Attachment::whereIn('id', $request->attachments ?? [])->get());
+
+            $studentAssigment->turned_at = now();
+
+            $studentAssigment->save();
+
+            return ['message' => 'ok'];
+        });
+
+        Route::get('{id}', function (Request $request, $id) {
+            $user = $request->user();
+
+            $student = $user->student;
+
+            $assigment = Assigment::with('myanswer')->findOrFail($id);
+
+            if (!$student->classrooms->pluck('id')->contains($assigment->classroom->id)) {
+                return ['message' => 'unathorized'];
+            }
+
+            return $assigment;
+        });
+    });
+
 
     Route::put('/settings', function (Request $request) {
         /**  @var App/Models/User $user  */
@@ -513,48 +558,79 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $classrooms = $student->classrooms();
 
             foreach ($classrooms->get() as $classroom) {
+                $eventsData = Octane::concurrently([
+                    function () use ($classroom) {
+                        $now = now();
 
-                $data = $classroom->exams()->with(["examsessions" => function ($q) use ($now) {
-                    $q->latest()->where('close_at', '>', $now);
-                }])->get();
+                        $data = $classroom->exams()->with(["examsessions" => function ($q) use ($now) {
+                            $q->latest()->where('close_at', '>', $now);
+                        }])->get();
 
-                $data = $data->map(fn ($e) => $e->examsessions)->flatten();
+                        $data = $data->map(fn ($e) => $e->examsessions)->flatten();
 
-                $data = $data->map(function ($e) {
-                    return [
-                        'name' => $e->exam->name,
-                        'subject' => $e->exam->subject,
-                        'classroom' => $e->exam->classroom,
-                        'teacher' => $e->exam->teacher,
-                        'id' => $e->id,
-                        'close_at' => $e->close_at,
-                        'open_at' => $e->open_at,
-                        'created_at' => $e->created_at,
-                        'updated_at' => $e->updated_at,
-                        'type' => 'Exam',
-                    ];
-                });
+                        $data = $data->map(function ($e) {
+                            return [
+                                'name' => $e->exam->name,
+                                'subject' => $e->exam->subject,
+                                'classroom' => $e->exam->classroom,
+                                'teacher' => $e->exam->teacher,
+                                'id' => $e->id,
+                                'close_at' => $e->close_at,
+                                'open_at' => $e->open_at,
+                                'created_at' => $e->created_at,
+                                'updated_at' => $e->updated_at,
+                                'type' => 'Exam',
+                            ];
+                        });
+                        return $data;
+                    },
+                    function () use ($classroom) {
+                        $data = $classroom->meetings()->whereNull('finish_at')->get();
 
-                $events = $events->merge($data);
+                        $data = $data->map(function ($e) use ($classroom) {
+                            return [
+                                'name' => $e->name,
+                                'subject' => $classroom->subject,
+                                'classroom' => $classroom,
+                                'teacher' => $classroom->teacher,
+                                'id' => $e->id,
+                                'close_at' => $e->finish_at,
+                                'open_at' => $e->start_at,
+                                'created_at' => $e->created_at,
+                                'updated_at' => $e->updated_at,
+                                'type' => 'Meeting',
+                            ];
+                        });
+                        return $data;
+                    },
+                    function () use ($classroom) {
+                        $data = $classroom->assigments()->where('close_at', '>', now())->get();
 
-                $data = $classroom->meetings()->whereNull('finish_at')->get();
+                        $data = $data->map(function ($e) use ($classroom) {
+                            return [
+                                'name' => $e->name,
+                                'subject' => $classroom->subject,
+                                'classroom' => $classroom,
+                                'teacher' => $classroom->teacher,
+                                'id' => $e->id,
+                                'close_at' => $e->close_at,
+                                'open_at' => $e->created_at,
+                                'created_at' => $e->created_at,
+                                'updated_at' => $e->updated_at,
+                                'type' => 'Assigment',
+                            ];
+                        });
 
-                $data = $data->map(function ($e) use ($classroom) {
-                    return [
-                        'name' => $e->name,
-                        'subject' => $classroom->subject,
-                        'classroom' => $classroom,
-                        'teacher' => $classroom->teacher,
-                        'id' => $e->id,
-                        'close_at' => $e->finish_at,
-                        'open_at' => $e->start_at,
-                        'created_at' => $e->created_at,
-                        'updated_at' => $e->updated_at,
-                        'type' => 'Meeting',
-                    ];
-                });
+                        return $data;
+                    }
 
-                $events = $events->merge($data);
+                ]);
+
+                foreach ($eventsData as $event) {
+                    foreach ($event as $e) {
+                        $events->push($e);
+                    }
+                }
             }
 
             return $events;
@@ -889,6 +965,57 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
     });
 
+    Route::group(['prefix' => 'assigments'], function () {
+        Route::post('/', function (Request $request) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+
+            $teacher = $user->teacher;
+
+            $assigment = new Assigment();
+
+            $assigment->name = $request->name;
+
+            $assigment->content = $request->content;
+
+            $assigment->classroom_id = $request->classroom;
+
+            $assigment->subject_id = $request->subject;
+
+            $assigment->close_at = $request->close_at;
+
+            $teacher->assigments()->save($assigment);
+
+            return ['message' => 'ok'];
+        });
+
+        Route::get('{id}', function (Request $request, $id) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+
+            $teacher = $user->teacher;
+
+            return $teacher->assigments()->with('studentassigments')->findOrFail($id);
+        });
+
+        Route::put('{assigmentId}/answers/{studentAssigmentId}', function (Request $request, $assigmentId, $studentAssigmentId) {
+
+            
+            $assigment = Assigment::findOrFail($assigmentId);
+
+            $studentanswer = StudentAssigment::findOrFail($studentAssigmentId);
+
+            if ($assigment->id != $studentanswer->assigment_id) return ['message' => 'ilegal move'];
+
+
+            $studentanswer->grade = $request->grade;
+
+            $studentanswer->save();
+
+
+            return ['message' => 'ok'];
+        });
+    });
     Route::group(['prefix' => 'meetings'], function () {
 
         Route::get('/', function (Request $request) {
@@ -962,7 +1089,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $room->users()->sync($request->participants ?? []);
 
-            $room->save();
+            $meeting = Meeting::find($meeting->id);
+
+            broadcast(new MeetingChangeEvent($meeting));
 
             return $meeting;
         });
@@ -983,7 +1112,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $room->users()->sync([$user->id]);
 
-            return Meeting::find($meeting->id);
+            $meeting = Meeting::find($meeting->id);
+
+            broadcast(new MeetingChangeEvent($meeting));
+
+            return $meeting;
         });
 
 
@@ -1063,53 +1196,84 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $events  = collect([]);
 
-            $now = now();
+
 
             $classrooms = $teacher->classrooms();
 
             foreach ($classrooms->get() as $classroom) {
+                $eventsData = Octane::concurrently([
+                    function () use ($classroom) {
+                        $now = now();
 
-                $data = $classroom->exams()->with(["examsessions" => function ($q) use ($now) {
-                    $q->latest()->where('close_at', '>', $now);
-                }])->get();
+                        $data = $classroom->exams()->with(["examsessions" => function ($q) use ($now) {
+                            $q->latest()->where('close_at', '>', $now);
+                        }])->get();
 
-                $data = $data->map(fn ($e) => $e->examsessions)->flatten();
+                        $data = $data->map(fn ($e) => $e->examsessions)->flatten();
 
-                $data = $data->map(function ($e) {
-                    return [
-                        'name' => $e->exam->name,
-                        'subject' => $e->exam->subject,
-                        'classroom' => $e->exam->classroom,
-                        'teacher' => $e->exam->teacher,
-                        'id' => $e->id,
-                        'close_at' => $e->close_at,
-                        'open_at' => $e->open_at,
-                        'created_at' => $e->created_at,
-                        'updated_at' => $e->updated_at,
-                        'type' => 'Exam',
-                    ];
-                });
+                        $data = $data->map(function ($e) {
+                            return [
+                                'name' => $e->exam->name,
+                                'subject' => $e->exam->subject,
+                                'classroom' => $e->exam->classroom,
+                                'teacher' => $e->exam->teacher,
+                                'id' => $e->id,
+                                'close_at' => $e->close_at,
+                                'open_at' => $e->open_at,
+                                'created_at' => $e->created_at,
+                                'updated_at' => $e->updated_at,
+                                'type' => 'Exam',
+                            ];
+                        });
+                        return $data;
+                    },
+                    function () use ($classroom) {
+                        $data = $classroom->meetings()->whereNull('finish_at')->get();
 
-                $events = $events->merge($data);
+                        $data = $data->map(function ($e) use ($classroom) {
+                            return [
+                                'name' => $e->name,
+                                'subject' => $classroom->subject,
+                                'classroom' => $classroom,
+                                'teacher' => $classroom->teacher,
+                                'id' => $e->id,
+                                'close_at' => $e->finish_at,
+                                'open_at' => $e->start_at,
+                                'created_at' => $e->created_at,
+                                'updated_at' => $e->updated_at,
+                                'type' => 'Meeting',
+                            ];
+                        });
+                        return $data;
+                    },
+                    function () use ($teacher, $classroom) {
+                        $data = $teacher->assigments()->where('close_at', '>', now())->get();
 
-                $data = $classroom->meetings()->whereNull('finish_at')->get();
+                        $data = $data->map(function ($e) use ($classroom) {
+                            return [
+                                'name' => $e->name,
+                                'subject' => $classroom->subject,
+                                'classroom' => $classroom,
+                                'teacher' => $classroom->teacher,
+                                'id' => $e->id,
+                                'close_at' => $e->close_at,
+                                'open_at' => $e->created_at,
+                                'created_at' => $e->created_at,
+                                'updated_at' => $e->updated_at,
+                                'type' => 'Assigment',
+                            ];
+                        });
 
-                $data = $data->map(function ($e) use ($classroom) {
-                    return [
-                        'name' => $e->name,
-                        'subject' => $classroom->subject,
-                        'classroom' => $classroom,
-                        'teacher' => $classroom->teacher,
-                        'id' => $e->id,
-                        'close_at' => $e->finish_at,
-                        'open_at' => $e->start_at,
-                        'created_at' => $e->created_at,
-                        'updated_at' => $e->updated_at,
-                        'type' => 'Meeting',
-                    ];
-                });
+                        return $data;
+                    }
 
-                $events = $events->merge($data);
+                ]);
+
+                foreach ($eventsData as $event) {
+                    foreach ($event as $e) {
+                        $events->push($e);
+                    }
+                }
             }
 
             return $events;
