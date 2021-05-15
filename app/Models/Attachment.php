@@ -18,7 +18,7 @@ class Attachment extends Model
 
     function getPathAttribute()
     {
-        return request()->getSchemeAndHttpHost() . '/attachments/' . $this->name;
+        return env('APP_URL') . '/attachments/' . $this->name;
     }
 
     public function getFilePathAttribute()
