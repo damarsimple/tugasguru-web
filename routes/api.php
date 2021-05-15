@@ -79,6 +79,8 @@ Route::get('/cities/{id}/schools', function (Request $request, $id) {
     }
 });
 
+Route::get('/test1', fn () => ini_get('upload_max_filesize'));
+
 Route::post("/token", [ApiAuthController::class, "token"]);
 Route::post("/login", [ApiAuthController::class, "login"]);
 Route::post("/register", [ApiAuthController::class, "register"]);
@@ -1000,7 +1002,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::put('{assigmentId}/answers/{studentAssigmentId}', function (Request $request, $assigmentId, $studentAssigmentId) {
 
-            
+
             $assigment = Assigment::findOrFail($assigmentId);
 
             $studentanswer = StudentAssigment::findOrFail($studentAssigmentId);
