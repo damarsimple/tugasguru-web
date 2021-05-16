@@ -606,7 +606,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                         return $data;
                     },
                     function () use ($classroom) {
-                        $data = $classroom->assigments()->where('close_at', '>', now())->get();
+                        $data = $classroom->assigments()->where('close_at', '>', now())->with('teacher', 'classroom', 'subject')->get();
 
                         $data = $data->map(function ($e) use ($classroom) {
                             return [
@@ -1249,7 +1249,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                         return $data;
                     },
                     function () use ($teacher, $classroom) {
-                        $data = $teacher->assigments()->where('close_at', '>', now())->get();
+                        $data = $teacher->assigments()->where('close_at', '>', now())->with('teacher', 'classroom', 'subject')->get();
 
                         $data = $data->map(function ($e) use ($classroom) {
                             return [

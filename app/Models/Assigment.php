@@ -13,7 +13,7 @@ class Assigment extends Model
 {
     use HasFactory;
 
-    protected $with = ['teacher', 'classroom', 'subject'];
+    // protected $with = ['teacher', 'classroom', 'subject'];
 
     public function teacher(): BelongsTo
     {

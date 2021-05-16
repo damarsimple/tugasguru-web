@@ -12,7 +12,7 @@ class Classroom extends Model
 {
     use HasFactory;
 
-    public $with = ['classtype'];
+    public $with = ['classtype', 'assigments'];
 
     public $appends = ['name_formatted'];
     
