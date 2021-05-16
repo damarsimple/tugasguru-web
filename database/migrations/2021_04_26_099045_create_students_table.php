@@ -24,8 +24,6 @@ class CreateStudentsTable extends Migration
             $table->foreignId('classtype_id')->nullable()->index()->constrained()->onDelete('cascade');
             $table->bigInteger('nisn');
             $table->foreignId('school_id')->index()->constrained()->onDelete('cascade');
-            $table->string('specialty')->nullable();
-            $table->string('academic_degree')->nullable();
             $table->timestamps();
         });
     }

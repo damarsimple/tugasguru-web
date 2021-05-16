@@ -65,6 +65,8 @@ class CreateNewUser implements CreatesNewUsers
             'city_id' => $input['city_id'],
             'district_id' => $input['district_id'],
             'phone' => $input['phone'],
+            'specialty' => $input['specialty'] ?? null,
+            'academic_degree' => $input['academic_degree'] ?? null,
             'roles' => $input['roles']
         ]);
 
@@ -73,8 +75,7 @@ class CreateNewUser implements CreatesNewUsers
             case 'TEACHER_BIMBEL':
                 $teacher = new Teacher();
                 $teacher->user_id = $user->id;
-                $teacher->specialty = $input['specialty'] ?? null;
-                $teacher->academic_degree = $input['academic_degree'] ?? null;
+
                 $teacher->is_bimbel = $input['roles'] == 'TEACHER_BIMBEL' ? true : false;
                 $teacher->school_id = $input['school_id'] ?? null;
                 $user->teacher()->save($teacher);
@@ -83,8 +84,6 @@ class CreateNewUser implements CreatesNewUsers
                 $student = new Student();
                 $student->nisn = $input['nisn'];
                 $student->school_id = $input['school_id'];
-                $student->specialty = $input['specialty'] ?? null;
-                $student->academic_degree = $input['academic_degree'] ?? null;
                 $user->student()->save($student);
                 break;
             default:

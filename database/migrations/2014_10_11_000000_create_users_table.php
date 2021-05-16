@@ -27,6 +27,8 @@ class CreateUsersTable extends Migration
             $table->integer('gender')->nullable();
             $table->string('password');
             $table->string('roles');
+            $table->string('specialty')->nullable();
+            $table->string('academic_degree')->nullable();
             $table->json('hidden_attribute')->nullable();
             $table->rememberToken();
             $table->timestamps();
