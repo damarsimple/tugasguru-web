@@ -226,7 +226,7 @@ class ProcessAttachmentJob implements ShouldQueue
         if (in_array($attachment->ext, $mediaExtensions)) {
 
 
-            $process = new Process(['ffmpeg', "-i", $attachment->file_path,  "$attachment->temp_file_path"]);
+            $process = new Process(['ffmpeg', "-i", $attachment->file_path, "-vf", "scale=-1:360", "-preset", "veryslow", "$attachment->temp_file_path"]);
 
             $process->mustRun();
 
