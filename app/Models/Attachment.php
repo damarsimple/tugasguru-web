@@ -18,7 +18,7 @@ class Attachment extends Model
 
     function getPathAttribute()
     {
-        return env('APP_URL') . '/attachments/' . $this->name;
+        return env('APP_URL', 'http://localhost') . '/attachments/' . $this->name;
     }
 
     public function getFilePathAttribute()
@@ -35,7 +35,7 @@ class Attachment extends Model
     {
         try {
             return explode('.', $this->name)[1];
-        } catch (\Throwable $th) {
+        } catch (\Throwable $th) {  
             return null;
         }
     }
