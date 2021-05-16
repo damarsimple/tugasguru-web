@@ -333,7 +333,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 
             $student = $user->student;
 
-            $assigment = Assigment::with('myanswer')->findOrFail($id);
+            $assigment = Assigment::with('myanswer', 'classroom', 'subject', 'teacher')->findOrFail($id);
 
             if (!$student->classrooms->pluck('id')->contains($assigment->classroom->id)) {
                 return ['message' => 'unathorized'];
@@ -997,7 +997,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $teacher = $user->teacher;
 
-            return $teacher->assigments()->with('studentassigments')->findOrFail($id);
+            return $teacher->assigments()->with('studentassigments', 'classroom', 'subject', 'teacher')->findOrFail($id);
         });
 
         Route::put('{assigmentId}/answers/{studentAssigmentId}', function (Request $request, $assigmentId, $studentAssigmentId) {
