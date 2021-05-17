@@ -449,9 +449,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             }
 
             if ($candidate->roles == "TEACHER") {
-                $candidate->teacher->requestfollow()->attach($student?->user?->id);
+                $candidate->teacher->requestfollow()->syncWithoutDetaching([$student?->user?->id]);
             } else {
-                $candidate->student->requestfollow()->attach($student?->user?->id);
+                $candidate->student->requestfollow()->syncWithoutDetaching([$student?->user?->id]);
             }
 
             return ['message' => 'ok'];
@@ -964,7 +964,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 return ['message' => 'invalid follow target'];
             }
 
-            $candidate->teacher->requestfollow()->attach($teacher?->user?->id);
+            $candidate->teacher->requestfollow()->syncWithoutDetaching([$teacher?->user?->id]);
 
             return ['message' => 'ok'];
         });
