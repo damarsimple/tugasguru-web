@@ -158,7 +158,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
     Route::get('notifications', function (Request $request) {
 
-        return $request->user()->notifications;
+        return $request->user->notifications;
     });
 
 
