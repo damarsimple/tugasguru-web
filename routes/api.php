@@ -315,6 +315,10 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
                 'student_id' => $student->id,
             ]);
 
+            if ($studentAssigment->edited_times > 3) {
+                return ['message' => 'Anda tidak bisa mengubah tugas lebih dari 3 kali'];
+            }
+
             $studentAssigment->content = $request->content;
 
             $studentAssigment->external_url = $request->external_url;
@@ -323,7 +327,13 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 
             $studentAssigment->turned_at = now();
 
+
+            $studentAssigment->increment('edited_times');
+
+
             $studentAssigment->save();
+
+
 
             return ['message' => 'ok'];
         });
@@ -1011,6 +1021,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
             $studentanswer->grade = $request->grade;
+
+            $studentanswer->comment = $request->comment;
+
+            $studentanswer->is_graded = true;
 
             $studentanswer->save();
 

@@ -26,8 +26,8 @@ class MeetingObserver
         $studentUserIds = $meeting->classroom->students->pluck('user.id');
 
         $room = new Room();
-        $room->name = 'Umum';
-        $room->identifier = 'meeting.' . $meeting->id;
+        $room->name = 'Diskusi Kelas';
+        $room->identifier = 'meeting.general.' . $meeting->id;
         $meeting->rooms()->save($room);
 
         $room->users()->attach(array_merge([$meeting->teacher->user->id], $studentUserIds->toArray()));

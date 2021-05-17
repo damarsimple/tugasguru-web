@@ -20,6 +20,9 @@ class CreateStudentAssigmentsTable extends Migration
             $table->longText('content')->nullable();
             $table->string('external_url')->nullable();
             $table->float('grade', unsigned: true)->default(0);
+            $table->boolean('is_graded')->default(false);
+            $table->longText('comment')->nullable();
+            $table->smallInteger('edited_times')->default(1);
             $table->timestamp('turned_at')->nullable();
             $table->timestamps();
         });

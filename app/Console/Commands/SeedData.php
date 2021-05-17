@@ -421,8 +421,6 @@ class SeedData extends Command
         $user->save();
 
         $teacher = new Teacher();
-        $teacher->specialty = "any";
-        $teacher->academic_degree = "any";
         $teacher->is_bimbel = false;
         $teacher->school_id = 1;
         $user->teacher()->save($teacher);
@@ -443,8 +441,6 @@ class SeedData extends Command
         $user->save();
 
         $teacher = new Teacher();
-        $teacher->specialty = "any";
-        $teacher->academic_degree = "any";
         $teacher->is_bimbel = false;
         $teacher->school_id = 1;
         $user->teacher()->save($teacher);
@@ -467,7 +463,6 @@ class SeedData extends Command
 
         $student = new Student();
         $student->nisn = 1234568123;
-        $student->academic_degree = "any";
         $student->school_id = 1;
         $student->classtype_id = 1;
         $user->student()->save($student);
