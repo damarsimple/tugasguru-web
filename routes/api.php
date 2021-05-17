@@ -158,6 +158,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
     Route::get('notifications', function (Request $request) {
 
+        return [];
         return $request->user->unreadNotifications;
     });
 
