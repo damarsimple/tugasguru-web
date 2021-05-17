@@ -50,6 +50,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'hidden_attribute' => 'array'
     ];
 
     public const PROFILEPICTURE = 'PROFILEPICTURE';
@@ -98,6 +99,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Article');
     }
 
+    public function frontarticles(): HasMany
+    {
+        return $this->hasMany('App\Models\Article')->take(10)->latest();
+    }
+
 
     function followingteachers(): BelongsToMany
     {
@@ -123,5 +129,4 @@ class User extends Authenticatable
     {
         return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::PROFILEPICTURE);
     }
-    
 }

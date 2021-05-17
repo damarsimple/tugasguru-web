@@ -140,6 +140,15 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
 
+    Route::get('{id}', function (Request $request, $id) {
+
+        return User::with(
+            'student.followers',
+            'teacher.followers',
+            'frontarticles'
+        )->findOrFail($id);
+    });
+
     Route::get('mark-read-all', function (Request $request) {
 
         $request->user()->unreadNotifications->markAsRead();
@@ -164,6 +173,13 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
         $user->gender = $request->gender;
         $user->address = $request->address;
 
+        $user->specialty = $request->specialty;
+        $user->academic_degree = $request->academic_degree;
+
+        if ($request->hidden_attribute) {
+            $user->hidden_attribute = json_encode($request->hidden_attribute);
+        }
+
         $user->save();
 
         if ($request->has('profilepicture')) {
@@ -172,17 +188,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             $newPicture->save();
             $user->profilepicture()->delete();
             $user->profilepicture()->save($newPicture);
-        }
-        if ($user->roles == "TEACHER") {
-            $teacher = $user->teacher;
-            $teacher->specialty = $request->specialty;
-            $teacher->academic_degree = $request->academic_degree;
-            $teacher->save();
-        } else {
-            $student = $user->student;
-            $student->specialty = $request->specialty;
-            $student->academic_degree = $request->academic_degree;
-            $student->save();
         }
 
         return ['message' => 'ok'];
