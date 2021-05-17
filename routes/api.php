@@ -140,14 +140,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
 
-    Route::get('{id}', function (Request $request, $id) {
 
-        return User::with(
-            'student.followers',
-            'teacher.followers',
-            'frontarticles'
-        )->findOrFail($id);
-    });
 
     Route::get('mark-read-all', function (Request $request) {
 
@@ -158,8 +151,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
     Route::get('notifications', function (Request $request) {
 
-        return [];
-        return $request->user->unreadNotifications;
+        return $request->user()->unreadNotifications;
     });
 
 
@@ -207,6 +199,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             return $attachment;
         });
     });
+
 
     Route::group(['prefix' => 'messages'], function () {
 
@@ -286,6 +279,17 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
                 ]);
             });
         });
+    });
+
+
+
+    Route::get('{id}', function (Request $request, $id) {
+
+        return User::with(
+            'student.followers',
+            'teacher.followers',
+            'frontarticles'
+        )->findOrFail($id);
     });
 });
 Route::get('/attachments/{id}', fn ($id) => Attachment::findOrFail($id));
