@@ -20,7 +20,7 @@ class CreateAbsentsTable extends Migration
             $table->string('title');
             $table->longText('reason');
             $table->timestamp('start_at');
-            $table->timestamp('finish_at');
+            $table->timestamp('finish_at')->nullable();
             $table->timestamps();
         });
     }
