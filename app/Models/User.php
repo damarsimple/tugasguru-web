@@ -115,6 +115,16 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\Student')->where('is_accepted', true);
     }
 
+    function requestfollowingteachers(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Teacher')->where('is_accepted', false);
+    }
+
+    function requestfollowingstudents(): belongsToMany
+    {
+        return $this->belongsToMany('App\Models\Student')->where('is_accepted', false);
+    }
+
     public function getFollowingCountAttribute()
     {
         return $this->followingteachers()->count() + $this->followingstudents()->count();

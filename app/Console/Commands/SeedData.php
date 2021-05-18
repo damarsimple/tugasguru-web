@@ -406,126 +406,128 @@ class SeedData extends Command
         }
 
 
+        if ($onTest) {
 
-        $user = new User();
-        $user->name = "Damar Albaribin Guru 1";
-        $user->email = "damaralbaribin@gmail.com";
-        $user->password = Hash::make("we5n9t5ReNV8gNE");
-        $user->city_id = 1;
-        $user->province_id = 1;
-        $user->district_id = 1;
-        $user->gender = 1;
-        $user->phone = "08987181017";
-        $user->roles = "TEACHER";
+            $user = new User();
+            $user->name = "Damar Albaribin Guru 1";
+            $user->email = "damaralbaribin@gmail.com";
+            $user->password = Hash::make("we5n9t5ReNV8gNE");
+            $user->city_id = 1;
+            $user->province_id = 1;
+            $user->district_id = 1;
+            $user->gender = 1;
+            $user->phone = "08987181017";
+            $user->roles = "TEACHER";
 
-        $user->save();
+            $user->save();
 
-        $teacher = new Teacher();
-        $teacher->is_bimbel = false;
-        $teacher->school_id = 1;
-        $user->teacher()->save($teacher);
+            $teacher = new Teacher();
+            $teacher->is_bimbel = false;
+            $teacher->school_id = 1;
+            $user->teacher()->save($teacher);
 
-        $teacher->subjects()->attach(Subject::first());
+            $teacher->subjects()->attach(Subject::first());
 
-        $user = new User();
-        $user->name = "Damar Albaribin Guru 2";
-        $user->email = "damaralbaribin2@gmail.com";
-        $user->password = Hash::make("we5n9t5ReNV8gNE");
-        $user->city_id = 1;
-        $user->province_id = 1;
-        $user->district_id = 1;
-        $user->gender = 1;
-        $user->phone = "08987181012";
-        $user->roles = "TEACHER";
+            $user = new User();
+            $user->name = "Damar Albaribin Guru 2";
+            $user->email = "damaralbaribin2@gmail.com";
+            $user->password = Hash::make("we5n9t5ReNV8gNE");
+            $user->city_id = 1;
+            $user->province_id = 1;
+            $user->district_id = 1;
+            $user->gender = 1;
+            $user->phone = "08987181012";
+            $user->roles = "TEACHER";
 
-        $user->save();
+            $user->save();
 
-        $teacher = new Teacher();
-        $teacher->is_bimbel = false;
-        $teacher->school_id = 1;
-        $user->teacher()->save($teacher);
-
-
-        $teacher->subjects()->attach(Subject::first());
-
-        $user = new User();
-        $user->name = "Damar Albaribin Siswa";
-        $user->email = "damara1@gmail.com";
-        $user->password = Hash::make("123456789");
-        $user->city_id = 1;
-        $user->province_id = 1;
-        $user->district_id = 1;
-        $user->gender = 1;
-        $user->phone = "08987181014";
-        $user->roles = "STUDENT";
-
-        $user->save();
-
-        $student = new Student();
-        $student->nisn = 1234568123;
-        $student->school_id = 1;
-        $student->classtype_id = 1;
-        $user->student()->save($student);
+            $teacher = new Teacher();
+            $teacher->is_bimbel = false;
+            $teacher->school_id = 1;
+            $user->teacher()->save($teacher);
 
 
-        $school = School::first();
+            $teacher->subjects()->attach(Subject::first());
 
-        $classroom = new Classroom();
-        $classroom->name =  "Test";
-        $classroom->teacher_id = 1;
-        $classroom->classtype_id = 1;
-        $school->classrooms()->save($classroom);
+            $user = new User();
+            $user->name = "Damar Albaribin Siswa";
+            $user->email = "damara1@gmail.com";
+            $user->password = Hash::make("123456789");
+            $user->city_id = 1;
+            $user->province_id = 1;
+            $user->district_id = 1;
+            $user->gender = 1;
+            $user->phone = "08987181014";
+            $user->roles = "STUDENT";
 
-        $classroom->students()->save($student);
+            $user->save();
 
-        $classroom = new Classroom();
-        $classroom->name =  "Test";
-        $classroom->teacher_id = 2;
-        $classroom->classtype_id = 1;
-        $school->classrooms()->save($classroom);
+            $student = new Student();
+            $student->nisn = 1234568123;
+            $student->school_id = 1;
+            $student->classtype_id = 1;
+            $user->student()->save($student);
+
+
+            $school = School::first();
+
+            $classroom = new Classroom();
+            $classroom->name =  "Test";
+            $classroom->teacher_id = 1;
+            $classroom->classtype_id = 1;
+            $school->classrooms()->save($classroom);
+
+            $classroom->students()->save($student);
+
+            $classroom = new Classroom();
+            $classroom->name =  "Test";
+            $classroom->teacher_id = 2;
+            $classroom->classtype_id = 1;
+            $school->classrooms()->save($classroom);
 
 
 
-        // $teacher->user->followingteachers()->attach($student->user->id);
+            // $teacher->user->followingteachers()->attach($student->user->id);
 
-        $classroom->students()->save($student);
+            $classroom->students()->save($student);
 
-        $meeting = new Meeting();
+            $meeting = new Meeting();
 
-        $meeting->subject_id  = Subject::first()->id;
+            $meeting->subject_id  = Subject::first()->id;
 
-        $meeting->name = "Pertemuan oleh kian santang";
+            $meeting->name = "Pertemuan oleh kian santang";
 
-        $meeting->teacher_id = $teacher->id;
+            $meeting->teacher_id = $teacher->id;
 
-        $meeting->start_at = now();
+            $meeting->start_at = now();
 
-        $classroom->meetings()->save($meeting);
+            $classroom->meetings()->save($meeting);
 
-        foreach (['Umum', 'Kelompok 1', 'Kelompok 2'] as $name) {
-            $room = new Room();
-            $room->name = $name;
-            $room->identifier = "meeeting.chat." . $meeting->id;
-            $meeting->rooms()->save($room);
+            foreach (['Umum', 'Kelompok 1', 'Kelompok 2'] as $name) {
+                $room = new Room();
+                $room->name = $name;
+                $room->identifier = "meeeting.chat." . $meeting->id;
+                $meeting->rooms()->save($room);
 
-            $room->users()->attach($teacher->user->id, ['is_administrator' => true]);
+                $room->users()->attach($teacher->user->id, ['is_administrator' => true]);
 
-            $room->users()->attach($student->user->id);
+                $room->users()->attach($student->user->id);
+            }
+
+            $assigment = new Assigment();
+
+            $assigment->name = "Test Assigment";
+
+            $assigment->content = "Test";
+
+            $assigment->classroom_id = $classroom->id;
+
+            $assigment->subject_id = 1;
+
+            $assigment->close_at = now()->addHour(4);
+
+            $teacher->assigments()->save($assigment);
         }
-
-        $assigment = new Assigment();
-
-        $assigment->name = "Test Assigment";
-
-        $assigment->content = "Test";
-
-        $assigment->classroom_id = $classroom->id;
-
-        $assigment->subject_id = 1;
-
-        $assigment->close_at = now()->addHour(4);
-
-        $teacher->assigments()->save($assigment);
 
         print("finish at " . time() - $start . PHP_EOL);
         return 0;

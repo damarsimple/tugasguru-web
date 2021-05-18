@@ -13,7 +13,7 @@ class Exam extends Model
     use HasFactory;
 
     public $with = ['teacher', 'subject', 'examtype', 'classroom'];
-    
+
     public function examsessions(): HasMany
     {
         return $this->hasMany('App\Models\Examsession');
@@ -60,5 +60,10 @@ class Exam extends Model
     public function teacher(): BelongsTo
     {
         return $this->belongsTo('App\Models\Teacher');
+    }
+
+    public function attendances()
+    {
+        return $this->morphMany('App\Models\Attachment', 'attendable');
     }
 }

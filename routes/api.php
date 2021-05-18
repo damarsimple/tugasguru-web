@@ -6,13 +6,16 @@ use App\Events\NewPrivateMessageEvent;
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
+use App\Models\Absent;
 use App\Models\Answer;
 use App\Models\Article;
 use App\Models\Assigment;
 use App\Models\Attachment;
+use App\Models\Attendance;
 use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
+use App\Models\Consultation;
 use App\Models\District;
 use App\Models\Exam;
 use App\Models\Examresult;
@@ -94,12 +97,25 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
 
         if ($user->roles == "TEACHER") {
             $teacher = $user->teacher;
-
             return $teacher->meetings()->with('classroom.students')->findOrFail($id);
         } else {
             $meeting = Meeting::with('classroom.students')->with(['rooms' => function ($e) use ($user) {
                 return $e->whereHas('users', fn ($e) => $e->where('user_id', $user->id));
             }])->findOrFail($id);
+
+            $attendance = Attendance::firstOrCreate([
+                'teacher_id' => $meeting->teacher_id,
+                'subject_id' => $meeting->subject_id,
+                'classroom_id' => $meeting->classroom_id,
+                'student_id' => $user->student->id,
+                'attendable_id' => $meeting->id,
+                'attendable_type' => Meeting::class
+            ]);
+
+            $attendance->updated_at = now();
+
+            $attendance->save();
+
             return $meeting;
         }
         return;
@@ -391,8 +407,51 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' => 'students'], function () {
 
+    Route::group(['prefix' => 'absents'], function () {
+        Route::post('/', function (Request $request) {
+            $user = $request->user();
+            /**  @var App/Models/Student $student  */
+            $student = $user->student;
+
+            $absent = new Absent();
+            $absent->teacher_id = $request->teacher;
+            $absent->title = $request->title;
+            $absent->reason = $request->reason;
+            $absent->start_at = Carbon::parse($request->start_at);
+            $absent->finish_at = Carbon::parse($request->finish_at);
+
+            $student->absents()->save($absent);
+        });
+
+        Route::get('/', fn (Request $request) => $request->user->student->absents()->paginate(10));
+    });
+
+    Route::group(['prefix' => 'consultations'], function () {
+        Route::post('/', function (Request $request) {
+            $user = $request->user();
+            /**  @var App/Models/Student $student  */
+            $student = $user->student;
+            $constult = new Consultation();
+            $constult->teacher_id = User::findOrFail($request->teacher)->teacher->id;
+            $constult->title = $request->title;
+            $constult->problem = $request->problem;
+            $student->consultations()->save($constult);
+        });
+
+        Route::get('/', fn (Request $request) => $request->user->student->consultations()->paginate(10));
+    });
 
     Route::group(['prefix' => 'followers'], function () {
+
+        Route::get('/following', function (Request $request) {
+            /**  @var App/Models/Student $student  */
+            $user = $request->user();
+
+            return array_merge(
+                $user->followingteachers->map(fn ($e) => $e->user)->toArray(),
+                $user->followingstudents->map(fn ($e) => $e->user)->toArray()
+            );
+        });
 
         Route::get('/myfollowing', function (Request $request) {
             /**  @var App/Models/Student $student  */
@@ -667,6 +726,21 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $exam = Exam::findOrFail($id);
 
+
+            $attendance = Attendance::firstOrCreate([
+                'teacher_id' => $exam->teacher_id,
+                'subject_id' => $exam->subject_id,
+                'classroom_id' => $exam->classroom_id,
+                'student_id' => $student->id,
+                'attendable_id' => $exam->id,
+                'attendable_type' => Exam::class
+            ]);
+
+            $attendance->updated_at = now();
+
+            $attendance->save();
+
+
             if (!$exam->classroom->students()->where('students.id', $student->id)->exists()) {
                 return response(['message' => 'Anda Tidak Memiliki Akses ulangan ini !'], 401);
             }
@@ -707,6 +781,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             ]);
 
             $examresult->save();
+
 
 
 
@@ -908,6 +983,34 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
 
 
+    Route::group(['prefix' => 'consultations'], function () {
+
+        Route::get('/', function (Request $request) {
+            /**  @var App/Models/User $user  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            $classrooms = $teacher->classrooms()->get('id')->pluck('id');
+
+            $students = $teacher
+                ->school
+                ->students()
+                ->whereHas('classrooms', fn ($e) => $e->whereIn('classroom_id', $classrooms))->get('id')->pluck('id');
+
+            return Consultation::whereIn('student_id', $students)->paginate(10);
+        });
+
+        Route::put('{id}', function (Request $request, $id) {
+            $constult = Consultation::findOrFail($id);
+
+            $constult->note = $request->note;
+            $constult->advice = $request->advice;
+
+            $constult->save();
+
+            return ['message' => 'ok'];
+        });
+    });
     Route::group(['prefix' => 'followers'], function () {
 
         Route::get('/myfollowing', function (Request $request) {
@@ -1075,6 +1178,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $meeting =  $teacher->meetings()->findOrFail($id);
 
             $meeting->name = $request->name ??  $meeting->name;
+
+            $meeting->content = $request->content ??  $meeting->content;
+
             $meeting->data = $request->data ?? null;
 
             if ($request->finish_at) {
@@ -1114,6 +1220,24 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $room->name = $request->name;
 
             $room->users()->sync($request->participants ?? []);
+
+            $meeting = Meeting::find($meeting->id);
+
+            broadcast(new MeetingChangeEvent($meeting));
+
+            return $meeting;
+        });
+
+        Route::delete('{meetingId}/{roomId}', function (Request $request, $meetingId, $roomId) {
+            /**  @var App/Models/User $teacher  */
+            $user = $request->user();
+            $teacher = $user->teacher;
+
+            $meeting =  $teacher->meetings()->findOrFail($meetingId);
+
+            $room = $meeting->rooms()->findOrFail($roomId);
+
+            $room->delete();
 
             $meeting = Meeting::find($meeting->id);
 

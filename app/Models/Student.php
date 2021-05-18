@@ -50,4 +50,14 @@ class Student extends Model
     {
         return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
     }
+
+    public function consultations(): HasMany
+    {
+        return $this->hasMany('App\Models\Consultation');
+    }
+
+    public function absents(): HasMany
+    {
+        return $this->hasMany('App\Models\Absent');
+    }
 }

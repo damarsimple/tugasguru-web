@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMeetingsTable extends Migration
+class CreateAttendancesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,14 @@ class CreateMeetingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('meetings', function (Blueprint $table) {
+        Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->json('data')->nullable();
-            $table->timestamp('start_at')->useCurrent();
-            $table->string('description')->nullable();
-            $table->longText('content')->nullable();
-            $table->timestamp('finish_at')->nullable();
-            $table->foreignId('article_id')->nullable()->index();
+            $table->foreignId('student_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('attendable_id')->nullable();
+            $table->string('attendable_type')->nullable();
             $table->timestamps();
         });
     }
@@ -36,6 +32,6 @@ class CreateMeetingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('meetings');
+        Schema::dropIfExists('attendances');
     }
 }

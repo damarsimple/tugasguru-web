@@ -12,7 +12,7 @@ class Meeting extends Model
 {
     use HasFactory;
 
-    protected $with = ['rooms', 'classroom.students', 'subject', 'teacher','article'];
+    protected $with = ['rooms', 'classroom.students', 'subject', 'teacher', 'article'];
 
     protected $casts  = ['data' => 'object'];
 
@@ -44,5 +44,10 @@ class Meeting extends Model
     public function attachments()
     {
         return $this->morphMany('App\Models\Attachment', 'attachable');
+    }
+
+    public function attendances()
+    {
+        return $this->morphMany('App\Models\Attachment', 'attendable');
     }
 }
