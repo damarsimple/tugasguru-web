@@ -18,6 +18,7 @@ class CreateAssigmentsTable extends Migration
             $table->string('name');
             $table->longText('content');
             $table->timestamp('close_at')->nullable();
+            $table->boolean('is_odd_semester')->default(true);
             $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('teacher_id')->index()->constrained('users')->onDelete('cascade');
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');

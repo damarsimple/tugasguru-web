@@ -222,4 +222,19 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Question');
     }
+
+    public function examresults(): HasMany
+    {
+        return $this->hasMany('App\Models\Examresult');
+    }
+
+    public function studentassigments(): HasMany
+    {
+        return $this->hasMany('App\Models\StudentAssigment');
+    }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany('App\Models\Attendance');
+    }
 }

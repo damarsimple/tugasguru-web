@@ -18,6 +18,9 @@ class Attendance extends Model
         'attendable_id',
         'attendable_type'
     ];
+    
+
+    protected $with = ['subject', 'attendable', 'classroom.teacher'];
     public function user(): BelongsTo
     {
         return $this->belongsTo('App\Models\User');

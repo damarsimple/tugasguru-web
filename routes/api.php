@@ -59,6 +59,7 @@ Broadcast::routes(['middleware' => ['api', 'auth:sanctum']]);
 
 Route::get('me', fn (Request $request) => $request->user());
 
+Route::get('examtypes', fn () => Examtype::all());
 Route::get('/provinces', fn () => Province::all());
 Route::get('/provinces/{id}/city', fn ($id) => Province::findOrFail($id)->cities);
 Route::get('/cities/{id}/districts', fn ($id) => City::findOrFail($id)->districts);
@@ -310,6 +311,41 @@ Route::get('/{id}/rank', function (Request $request, $id) {
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], function () {
 
+
+    Route::group(['prefix' => 'attendances'], function () {
+        Route::get('/', function (Request $request) {
+            return $request->user()->attendances()->paginate(10);
+        });
+    });
+    Route::group(['prefix' => 'subjects'], function () {
+
+        Route::get('/all', function (Request $request) {
+            return Subject::all();
+        });
+    });
+    Route::group(['prefix' => 'grades'], function () {
+
+        Route::get('/', function (Request $request) {
+
+            $examresultSubjects = $request->user()->examresults()->get()->groupBy('exam.subject.name');
+            $studentassigments = $request->user()->studentassigments()->get()->groupBy('assigment.subject.name');
+            $map = [];
+
+            foreach ($examresultSubjects as $subject => $examresult) {
+
+                $types = $examresult->groupBy('exam.examtype.name');
+
+                foreach ($types as $type => $value) {
+                    $map[$subject][$type] = $value;
+                }
+            }
+            foreach ($studentassigments as $subject => $value) {
+                $map[$subject]["Tugas"] = $value;
+            }
+
+            return $map;
+        });
+    });
     Route::group(['prefix' => 'assigments'], function () {
         Route::post('/{id}', function (Request $request, $id) {
             $user = $request->user();
@@ -399,7 +435,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $user->absents()->save($absent);
         });
 
-        Route::get('/', fn (Request $request) => $request->user()->student->absents()->paginate(10));
+        Route::get('/', fn (Request $request) => $request->user()->absents()->paginate(10));
     });
 
     Route::group(['prefix' => 'consultations'], function () {
@@ -407,7 +443,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $user = $request->user();
 
             $constult = new Consultation();
-            $constult->teacher_id = User::findOrFail($request->teacher)->teacher->id;
+            $constult->teacher_id = User::findOrFail($request->teacher)->id;
             $constult->title = $request->title;
             $constult->problem = $request->problem;
             $user->consultations()->save($constult);
@@ -786,7 +822,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $exam = Exam::findOrFail($id);
 
             $check = $exam->classroom->students()->where('user_id', $user->id)->exists();
-            
+
             $examresult = Examresult::where('user_id', $user->id)
                 ->where('exam_id', $exam->id)->first();
 
@@ -1013,6 +1049,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $assigment->content = $request->content;
 
             $assigment->classroom_id = $request->classroom;
+
+            $assigment->is_odd_semester = $request->is_odd_semester;
 
             $assigment->subject_id = $request->subject;
 

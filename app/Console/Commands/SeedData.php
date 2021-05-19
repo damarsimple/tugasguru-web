@@ -533,6 +533,8 @@ class SeedData extends Command
             $assigment->close_at = now()->addHour(4);
 
             $teacher->assigments()->save($assigment);
+
+            $teacher->followers()->attach([$user->id => ['is_accepted' => true]]);
         }
 
         print("finish at " . time() - $start . PHP_EOL);

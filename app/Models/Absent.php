@@ -10,6 +10,8 @@ class Absent extends Model
 {
     use HasFactory;
 
+    public $with = ['user', 'teacher'];
+    
     public function teacher(): BelongsTo
     {
         return $this->belongsTo('App\Models\User', 'teacher_id');
