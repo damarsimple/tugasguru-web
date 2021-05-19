@@ -37,6 +37,6 @@ class Assigment extends Model
 
     public function myanswer(): HasOne
     {
-        return $this->hasOne('App\Models\StudentAssigment')->where('user_id', request()->user()->student?->id);
+        return $this->hasOne('App\Models\StudentAssigment')->where('user_id', request()->user()->id);
     }
 }

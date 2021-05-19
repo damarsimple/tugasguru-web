@@ -20,7 +20,7 @@ class Examtracker extends Model
         'examsession_id'
     ];
 
-    public function examsessions(): BelongsTo
+    public function examsession(): BelongsTo
     {
         return $this->belongsTo('App\Models\Examsession');
     }

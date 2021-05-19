@@ -5,7 +5,9 @@ scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
 #import types.graphql
-
+#import student/*.graphql
+#import teacher/*.graphql
+#import user/*.graphql
 type Query {
     provinces: [Province!]! @all
     cities: [City!]! @all

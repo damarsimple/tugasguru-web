@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Exam extends Model
 {
@@ -62,7 +63,7 @@ class Exam extends Model
         return $this->belongsTo('App\Models\User', 'teacher_id');
     }
 
-    public function attendances()
+    public function attendances() : MorphMany
     {
         return $this->morphMany('App\Models\Attachment', 'attendable');
     }

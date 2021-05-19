@@ -24,8 +24,4 @@ class Examsession extends Model
         return $this->belongsTo('App\Models\Exam');
     }
 
-    public function examsupervisors(): HasMany
-    {
-        return $this->hasMany('App\Models\ExamSupervisor');
-    }
 }

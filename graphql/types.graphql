@@ -41,4 +41,239 @@ type School {
     longtitude: string
     npsn: string
 
+    teachers: [User!]! @hasMany
+    students: [User!]! @hasMany
+    partteacher: [User!]! @belongsToMany
+    schooltype: Schooltype @belongsTo
+    subjects: [Subject!]! @belongsToMany
+    classrooms: [Classroom!]! @hasMany
+}
+
+type Absent{
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    teacher: User
+    user: User
+}
+
+type Answer {
+    question: Question
+    attachment: Attachment @morphOne
+}
+
+type Article {
+    user: User
+    price: Price
+    thumbnail: Attachment @morphOne
+    subjects: [Subject!]! @belongsToMany
+    classtypes: [Classtype!]! @belongsToMany
+    meetings: [Meeting!]! @hasMany
+}
+
+type Assigment {
+    user: User
+    subject: Subject
+    classroom: Classroom
+    studentassigments: [StudentAssigment!]! @hasMany
+    myanswer: StudentAssigment
+}
+
+
+union Attachable = User
+
+type Attachment {
+    path: String
+    attachable: Attachable @morphTo
+
+}
+
+union Attendable = Meeting | Exam
+
+type Attendance {
+    user: User @belongsTo
+    classroom: Classroom @belongsTo
+    subject: Subject @belongsTo
+    attendable: Attendable @morphTo
+}
+
+type Classroom {
+    students: [Student!]! @belongsToMany
+    user: User @belongsTo
+    subject: Subject @belongsTo
+    exams: [Exam!]! @hasMany
+    classtype: Classtype @belongsTo
+    name_formatted: String
+    meeting: [Meeting!]! @hasMany
+    assigments: [Assigment!] @hasMany
+}
+
+type Classtype {
+    schooltype: Schooltype @belongsTo
+    name: String
+}
+
+type Consultation {
+    user: User @belongsTo
+    teacher: User @belongsTo
+}
+
+type Exam {
+    examsessions: [Examsession!]! @hasMany
+    examresults: [Examresult!]! @hasMany
+    questions: [Question!]! @hasMany
+    subject: Subject @belongsTo
+    classroom: Classroom @belongsTo 
+    supervisors: User @belongsToMany
+    examtype: Examtype @belongsTo
+    teacher: User
+    attendances: [Attendance!]! @morphMany
+}
+
+type Examresult {
+    exam: Exam @belongsTo
+    user: User @belongsTo
+    examsession: Examsession @belongsTo
+    studentanswers: StudentAnswer @hasMany
+}
+
+type Examsession {
+    exam: Exam @belongsTo
+}
+
+type Examtracker {
+    examsession: Examsession @belongsTo
+    exam: Exam @belongsTo
+    user: User @belongsTo
+}
+
+type Examtype {
+    exams: [Exam!]! @hasMany
+}
+
+type Meeting {
+    classroom: Classroom @belongsTo
+    article: Article @belongsTo
+    user: User @belongsTo
+    rooms: [Room!]! @morphMany
+    attachments: [Attachment!]! @morphMany
+    attendances: [Attendance!]! @morphMany
+}
+
+union Messageable = Room | PrivateRoom
+
+type Message {
+    user: User @belongsTo
+    messageable: Messageable @morphTo
+}
+
+type Packagequestion {
+    questions: [Question!]! @belongsToMany
+    user: User @belongsTo
+    subject: Subject @belongsTo
+    classtype: Classtype @belongsTo
+}
+
+union Priceable = Article
+
+type Price {
+    priceable: Priceable @morphTo
+}
+
+type PrivateRoom {
+    messages: [Message!]! @morphMany
+    firstmessage: Message @morphOne
+    first: User @belongsTo
+    second: User @belongsTo
+}
+
+type Question {
+    teacher: User @belongsTo
+    answers: [Answer!]! @hasMany
+    correctanswer: Answer @hasOne
+    attachments: [Attachment!]! @morphMany
+    subject: Subject @belongsTo
+    classtype: Classtype @belongsTo
+}
+
+union Roomable = Meeting
+
+type Room {
+    messages: [Message!]! @morphMany
+    users: [User!]! @belongsToMany
+    roomable: Roomable @morphTo
+}
+
+type Schooltype {
+    classtypes: [Classtype!]! @hasMany
+    schools: [School!]! @hasMany
+}
+
+type StudentAnswer {
+    answer: Answer @belongsTo
+    question: Question @belongsTo
+    examsession: Examsession @belongsTo
+    user: User @belongsTo
+    exam: Exam @belongsTo
+    examresult: Examresult @belongsTo
+}
+
+type StudentAssigment {
+    assigment: Assigment @belongsTo
+    user: User @belongsTo
+    attachments: [Attachment!]! @morphMany
+}
+
+type Subject {
+    schools: [School!]! @belongsToMany
+    meetings: [Meeting!]! @hasMany
+}
+
+type Topup {
+
+}
+
+type Transaction {
+    
+}
+
+type User {
+    
+    province: Province @belongsTo
+    city: City @belongsTo
+    district: District @belongsTo
+    childrens: [User!]! @hasMany
+    attachments: [Attachment!]! @hasMany
+    articles: [Article!]! @hasMany
+    frontarticles: [Article!]! @hasMany
+
+    followers: [User!]! @belongsToMany
+    requestfollowers: [User!]! @belongsToMany
+    following: [User!]! @belongsToMany
+    rooms: [Room!]! @belongsToMany
+    school: School @belongsTo
+
+    "Student"
+
+    myclassrooms: [Classroom!]! @belongsToMany
+    guardian: User @belongsTo
+    consultations: [Consultation!]! @hasMany
+    absents: [Absent!]! @hasMany
+    schools: [School!]! @belongsToMany
+
+    "Teacher"
+    subjects: [Subject!]! @belongsToMany
+    questions: [Question!]! @hasMany
+    exams: [Exam!]! @hasMany
+    classrooms: [Classroom!]! @hasMany
+    assigments: [Assigment!]! @hasMany
+    packagequestions: [Packagequestion!]! @hasMany
+    meetings: [Meeting!]! @hasMany
+
+}
+
+
+type Withdraw {
+    
 }

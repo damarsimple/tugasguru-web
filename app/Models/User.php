@@ -79,11 +79,6 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\User', 'parent_id');
     }
 
-    public function teacher(): HasOne
-    {
-        return $this->hasOne('App\Models\User');
-    }
-
     public function attachments(): HasMany
     {
         return $this->hasMany('App\Models\Attachment');
