@@ -26,45 +26,7 @@ class Teacher extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function schools(): BelongsToMany
-    {
-        return $this->belongsToMany('App\Models\School');
-    }
-
-    public function subjects(): BelongsToMany
-    {
-        return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
-    }
-
-    public function questions(): HasMany
-    {
-        return $this->hasMany('App\Models\Question');
-    }
-
-    public function exams(): HasMany
-    {
-        return $this->hasMany('App\Models\Exam');
-    }
-
-    public function classrooms(): HasMany
-    {
-        return $this->hasMany('App\Models\Classroom');
-    }
-
-    public function assigments(): HasMany
-    {
-        return $this->hasMany('App\Models\Assigment');
-    }
-
-    public function packagequestions(): HasMany
-    {
-        return $this->hasMany('App\Models\Packagequestion');
-    }
-
-    public function articles(): HasMany
-    {
-        return $this->hasMany('App\Models\Article');
-    }
+   
 
     public function followers(): BelongsToMany
     {
@@ -76,8 +38,5 @@ class Teacher extends Model
         return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
     }
 
-    public function meetings(): HasMany
-    {
-        return $this->hasMany('App\Models\Meeting');
-    }
+  
 }

@@ -13,7 +13,6 @@ class Attendance extends Model
 
     protected $fillable = [
         'user_id',
-        'teacher_id',
         'subject_id',
         'classroom_id',
         'attendable_id',
@@ -32,11 +31,6 @@ class Attendance extends Model
     public function subject(): BelongsTo
     {
         return $this->belongsTo('App\Models\Subject');
-    }
-
-    public function teacher(): BelongsTo
-    {
-        return $this->belongsTo('App\Models\User', 'teacher_id');
     }
 
     public function attendable(): MorphTo

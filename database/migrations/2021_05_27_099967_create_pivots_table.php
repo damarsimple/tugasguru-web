@@ -13,10 +13,9 @@ class CreatePivotsTable extends Migration
      */
     public function up()
     {
-        Schema::create('teacher_school', function (Blueprint $table) {
+        Schema::create('user_school', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher_id')->references('id')
-                ->on('users')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('school_id')->index()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
@@ -52,7 +51,7 @@ class CreatePivotsTable extends Migration
         Schema::create('exam_supervisor', function (Blueprint $table) {
             $table->id();
             $table->foreignId('exam_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('supervisor_id')->references('id')->on('teachers')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -100,11 +99,10 @@ class CreatePivotsTable extends Migration
         });
 
 
-        Schema::create('subject_teacher', function (Blueprint $table) {
+        Schema::create('subject_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('teacher_id')->references('id')
-                ->on('users')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->float('kkm')->default(75);
             $table->timestamps();
         });
@@ -120,7 +118,7 @@ class CreatePivotsTable extends Migration
         // Schema::create('teacher_user', function (Blueprint $table) {
         //     $table->id();
         //     $table->foreignId('teacher_id')->references('id')
-                ->on('users')->index()->constrained()->onDelete('cascade');
+        // ->on('users')->index()->constrained()->onDelete('cascade');
         //     $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
         //     $table->boolean('is_accepted')->default(false);
         //     $table->timestamps();
@@ -129,7 +127,8 @@ class CreatePivotsTable extends Migration
         Schema::create('user_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('follower_id')->index()->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('follower_id');
+            $table->foreign('follower_id')->references('id')->on('users')->onDelete('cascade');;
             $table->boolean('is_accepted')->default(false);
             $table->timestamps();
         });

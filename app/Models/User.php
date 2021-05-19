@@ -158,7 +158,7 @@ class User extends Authenticatable
     // student
 
    
-    public function classrooms(): BelongsToMany
+    public function myclassrooms(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Classroom');
     }
@@ -176,5 +176,45 @@ class User extends Authenticatable
     public function absents(): HasMany
     {
         return $this->hasMany('App\Models\Absent');
+    }
+
+    public function schools(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\School');
+    }
+
+    public function subjects(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany('App\Models\Question');
+    }
+
+    public function exams(): HasMany
+    {
+        return $this->hasMany('App\Models\Exam');
+    }
+
+    public function classrooms(): HasMany
+    {
+        return $this->hasMany('App\Models\Classroom');
+    }
+
+    public function assigments(): HasMany
+    {
+        return $this->hasMany('App\Models\Assigment');
+    }
+
+    public function packagequestions(): HasMany
+    {
+        return $this->hasMany('App\Models\Packagequestion');
+    }
+
+    public function meetings(): HasMany
+    {
+        return $this->hasMany('App\Models\Meeting');
     }
 }

@@ -20,17 +20,18 @@ class MeetingObserver
         broadcast(new MeetingChangeEvent($meeting));
 
         foreach ($meeting->classroom->students as $student) {
-            $student->user->notify(new NewMeeting($meeting));
+            $student->notify(new NewMeeting($meeting));
         }
 
-        $studentUserIds = $meeting->classroom->students->pluck('user.id');
+        $studentUserIds = $meeting->classroom->students->pluck('id');
 
         $room = new Room();
         $room->name = 'Diskusi Kelas';
         $room->identifier = 'meeting.general.' . $meeting->id;
         $meeting->rooms()->save($room);
 
-        $room->users()->attach(array_merge([$meeting->teacher->user->id], $studentUserIds->toArray()));
+        $room->users()->attach(array_merge([$meeting->user->id], $studentUserIds->toArray()));
+        
     }
 
     /**

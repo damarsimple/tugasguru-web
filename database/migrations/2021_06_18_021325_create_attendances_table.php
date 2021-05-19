@@ -17,8 +17,6 @@ class CreateAttendancesTable extends Migration
             $table->id();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('teacher_id')->references('id')
-                ->on('users')->index()->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('attendable_id')->nullable();
             $table->string('attendable_type')->nullable();

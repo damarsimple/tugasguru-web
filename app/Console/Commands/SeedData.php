@@ -16,7 +16,6 @@ use App\Models\School;
 use App\Models\Schooltype;
 use App\Models\Subject;
 use App\Models\User;
-use App\Models\User;
 use Illuminate\Console\Command;
 use Faker\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -194,6 +193,16 @@ class SeedData extends Command
             foreach ($schoolsData as $key => $schools) {
 
                 foreach ($schools as $key => $school) {
+                    
+                    if (str_contains($school->sekolah, 'SD')) {
+                        continue;
+                    }
+                    if (str_contains($school->sekolah, 'SMP')) {
+                        continue;
+                    }
+                    if (str_contains($school->sekolah, 'SMA')) {
+                        continue;
+                    }
 
                     $disctrictName = preg_replace(['/Kec./', '/KEC. /', '/Kecamatan/'], "", $school->kecamatan);
                     if (str_contains($school->kabupaten_kota, "Kab.")) {
@@ -407,23 +416,23 @@ class SeedData extends Command
 
         if ($onTest) {
 
-            $user = new User();
-            $user->name = "Damar Albaribin Guru 1";
-            $user->email = "damaralbaribin@gmail.com";
-            $user->password = Hash::make("we5n9t5ReNV8gNE");
-            $user->city_id = 1;
-            $user->province_id = 1;
-            $user->district_id = 1;
-            $user->gender = 1;
-            $user->phone = "08987181017";
-            $user->roles = "TEACHER";
+            $teacher = new User();
+            $teacher->name = "Damar Albaribin Guru 1";
+            $teacher->email = "damaralbaribin@gmail.com";
+            $teacher->password = Hash::make("we5n9t5ReNV8gNE");
+            $teacher->city_id = 1;
+            $teacher->province_id = 1;
+            $teacher->district_id = 1;
+            $teacher->gender = 1;
+            $teacher->phone = "08987181017";
+            $teacher->roles = "TEACHER";
 
-            $user->save();
+            $teacher->save();
 
-            $teacher = new Teacher();
+
             $teacher->is_bimbel = false;
             $teacher->school_id = 1;
-            $user->teacher()->save($teacher);
+
 
             $teacher->subjects()->attach(Subject::first());
 
@@ -440,13 +449,11 @@ class SeedData extends Command
 
             $user->save();
 
-            $teacher = new Teacher();
-            $teacher->is_bimbel = false;
-            $teacher->school_id = 1;
-            $user->teacher()->save($teacher);
+            $user->is_bimbel = false;
+            $user->school_id = 1;
 
 
-            $teacher->subjects()->attach(Subject::first());
+            $user->subjects()->attach(Subject::first());
 
             $user = new User();
             $user->name = "Damar Albaribin Siswa";
@@ -460,7 +467,6 @@ class SeedData extends Command
             $user->roles = "STUDENT";
 
 
-            $user = new user();
             $user->nisn = 1234568123;
             $user->school_id = 1;
             $user->classtype_id = 1;
@@ -471,7 +477,7 @@ class SeedData extends Command
 
             $classroom = new Classroom();
             $classroom->name =  "Test";
-            $classroom->teacher_id = 1;
+            $classroom->user_id = 1;
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
@@ -479,7 +485,7 @@ class SeedData extends Command
 
             $classroom = new Classroom();
             $classroom->name =  "Test";
-            $classroom->teacher_id = 2;
+            $classroom->user_id = 2;
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
@@ -491,7 +497,7 @@ class SeedData extends Command
 
             $meeting->name = "Pertemuan oleh kian santang";
 
-            $meeting->teacher_id = $teacher->id;
+            $meeting->user_id = $teacher->id;
 
             $meeting->start_at = now();
 
@@ -503,7 +509,7 @@ class SeedData extends Command
                 $room->identifier = "meeeting.chat." . $meeting->id;
                 $meeting->rooms()->save($room);
 
-                $room->users()->attach($teacher->user->id, ['is_administrator' => true]);
+                $room->users()->attach($teacher->id, ['is_administrator' => true]);
 
                 $room->users()->attach($user->id);
             }

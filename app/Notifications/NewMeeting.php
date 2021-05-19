@@ -66,7 +66,7 @@ class NewMeeting extends Notification implements ShouldQueue
         return new BroadcastMessage([
             'type' => 'NEW_MEETING',
             'data' => $this->meeting,
-            'user' => $this->meeting->teacher->user
+            'user' => $this->meeting->user
         ]);
     }
 
@@ -81,7 +81,7 @@ class NewMeeting extends Notification implements ShouldQueue
         return [
             'type' => 'NEW_MEETING',
             'data' => $this->meeting,
-            'user' => $this->meeting->teacher->user
+            'user' => $this->meeting->user
         ];
     }
 }

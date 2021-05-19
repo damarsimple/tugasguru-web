@@ -23,9 +23,9 @@ class Packagequestion extends Model
         return $this->belongsToMany('App\Models\Question');
     }
 
-    public function teacher(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User', 'teacher_id');
+        return $this->belongsTo('App\Models\User');
     }
 
     public function subject(): BelongsTo

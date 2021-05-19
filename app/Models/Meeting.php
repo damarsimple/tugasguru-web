@@ -31,7 +31,7 @@ class Meeting extends Model
         return $this->belongsTo('App\Models\Subject');
     }
 
-    function teacher(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo('App\Models\User');
     }
