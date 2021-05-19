@@ -1,0 +1,44 @@
+
+type Province {
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    cities: [City!]! @hasMany
+}
+
+type City {
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    province: Province @belongsTo
+    type: String
+    schools: [School!]! @hasMany
+    districts: [District!]! @hasMany
+}
+
+type District {
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    city: City @belongsTo
+}
+
+type School {
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    city: City @belongsTo
+    province: Province @belongsTo
+    district: District @belongsTo
+    schooltype: Schooltype @belongsTo
+    address: string
+    description: string
+    latitude: string
+    longtitude: string
+    npsn: string
+
+}

@@ -105,24 +105,39 @@ class User extends Authenticatable
     }
 
 
-    function followingteachers(): BelongsToMany
+    // function followingteachers(): BelongsToMany
+    // {
+    //     return $this->belongsToMany('App\Models\Teacher')->where('is_accepted', true);
+    // }
+
+    // function followingstudents(): belongsToMany
+    // {
+    //     return $this->belongsToMany('App\Models\Student')->where('is_accepted', true);
+    // }
+
+    // function requestfollowingteachers(): BelongsToMany
+    // {
+    //     return $this->belongsToMany('App\Models\Teacher')->where('is_accepted', false);
+    // }
+
+    // function requestfollowingstudents(): belongsToMany
+    // {
+    //     return $this->belongsToMany('App\Models\Student')->where('is_accepted', false);
+    // }
+
+    public function followers(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Teacher')->where('is_accepted', true);
+        return $this->belongsToMany('App\Models\User', 'follower_id')->where('is_accepted', true);
     }
 
-    function followingstudents(): belongsToMany
+    public function requestfollowers(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Student')->where('is_accepted', true);
+        return $this->belongsToMany('App\Models\User', 'follower_id')->where('is_accepted', false);
     }
 
-    function requestfollowingteachers(): BelongsToMany
+    public function following(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Teacher')->where('is_accepted', false);
-    }
-
-    function requestfollowingstudents(): belongsToMany
-    {
-        return $this->belongsToMany('App\Models\Student')->where('is_accepted', false);
+        return $this->belongsToMany('App\Models\User', 'user_id', 'follower_id')->where('is_accepted', true);
     }
 
     public function getFollowingCountAttribute()
