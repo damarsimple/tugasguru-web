@@ -15,15 +15,15 @@ class Classroom extends Model
     public $with = ['classtype', 'assigments'];
 
     public $appends = ['name_formatted'];
-    
+
     public function students(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\User');
     }
 
-    public function user(): BelongsTo
+    public function teacher(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User', 'teacher_id');
     }
 
     public function exams(): HasMany

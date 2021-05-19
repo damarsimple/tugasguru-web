@@ -16,7 +16,7 @@ class StudentAssigmentObserver
      */
     public function created(StudentAssigment $studentAssigment)
     {
-        $studentAssigment->assigment->teacher->user->notify(new StudentTurningAssigment($studentAssigment));
+        $studentAssigment->assigment->teacher->notify(new StudentTurningAssigment($studentAssigment));
     }
 
     /**
@@ -28,7 +28,7 @@ class StudentAssigmentObserver
     public function updated(StudentAssigment $studentAssigment)
     {
         if ($studentAssigment->grade != 0) {
-            $studentAssigment->student->user->notify(new TeacherGradeAssigment($studentAssigment));
+            $studentAssigment->user->notify(new TeacherGradeAssigment($studentAssigment));
         }
     }
 

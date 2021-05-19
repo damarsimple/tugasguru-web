@@ -56,7 +56,7 @@ class ApiAuthController extends Controller
     }
     public function profile(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user()->load('classrooms', 'myclassrooms', 'school', 'followings','requestfollowings');
 
         return response()->json(['user' => $user]);
     }

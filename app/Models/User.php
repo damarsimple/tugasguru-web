@@ -55,6 +55,7 @@ class User extends Authenticatable
 
     public const PROFILEPICTURE = 'PROFILEPICTURE';
     public const STUDENT = 'STUDENT';
+    public const TEACHER = 'TEACHER';
     // protected $appends = ['following_count'];
 
     protected $with = ['profilepicture'];
@@ -117,18 +118,24 @@ class User extends Authenticatable
 
     public function followers(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\User', 'follower_id')->where('is_accepted', true);
+        return $this->belongsToMany('App\Models\User', relatedPivotKey: 'follower_id', foreignPivotKey: 'user_id')->where('is_accepted', true);
     }
 
     public function requestfollowers(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\User', 'follower_id')->where('is_accepted', false);
+        return $this->belongsToMany('App\Models\User', relatedPivotKey: 'follower_id', foreignPivotKey: 'user_id')->where('is_accepted', false);
     }
 
-    public function following(): BelongsToMany
+    public function followings(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\User', 'user_id', 'follower_id')->where('is_accepted', true);
+        return $this->belongsToMany('App\Models\User', relatedPivotKey: 'user_id', foreignPivotKey: 'follower_id')->where('is_accepted', true);
     }
+
+    public function requestfollowings(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\User', relatedPivotKey: 'user_id', foreignPivotKey: 'follower_id')->where('is_accepted', false);
+    }
+
 
     public function getFollowingCountAttribute()
     {
@@ -149,10 +156,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Models\School');
     }
-    
+
     // student
 
-   
+
     public function myclassrooms(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Classroom');
@@ -183,24 +190,27 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
     }
 
-    public function questions(): HasMany
-    {
-        return $this->hasMany('App\Models\Question');
-    }
+
 
     public function exams(): HasMany
     {
-        return $this->hasMany('App\Models\Exam');
+        return $this->hasMany('App\Models\Exam', 'teacher_id');
     }
 
     public function classrooms(): HasMany
     {
-        return $this->hasMany('App\Models\Classroom');
+        return $this->hasMany('App\Models\Classroom', 'teacher_id');
     }
 
     public function assigments(): HasMany
     {
-        return $this->hasMany('App\Models\Assigment');
+        return $this->hasMany('App\Models\Assigment', 'teacher_id');
+    }
+
+
+    public function meetings(): HasMany
+    {
+        return $this->hasMany('App\Models\Meeting', 'teacher_id');
     }
 
     public function packagequestions(): HasMany
@@ -208,8 +218,8 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Packagequestion');
     }
 
-    public function meetings(): HasMany
+    public function questions(): HasMany
     {
-        return $this->hasMany('App\Models\Meeting');
+        return $this->hasMany('App\Models\Question');
     }
 }

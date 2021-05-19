@@ -12,7 +12,7 @@ class Packagequestion extends Model
     use HasFactory;
 
     public $with = [
-        'teacher',
+        'user',
         'subject',
         'questions.answers.attachment',
         'questions.attachments'

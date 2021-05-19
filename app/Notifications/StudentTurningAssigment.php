@@ -66,7 +66,7 @@ class StudentTurningAssigment extends Notification
         return new BroadcastMessage([
             'type' => 'STUDENT_TURNING_ASSIGMENT',
             'data' => $this->studentAssigment,
-            'user' => $this->studentAssigment->student->user
+            'user' => $this->studentAssigment->user
         ]);
     }
 
@@ -81,7 +81,7 @@ class StudentTurningAssigment extends Notification
         return [
             'type' => 'STUDENT_TURNING_ASSIGMENT',
             'data' => $this->studentAssigment,
-            'user' => $this->studentAssigment->student->user
+            'user' => $this->studentAssigment->user
         ];
     }
 }

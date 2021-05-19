@@ -2,7 +2,6 @@
 
 use App\Actions\Attachment\Upload;
 use App\Events\MeetingChangeEvent;
-use App\Events\NewPrivateMessageEvent;
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
@@ -16,7 +15,6 @@ use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
 use App\Models\Consultation;
-use App\Models\District;
 use App\Models\Exam;
 use App\Models\Examresult;
 use App\Models\Examsession;
@@ -94,18 +92,16 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
         $user = $request->user();
 
         if ($user->roles == "TEACHER") {
-            $teacher = $user->teacher;
-            return $teacher->meetings()->with('classroom.students')->findOrFail($id);
+            return $user->meetings()->with('classroom.students')->findOrFail($id);
         } else {
             $meeting = Meeting::with('classroom.students')->with(['rooms' => function ($e) use ($user) {
                 return $e->whereHas('users', fn ($e) => $e->where('user_id', $user->id));
             }])->findOrFail($id);
 
             $attendance = Attendance::firstOrCreate([
-                'teacher_id' => $meeting->teacher_id,
                 'subject_id' => $meeting->subject_id,
                 'classroom_id' => $meeting->classroom_id,
-                'user_id' => $user->student->id,
+                'user_id' => $user->id,
                 'attendable_id' => $meeting->id,
                 'attendable_type' => Meeting::class
             ]);
@@ -220,15 +216,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
         Route::group(['prefix' => 'private'], function () {
 
             Route::get('/targets', function (Request $request) {
-                $sender = $request->user();
+                $user = $request->user();
 
-                if ($sender->roles == "TEACHER") {
-                    $y = $sender->teacher;
-                } else {
-                    $y = $sender->student;
-                }
-
-                $y = $y->school;
+                $y = $user->school;
 
                 return array_merge($y->teachers->toArray(), $y->students->toArray());
             });
@@ -298,10 +288,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
 
     Route::get('{id}', function (Request $request, $id) {
-
         return User::with(
-            'student.followers',
-            'teacher.followers',
+            'followers',
             'frontarticles'
         )->findOrFail($id);
     });
@@ -314,13 +302,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'articles'], functio
 
 
 Route::get('/{id}/rank', function (Request $request, $id) {
-    /**  @var App/Models/Student $student  */
 
     return Examresult::where('exam_id', $id)
         ->orderBy('grade', 'DESC')
-        ->with(
-            'student',
-        )
         ->get();
 });
 
@@ -332,11 +316,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 
             $assigment = Assigment::findOrFail($id);
 
-            $student = $user->student;
-
             $studentAssigment = StudentAssigment::firstOrCreate([
                 'assigment_id' => $assigment->id,
-                'user_id' => $student->id,
+                'user_id' => $user->id,
             ]);
 
             if ($studentAssigment->edited_times > 3) {
@@ -365,11 +347,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
         Route::get('{id}', function (Request $request, $id) {
             $user = $request->user();
 
-            $student = $user->student;
-
             $assigment = Assigment::with('myanswer', 'classroom', 'subject', 'teacher')->findOrFail($id);
 
-            if (!$student->classrooms->pluck('id')->contains($assigment->classroom->id)) {
+            if (!$user->myclassrooms->pluck('id')->contains($assigment->classroom->id)) {
                 return ['message' => 'unathorized'];
             }
 
@@ -408,8 +388,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     Route::group(['prefix' => 'absents'], function () {
         Route::post('/', function (Request $request) {
             $user = $request->user();
-            /**  @var App/Models/Student $student  */
-            $student = $user->student;
 
             $absent = new Absent();
             $absent->teacher_id = $request->teacher;
@@ -418,68 +396,47 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $absent->start_at = Carbon::parse($request->start_at);
             $absent->finish_at = Carbon::parse($request->finish_at);
 
-            $student->absents()->save($absent);
+            $user->absents()->save($absent);
         });
 
-        Route::get('/', fn (Request $request) => $request->user->student->absents()->paginate(10));
+        Route::get('/', fn (Request $request) => $request->user()->student->absents()->paginate(10));
     });
 
     Route::group(['prefix' => 'consultations'], function () {
         Route::post('/', function (Request $request) {
             $user = $request->user();
-            /**  @var App/Models/Student $student  */
-            $student = $user->student;
+
             $constult = new Consultation();
             $constult->teacher_id = User::findOrFail($request->teacher)->teacher->id;
             $constult->title = $request->title;
             $constult->problem = $request->problem;
-            $student->consultations()->save($constult);
+            $user->consultations()->save($constult);
         });
 
-        Route::get('/', fn (Request $request) => $request->user->student->consultations()->paginate(10));
+        Route::get('/', fn (Request $request) => $request->user()->consultations()->paginate(10));
     });
 
     Route::group(['prefix' => 'followers'], function () {
 
         Route::get('/following', function (Request $request) {
-            /**  @var App/Models/Student $student  */
             $user = $request->user();
 
-            return array_merge(
-                $user->followingteachers->map(fn ($e) => $e->user)->toArray(),
-                $user->followingstudents->map(fn ($e) => $e->user)->toArray()
-            );
+            return $user->followings;
         });
 
         Route::get('/myfollowing', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
 
-            return array_merge($student->followingteachers->pluck('user_id'), $student->followingstudents->pluck('user_id'));
+            return $request->user()->followings;
         });
 
         Route::get('/myfollower', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
 
-            return $student->followers;
-        });
-
-        Route::post('/accept', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
-            $user = $request->user();
-            $teacher = $user->teacher;
-
-            $teacher->requestfollow()->whereIn('user_id', $request->acceptIds)->update(['is_accepted' => true]);
-
-            return ['message' => 'ok'];
+            return $request->user()->followers;
         });
 
         Route::post('/deny', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
 
-            $student->requestfollow()->detach($request->userId);
+            $request->user()->requestfollowers()->detach($request->userId);
 
             return ['message' => 'ok'];
         });
@@ -487,11 +444,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         Route::post('/unfollow', function (Request $request) {
             $student = $request->user();
 
-            if ($student->roles == "TEACHER") {
-                $student->followingteachers()->detach($request->user);
-            } else {
-                $student->followingstudents()->detach($request->user);
-            }
+            $student->followings()->detah($request->user);
 
             return ['message' => 'ok'];
         });
@@ -499,8 +452,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
         Route::post('/request', function (Request $request) {
             $user = $request->user();
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
 
             if ($user->id == $request->user) {
                 return ['message' => 'Anda tidak bisa mengikuti diri sendiri'];
@@ -510,25 +461,23 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             if (
                 $candidate->roles == "TEACHER" &&
-                !$student->school->teachers->pluck('user_id')->contains($request->user)
+                !$user->school->teachers->pluck('id')->contains($request->user)
             ) {
                 return ['message' => 'Guru tidak ada di sekolah'];
             }
 
             if ($candidate->roles == "TEACHER") {
-                $candidate->teacher->requestfollow()->syncWithoutDetaching([$student?->user?->id]);
+                $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
             } else {
-                $candidate->student->requestfollow()->syncWithoutDetaching([$student?->user?->id]);
+                $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
             }
 
             return ['message' => 'ok'];
         });
 
         Route::get('/myrequests', function (Request $request) {
-            /**  @var App/Models/User $student  */
             $user = $request->user();
-            $student = $user->student;
-            return $student->requestfollow()->with('teacher', 'student', 'province')->get();
+            return $user->requestfollowers()->with('province')->get();
         });
     });
 
@@ -539,64 +488,56 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
 
         Route::post('/', function (Request $request) {
-            /**  @var App/Models/Student $student  */
             $user = $request->user();
-            $student = $user->student;
             $article = new Article();
             $article->name = $request->name;
             $article->content = $request->content;
             $article->visibility = 'PUBLIK';
             $article->user_id = $user->id;
             $article->role = Article::POST;
-            $article->school_id = $request?->school ?? $student?->school?->id;
-            $student->articles()->save($article);
+            $article->school_id = $request?->school ?? $user?->school?->id;
+            $user->articles()->save($article);
             return ['message' => 'ok'];
         });
     });
     Route::group(['prefix' => 'classrooms'], function () {
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $user = $request->user();
 
-            return $student->classrooms()->with(
+            return $user->myclassrooms()->with(
                 'students',
                 'teacher',
             )->get();
         });
 
         Route::post('/join', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $user = $request->user();
 
             $classroom = Classroom::findOrFail($request->classroom);
 
-            if (!$student->classtype_id) {
-                $student->classtype_id = $classroom->classtype_id;
-                $student->save();
+            if (!$user->classtype_id) {
+                $user->classtype_id = $classroom->classtype_id;
+                $user->save();
             }
 
-            if (!$student->classrooms()->where('classrooms.id', $classroom->id)->exists()) {
-                $student->classrooms()->attach($classroom);
+            if (!$user->classrooms()->where('classrooms.id', $classroom->id)->exists()) {
+                $user->myclassrooms()->syncWithoutDetaching($classroom);
             }
 
 
-            return $student->classrooms;
+            return $user->classrooms;
         });
 
         Route::get('/all', function (Request $request) {
             $user = $request->user();
 
-            $user = User::find($user->id);
-
             $classrooms  = [];
 
-            $student = $user->student;
+            foreach ($user->followings()->where('roles', User::TEACHER)->get() as $teacher) {
 
-            foreach ($user->followingteachers as $teacher) {
-
-                if ($student->classtype_id) {
-                    $candidateclasrooms = $teacher->classrooms()->where('classtype_id', $student->classtype_id);
+                if ($user->classtype_id) {
+                    $candidateclasrooms = $teacher->classrooms()->where('classtype_id', $user->classtype_id);
                 } else {
                     $candidateclasrooms = $teacher->classrooms();
                 }
@@ -612,13 +553,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
     Route::group(['prefix' => 'schools'], function () {
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $user = $request->user();
 
-            return $student->school()->with(
+            return $user->school()->with(
                 'schooltype',
-                'students.user.province',
-                'teachers.user.province',
+                'teachers.province',
             )->first();
         });
     });
@@ -626,15 +565,14 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     Route::group(['prefix' => 'events'], function () {
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $user = $request->user();
 
 
             $events  = collect([]);
 
             $now = now();
 
-            $classrooms = $student->classrooms();
+            $classrooms = $user->myclassrooms();
 
             foreach ($classrooms->get() as $classroom) {
                 $eventsData = Octane::concurrently([
@@ -718,18 +656,16 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     Route::group(['prefix' => 'exams'], function () {
 
         Route::post('{id}/reportbegin', function (Request $request, $id) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $user = $request->user();
 
 
             $exam = Exam::findOrFail($id);
 
 
             $attendance = Attendance::firstOrCreate([
-                'teacher_id' => $exam->teacher_id,
                 'subject_id' => $exam->subject_id,
                 'classroom_id' => $exam->classroom_id,
-                'user_id' => $student->id,
+                'user_id' => $user->id,
                 'attendable_id' => $exam->id,
                 'attendable_type' => Exam::class
             ]);
@@ -739,7 +675,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $attendance->save();
 
 
-            if (!$exam->classroom->students()->where('students.id', $student->id)->exists()) {
+            if (!$exam->classroom->students()->where('user_id', $user->id)->exists()) {
                 return response(['message' => 'Anda Tidak Memiliki Akses ulangan ini !'], 401);
             }
 
@@ -755,17 +691,17 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $examtracker = Examtracker::firstOrCreate([
                 'exam_id' => $exam->id,
-                'user_id' => $student->id,
+                'user_id' => $user->id,
                 'examsession_id' => $examsession->id,
             ]);
 
             if ($examresult = Examresult::where('examsession_id', $request->examsession)
-                ->where('user_id', $student->id)
+                ->where('user_id', $user->id)
                 ->where('exam_id', $exam->id)->exists()
             ) {
 
                 $studentanswers = StudentAnswer::where([
-                    'user_id' => $student->id,
+                    'user_id' => $user->id,
                     'examsession_id' => $examsession->id,
                     'exam_id' => $exam->id
                 ])->get();
@@ -774,7 +710,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $examresult = Examresult::firstOrCreate([
                 'examsession_id' => $examsession->id,
-                'user_id' => $student->id,
+                'user_id' => $user->id,
                 'exam_id' => $exam->id
             ]);
 
@@ -787,8 +723,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
 
         Route::post('{id}/heartbeat', function (Request $request, $id) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $user = $request->user();
 
 
 
@@ -799,7 +734,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $examtracker = Examtracker::firstOrCreate([
                 'exam_id' =>   $exam->id,
-                'user_id' =>   $student->id,
+                'user_id' =>   $user->id,
                 'examsession_id' =>   $examsession->id,
             ]);
 
@@ -814,8 +749,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             return ['message' => 'recorded', 'examtracker' => $examtracker];
         });
         Route::post('{id}/finish', function (Request $request, $id) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $user = $request->user();
 
 
             $exam = Exam::findOrFail($id);
@@ -831,11 +765,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             }
 
             $studentAnswer = StudentAnswer::where('examsession_id', $request->examsession)
-                ->where('user_id', $student->id)
+                ->where('user_id', $user->id)
                 ->where('exam_id', $exam->id);
 
             $examresult = Examresult::where('examsession_id', $request->examsession)
-                ->where('user_id', $student->id)
+                ->where('user_id', $user->id)
                 ->where('exam_id', $exam->id)->firstOrFail();
 
             $studentAnswer->update(['examresult_id' => $examresult->id]);
@@ -847,14 +781,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             return ['message' => 'graded'];
         });
         Route::get('{id}', function (Request $request, $id) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
-
+            $user = $request->user();
 
             $exam = Exam::findOrFail($id);
 
-            $check = $exam->classroom->students()->where('students.id', $student->id)->exists();
-            $examresult = Examresult::where('user_id', $student->id)
+            $check = $exam->classroom->students()->where('user_id', $user->id)->exists();
+            
+            $examresult = Examresult::where('user_id', $user->id)
                 ->where('exam_id', $exam->id)->first();
 
             if ($examresult?->finish_at) {
@@ -898,8 +831,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
 
         Route::get('/{id}/result', function (Request $request, $id) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $student = $request->user();
 
             return Examresult::where('user_id', $student->id)
                 ->where('exam_id', $id)
@@ -909,7 +841,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                     'exam.examtype',
                     'exam.supervisors',
                     'studentanswers',
-                    'student',
+                    'user.profilepicture',
                     'examsession'
                 )
                 ->firstOrFail();
@@ -920,8 +852,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
 
         Route::post('/submitanswer', function (Request $request) {
-            /**  @var App/Models/Student $student  */
-            $student = $request->user()->student;
+            $user = $request->user();
 
             $examsession = Examsession::findOrFail($request->examsession);
 
@@ -929,7 +860,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $examtracker = Examtracker::where([
                 'exam_id' =>  $request->exam,
-                'user_id' =>   $student->id,
+                'user_id' =>   $user->id,
                 'examsession_id' =>   $examsession->id,
             ])->firstOrFail();
 
@@ -947,7 +878,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $answer  = StudentAnswer::firstOrCreate([
                 'question_id' => $request->question,
-                'user_id' => $student->id,
+                'user_id' => $user->id,
                 'exam_id' => $exam->id,
                 'examsession_id' => $request->examsession,
             ]);
@@ -986,11 +917,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/', function (Request $request) {
             /**  @var App/Models/User $user  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
-            $classrooms = $teacher->classrooms()->get('id')->pluck('id');
+            $classrooms = $user->classrooms()->get('id')->pluck('id');
 
-            $students = $teacher
+            $students = $user
                 ->school
                 ->students()
                 ->whereHas('classrooms', fn ($e) => $e->whereIn('classroom_id', $classrooms))->get('id')->pluck('id');
@@ -1012,22 +942,15 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'followers'], function () {
 
         Route::get('/myfollowing', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
-
-            return $teacher->followingteachers;
+            return $user->followings;
         });
 
         Route::post('/unfollow', function (Request $request) {
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
 
-            if ($user->roles == "TEACHER") {
-                $user->followingteachers()->detach($request->user);
-            } else {
-                $user->followingstudents()->detach($request->user);
-            }
+            $user->followings()->detach($request->user);
 
             return ['message' => 'ok'];
         });
@@ -1035,35 +958,27 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/myfollower', function (Request $request) {
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
-
-            return $teacher->followers;
+            return $user->followers;
         });
 
         Route::post('/accept', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
-            $teacher->requestfollow()->whereIn('user_id', $request->acceptIds)->update(['is_accepted' => true]);
+            $user->requestfollowers()->whereIn('follower_id', $request->acceptIds)->update(['is_accepted' => true]);
 
             return ['message' => 'ok'];
         });
 
         Route::post('/deny', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
-            $teacher->requestfollow()->detach($request->userId);
+            $user->requestfollowers()->detach($request->userId);
 
             return ['message' => 'ok'];
         });
 
         Route::post('/request', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
             if ($user->id == $request->user) {
                 return ['message' => 'you cannot follow yourself'];
@@ -1075,7 +990,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 return ['message' => 'invalid follow target'];
             }
 
-            $candidate->teacher->requestfollow()->syncWithoutDetaching([$teacher?->user?->id]);
+            $candidate->teacher->requestfollowers()->syncWithoutDetaching([$user?->id]);
 
             return ['message' => 'ok'];
         });
@@ -1083,17 +998,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/myrequests', function (Request $request) {
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
-            return $teacher->requestfollow()->with('teacher', 'student', 'province')->get();
+            return $user->requestfollowers()->with('province')->get();
         });
     });
 
     Route::group(['prefix' => 'assigments'], function () {
         Route::post('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-
-            $teacher = $user->teacher;
 
             $assigment = new Assigment();
 
@@ -1107,7 +1018,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $assigment->close_at = Carbon::parse($request->close_at);
 
-            $teacher->assigments()->save($assigment);
+            $user->assigments()->save($assigment);
 
             return ['message' => 'ok'];
         });
@@ -1116,9 +1027,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
 
-            $teacher = $user->teacher;
-
-            return $teacher->assigments()->with('studentassigments', 'classroom', 'subject', 'teacher')->findOrFail($id);
+            return $user->assigments()->with('studentassigments', 'classroom', 'subject', 'teacher')->findOrFail($id);
         });
 
         Route::put('{assigmentId}/answers/{studentAssigmentId}', function (Request $request, $assigmentId, $studentAssigmentId) {
@@ -1146,34 +1055,26 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'meetings'], function () {
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
-            return $teacher->meetings()->latest()->whereNull('finish_at')->get();
+            return $user->meetings()->latest()->whereNull('finish_at')->get();
         });
 
         Route::get('{id}', function (Request $request, $id) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
-            return $teacher->meetings()->firstOrFail($id);
+            return $user->meetings()->firstOrFail($id);
         });
 
         Route::delete('{id}', function (Request $request, $id) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
-            return $teacher->meetings()->firstOrFail($id)->delete();
+            return $user->meetings()->firstOrFail($id)->delete();
         });
 
         Route::put('{id}', function (Request $request, $id) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
-            $meeting =  $teacher->meetings()->findOrFail($id);
+            $meeting =  $user->meetings()->findOrFail($id);
 
             $meeting->name = $request->name ??  $meeting->name;
 
@@ -1207,11 +1108,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::put('{meetingId}/{roomId}', function (Request $request, $meetingId, $roomId) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
-            $meeting =  $teacher->meetings()->findOrFail($meetingId);
+            $meeting =  $user->meetings()->findOrFail($meetingId);
 
             $room = $meeting->rooms()->findOrFail($roomId);
 
@@ -1227,11 +1126,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::delete('{meetingId}/{roomId}', function (Request $request, $meetingId, $roomId) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
 
-            $meeting =  $teacher->meetings()->findOrFail($meetingId);
+            $meeting =  $user->meetings()->findOrFail($meetingId);
 
             $room = $meeting->rooms()->findOrFail($roomId);
 
@@ -1245,10 +1142,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::post('{meetingId}/rooms', function (Request $request, $meetingId,) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
-            $meeting =  $teacher->meetings()->findOrFail($meetingId);
+
+            $meeting =  $user->meetings()->findOrFail($meetingId);
 
             $room = new Room();
 
@@ -1269,10 +1165,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
         Route::post('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-
-            $teacher = $user->teacher;
 
             $meeting = new Meeting();
 
@@ -1283,7 +1176,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $meeting->subject_id = $request->subject;
             $meeting->data = $request->data;
             $meeting->article_id = $request->article ?? null;
-            $meeting->teacher_id = $teacher->id;
+            $meeting->teacher_id = $user->id;
 
             $meeting->start_at = now();
 
@@ -1304,7 +1197,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                         $participants[] = $user['id'];
                     }
 
-                    $room->users()->attach(array_merge([$teacher->user->id], $participants));
+                    $room->users()->attach(array_merge([$user->id], $participants));
                 }
             }
             return $meeting;
@@ -1319,17 +1212,15 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::post('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
             $article = new Article();
             $article->name = $request->name;
             $article->content = $request->content;
             $article->visibility = 'PUBLIK';
             $article->user_id = $user->id;
             $article->role = Article::POST;
-            $article->school_id = $request?->school ?? $teacher?->school?->id;
-            $teacher->articles()->save($article);
+            $article->school_id = $request?->school ?? $user?->school?->id;
+            $user->articles()->save($article);
             return ['message' => 'ok'];
         });
     });
@@ -1338,15 +1229,14 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'events'], function () {
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
 
             $events  = collect([]);
 
 
 
-            $classrooms = $teacher->classrooms();
+            $classrooms = $user->classrooms();
 
             foreach ($classrooms->get() as $classroom) {
                 $eventsData = Octane::concurrently([
@@ -1394,8 +1284,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                         });
                         return $data;
                     },
-                    function () use ($teacher, $classroom) {
-                        $data = $teacher->assigments()->where('close_at', '>', now())->with('teacher', 'classroom', 'subject')->get();
+                    function () use ($user, $classroom) {
+                        $data = $user->assigments()->where('close_at', '>', now())->with('teacher', 'classroom', 'subject')->get();
 
                         $data = $data->map(function ($e) use ($classroom) {
                             return [
@@ -1430,8 +1320,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'feeds'], function () {
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
-            $teacher = $request->user()->teacher;
             return Article::latest()
                 ->where('role', Article::POST)
                 ->paginate(10);
@@ -1443,26 +1331,22 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'announcements'], function () {
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
-            $teacher = $request->user()->teacher;
             return Article::latest()
-                ->where('school_id', $teacher?->school?->id)
+                ->where('school_id', $request->user()?->school?->id)
                 ->where('role', Article::ANNOUNCEMENT)
                 ->paginate(10);
         });
 
         Route::post('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
             $article = new Article();
             $article->name = $request->name;
             $article->content = $request->content;
             $article->visibility = 'PUBLIK';
             $article->user_id = $user->id;
             $article->role = Article::ANNOUNCEMENT;
-            $article->school_id = $request?->school ?? $teacher?->school?->id;
-            $teacher->articles()->save($article);
+            $article->school_id = $request?->school ?? $user?->school?->id;
+            $user->articles()->save($article);
 
             if ($request->thumbnail) {
                 $thumbnail = Attachment::findOrFail($request->thumbnail);
@@ -1473,8 +1357,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $thumbnail->save();
             }
 
-
-
             return ['message' => 'ok'];
         });
     });
@@ -1482,14 +1364,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'theories'], function () {
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
-            // $teacher = $request->user()->teacher;
             return Article::latest()->where('role', Article::THEORY)->paginate(10);
         });
         Route::post('/', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
             $user = $request->user();
-            $teacher = $user->teacher;
             $article = new Article();
             $article->name = $request->name;
             $article->content = $request->content;
@@ -1497,8 +1375,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $article->visibility = $request->visibility;
             $article->user_id = $user->id;
             $article->role = Article::THEORY;
-            $article->school_id = $request?->school ?? $teacher?->school?->id;
-            $teacher->articles()->save($article);
+            $article->school_id = $request?->school ?? $user?->school?->id;
+            $user->articles()->save($article);
 
             if ($article->is_paid) {
                 $price = new Price();
@@ -1525,9 +1403,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'schooltypes'], function () {
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            return [$teacher->school->schooltype];
+            return [$request->user()->school?->schooltype];
         });
     });
 
@@ -1538,9 +1414,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return Classtype::all();
         });
         Route::get('/myschool', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            return $teacher->school->classtypes;
+            return $request->user()?->school?->schooltype?->classtypes;
         });
     });
 
@@ -1549,14 +1423,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'exams'], function () {
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            return $teacher->exams()->paginate(10);
+            return $request->user()->exams()?->paginate(10);
         });
         Route::post('/create', function (Request $request) {
 
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
 
             $exam = new Exam();
@@ -1575,7 +1446,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $exam->shuffle = $request->shuffle ?? false;
 
             $exam->subject_id = $request->subject;
-            $teacher->exams()->save($exam);
+            $user->exams()->save($exam);
 
             $examsessions = [];
             foreach ($request->examsessions as $examsessionData) {
@@ -1609,39 +1480,30 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'schools'], function () {
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
 
-            return $teacher->schools;
+            return $request->user()->schools;
         });
 
         Route::get('/teachers', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            return $teacher->school->teachers()->with('user')->get();
+            $user = $request->user();
+            return $user->school->teachers()->with('user')->get();
         });
 
         Route::get('/myschool', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            return $teacher->school()->with('students', 'teachers')->first();
+            $user = $request->user();
+            return $user->school()->with('students', 'teachers')->first();
         });
 
         Route::get('/subjects/{id}', function (Request $request, $id) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            return $teacher->school()->subjects()->where('subjects.id', $id)->firstOrFail();
+            $user = $request->user();
+            return $user->school()->subjects()->where('subjects.id', $id)->firstOrFail();
         });
     });
 
     Route::group(['prefix' => 'classrooms'], function () {
 
-
-
-
         Route::post('/admit', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
             $student = User::findOrFail($request->student)->student;
 
@@ -1649,7 +1511,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 return ['message' => 'Siswa tidak ditemukan'];
             }
 
-            $classroom = $teacher->classrooms()->findOrFail($request->classroom);
+            $classroom = $user->classrooms()->findOrFail($request->classroom);
 
             if (!$student->classrooms()->where('classrooms.id', $classroom->id)->exists()) {
                 $student->classrooms()->attach($classroom);
@@ -1660,10 +1522,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
-            $classrooms =  $teacher->classrooms();
+            $classrooms =  $user->classrooms();
             if ($request->withExtra) {
                 $classrooms = $classrooms->with(
                     'teacher',
@@ -1675,10 +1536,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::get('/all', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
-            $classrooms = $teacher->school->classrooms();
+            $classrooms = $user->school->classrooms();
 
             if ($request->withExtra) {
                 return $classrooms->with(
@@ -1691,35 +1551,32 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::post('/add', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
             /**  @var App/Models/School $school  */
-            $school = $teacher->school;
+            $school = $user->school;
 
 
-            if (Classroom::where(['teacher_id' => $teacher->id, 'name' => $request->name, 'classtype_id' => $request->classtype_id])->exists()) {
+            if (Classroom::where(['teacher_id' => $user->id, 'name' => $request->name, 'classtype_id' => $request->classtype_id])->exists()) {
                 return ['message' => 'exists'];
             }
 
             $classroom = new Classroom();
             $classroom->name = $request->name;
-            $classroom->teacher_id = $teacher->id;
+            $classroom->teacher_id = $user->id;
             $classroom->classtype_id = $request->classtype_id;
             $school->classrooms()->save($classroom);
         });
 
         Route::delete('/{id}', function (Request $request, $id) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
-            $teacher->classrooms()->where('id', $id)->firstOrFail()->delete();
+            $user->classrooms()->where('id', $id)->firstOrFail()->delete();
 
             return ['message' => 'ok'];
         });
 
         Route::put('/{id}/detach/{studentId}/to/{toId}', function (Request $request, $id, $studentId, $toId) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
 
             $classroom = Classroom::findOrFail($id);
@@ -1733,11 +1590,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::delete('/{id}/detach/{studentId}', function (Request $request, $id, $studentId) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
 
-            $classroom = $teacher->classrooms()->findOrFail($id);
+            $classroom = $user->classrooms()->findOrFail($id);
 
             $classroom->students()->detach($studentId);
 
@@ -1745,10 +1601,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::put('/{id}', function (Request $request, $id) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
-            $classroom = $teacher->classrooms()->where('id', $id)->firstOrFail();
+            $classroom = $user->classrooms()->where('id', $id)->firstOrFail();
 
             $classroom->name = $request->name;
 
@@ -1763,9 +1618,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'questions'], function () {
 
         Route::get('/', function (Request $request) {
-
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
             $questions = (new Question())->with(
                 'classtype.schooltype',
@@ -1797,8 +1650,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::get('/package', function (Request $request) {
 
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
 
             $packagequestions = (new Packagequestion())->with(
@@ -1833,8 +1685,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
         Route::post('/create', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
             $questionIds = [];
             foreach ($request->questions as $questionData) {
@@ -1851,7 +1702,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
                 $question->subject_id = $request['subject'];
 
-                $teacher->questions()->save($question);
+                $user->questions()->save($question);
 
                 $questionIds[] = $question->id;
 
@@ -1889,7 +1740,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $packagequestion->name = $request->packagequestion;
                 $packagequestion->subject_id = $request['subject'];
                 $packagequestion->classtype_id = $request['classtype'];
-                $packagequestion->teacher_id = $teacher->id;
+                $packagequestion->user_id = $user->id;
                 $packagequestion->visibility = $request['visibility'];
                 $packagequestion->save();
 
@@ -1905,25 +1756,21 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'subjects'], function () {
 
         Route::get('/all', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
             return Subject::all();
         });
 
         Route::get('/notin', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            return Subject::whereNotIn('id', $teacher->subjects->map(fn ($e) => $e->id))->get();
+            $user = $request->user();
+            return Subject::whereNotIn('id', $user->subjects->map(fn ($e) => $e->id))->get();
         });
 
         Route::get('/', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            return $teacher->subjects;
+            $user = $request->user();
+            return $user->subjects;
         });
 
         Route::get('/addable', function (Request $request) {
-            /**  @var App/Models/Teacher $teacher  */
-            $subjectIds = $request->user()->teacher->subjects->map(fn ($e) => $e->id);
+            $subjectIds = $request->user()->subjects->map(fn ($e) => $e->id);
             return Subject::whereNotIn('id', $subjectIds)->get();
         });
 
@@ -1931,10 +1778,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::post('/remove', function (Request $request) {
             $subject = Subject::findOrFail($request->id);
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
-            if (!$teacher->subjects()->where('id', $request->id)->exists()) {
-                $teacher->subjects()->detach($subject);
+            $user = $request->user();
+            if (!$user->subjects()->where('id', $request->id)->exists()) {
+                $user->subjects()->detach($subject);
                 return ['message' => 'success'];
             }
             return ['message' => 'success'];
@@ -1942,21 +1788,19 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::post('/add', function (Request $request) {
             $subjects = Subject::whereIn('id', $request->ids)->get();
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
             foreach ($subjects as  $subject) {
-                if (!$teacher->subjects()->where('subjects.id', $subject->id)->exists()) {
-                    $teacher->subjects()->save($subject);
+                if (!$user->subjects()->where('subjects.id', $subject->id)->exists()) {
+                    $user->subjects()->save($subject);
                 }
             }
             return ['message' => 'success', 'ids' => $request->ids];
         });
 
         Route::put('/{id}', function (Request $request, $id) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
-            $subject = $teacher->subjects()->where('subjects.id', $id)->firstOrFail();
+            $subject = $user->subjects()->where('subjects.id', $id)->firstOrFail();
 
             $subject->pivot->kkm = $request->kkm;
 
@@ -1967,10 +1811,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
         Route::delete('/{id}', function (Request $request, $id) {
-            /**  @var App/Models/Teacher $teacher  */
-            $teacher = $request->user()->teacher;
+            $user = $request->user();
 
-            $teacher->subjects()->detach([$id]);
+            $user->subjects()->detach([$id]);
 
             return ['message' => 'success'];
         });

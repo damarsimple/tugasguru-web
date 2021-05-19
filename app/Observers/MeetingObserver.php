@@ -30,7 +30,7 @@ class MeetingObserver
         $room->identifier = 'meeting.general.' . $meeting->id;
         $meeting->rooms()->save($room);
 
-        $room->users()->attach(array_merge([$meeting->user->id], $studentUserIds->toArray()));
+        $room->users()->attach(array_merge([$meeting->teacher->id], $studentUserIds->toArray()));
         
     }
 

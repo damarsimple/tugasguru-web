@@ -17,9 +17,9 @@ class Article extends Model
     public const THEORY = 'THEORY';
     public const POST = 'POST';
 
-    public $with = ['user', 'teacher', 'subjects', 'classtypes', 'price', 'thumbnail'];
+    public $with = ['user',  'subjects', 'classtypes', 'price', 'thumbnail'];
 
-    public function user(): BelongsTo   
+    public function user(): BelongsTo
     {
         return $this->belongsTo('App\Models\User');
     }

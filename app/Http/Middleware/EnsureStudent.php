@@ -16,10 +16,10 @@ class EnsureStudent
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->user()->student || $request->user()->roles != 'STUDENT') {
+        if ($request->user()->roles != 'STUDENT') {
             return response(['message' => 'Unauthorized'], 401);
         }
-        
+
         return $next($request);
     }
 }

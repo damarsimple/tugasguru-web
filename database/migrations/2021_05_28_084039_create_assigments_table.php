@@ -19,7 +19,7 @@ class CreateAssigmentsTable extends Migration
             $table->longText('content');
             $table->timestamp('close_at')->nullable();
             $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('teacher_id')->index()->constrained('users')->onDelete('cascade');
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->timestamps();
         });

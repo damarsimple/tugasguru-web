@@ -11,7 +11,7 @@ class StudentAssigment extends Model
 {
     use HasFactory;
 
-    protected $with = ['attachments', 'student'];
+    protected $with = ['attachments', 'user'];
 
     protected $fillable = ['assigment_id', 'user_id'];
 

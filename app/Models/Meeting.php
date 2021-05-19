@@ -31,9 +31,9 @@ class Meeting extends Model
         return $this->belongsTo('App\Models\Subject');
     }
 
-    public function user(): BelongsTo
+    public function teacher(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User', 'teacher_id');
     }
 
     public function rooms(): MorphMany

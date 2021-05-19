@@ -19,7 +19,7 @@ class CreateExamsTable extends Migration
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
             $table->foreignId('examtype_id')->constrained()->onDelete('cascade');
             $table->foreignId('classroom_id')->constrained()->onDelete('cascade');
-            $table->foreignId('teacher_id')->constrained()->onDelete('cascade');
+            $table->foreignId('teacher_id')->constrained('users')->onDelete('cascade');
             $table->longText('description')->nullable();
             $table->longText('hint')->nullable();
             $table->boolean('is_odd_semester')->default(true);

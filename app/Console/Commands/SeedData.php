@@ -193,7 +193,7 @@ class SeedData extends Command
             foreach ($schoolsData as $key => $schools) {
 
                 foreach ($schools as $key => $school) {
-                    
+
                     if (str_contains($school->sekolah, 'SD')) {
                         continue;
                     }
@@ -295,6 +295,7 @@ class SeedData extends Command
                                         $classtypes[] = $classtype;
                                     }
                                     break;
+                                case 'slb':
                                 case 'sd':
                                     for ($i = 0; $i < 6; $i++) {
                                         $classtype = new Classtype();
@@ -305,6 +306,8 @@ class SeedData extends Command
                                     }
                                     break;
                                 default:
+                                    print(strtolower($school->bentuk) . PHP_EOL);
+                                    exit;
                                     break;
                             }
 
@@ -423,6 +426,7 @@ class SeedData extends Command
             $teacher->city_id = 1;
             $teacher->province_id = 1;
             $teacher->district_id = 1;
+            $teacher->school_id = 1;
             $teacher->gender = 1;
             $teacher->phone = "08987181017";
             $teacher->roles = "TEACHER";
@@ -442,6 +446,7 @@ class SeedData extends Command
             $user->password = Hash::make("we5n9t5ReNV8gNE");
             $user->city_id = 1;
             $user->province_id = 1;
+            $user->school_id = 1;
             $user->district_id = 1;
             $user->gender = 1;
             $user->phone = "08987181012";
@@ -460,6 +465,7 @@ class SeedData extends Command
             $user->email = "damara1@gmail.com";
             $user->password = Hash::make("123456789");
             $user->city_id = 1;
+            $user->school_id = 1;
             $user->province_id = 1;
             $user->district_id = 1;
             $user->gender = 1;
@@ -477,7 +483,7 @@ class SeedData extends Command
 
             $classroom = new Classroom();
             $classroom->name =  "Test";
-            $classroom->user_id = 1;
+            $classroom->teacher_id = 1;
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
@@ -485,7 +491,7 @@ class SeedData extends Command
 
             $classroom = new Classroom();
             $classroom->name =  "Test";
-            $classroom->user_id = 2;
+            $classroom->teacher_id = 2;
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
@@ -497,7 +503,7 @@ class SeedData extends Command
 
             $meeting->name = "Pertemuan oleh kian santang";
 
-            $meeting->user_id = $teacher->id;
+            $meeting->teacher_id = $teacher->id;
 
             $meeting->start_at = now();
 
