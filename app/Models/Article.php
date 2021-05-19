@@ -24,11 +24,6 @@ class Article extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function teacher(): BelongsTo
-    {
-        return $this->belongsTo('App\Models\Teacher');
-    }
-
     public function price()
     {
         return $this->morphOne('App\Models\Price', 'priceable');

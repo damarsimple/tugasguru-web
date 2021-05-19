@@ -9,15 +9,15 @@ trait TeacherFollowable
 
     public function teachers(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Teacher')->wherePivot('is_accepted', true);
+        return $this->belongsToMany('App\Models\User')->wherePivot('is_accepted', true);
     }
     public function pendingteachers(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Teacher')->wherePivot('is_accepted', false);
+        return $this->belongsToMany('App\Models\User')->wherePivot('is_accepted', false);
     }
 
     public function rejectedteachers(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Teacher')->wherePivot('is_rejected', true);
+        return $this->belongsToMany('App\Models\User')->wherePivot('is_rejected', true);
     }
 }

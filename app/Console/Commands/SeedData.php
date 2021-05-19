@@ -15,7 +15,7 @@ use App\Models\Room;
 use App\Models\School;
 use App\Models\Schooltype;
 use App\Models\Subject;
-use App\Models\Teacher;
+use App\Models\User;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Faker\Factory;

@@ -15,7 +15,8 @@ class CreateConsultationsTable extends Migration
     {
         Schema::create('consultations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('teacher_id')->references('id')
+                ->on('users')->index()->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->string('title');
             $table->string('problem');

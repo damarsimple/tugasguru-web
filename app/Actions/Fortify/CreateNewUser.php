@@ -2,7 +2,6 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -72,12 +71,8 @@ class CreateNewUser implements CreatesNewUsers
         switch ($input['roles']) {
             case 'TEACHER':
             case 'TEACHER_BIMBEL':
-                $teacher = new Teacher();
-                $teacher->user_id = $user->id;
-
-                $teacher->is_bimbel = $input['roles'] == 'TEACHER_BIMBEL' ? true : false;
-                $teacher->school_id = $input['school_id'] ?? null;
-                $user->teacher()->save($teacher);
+                $user->is_bimbel = $input['roles'] == 'TEACHER_BIMBEL' ? true : false;
+                $user->school_id = $input['school_id'] ?? null;
                 break;
             case 'STUDENT':
                 $user->nisn = $input['nisn'];

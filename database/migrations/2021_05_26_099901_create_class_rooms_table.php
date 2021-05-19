@@ -15,7 +15,8 @@ class CreateClassRoomsTable extends Migration
     {
         Schema::create('classrooms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('teacher_id')->references('id')
+                ->on('users')->index()->constrained()->onDelete('cascade');
             $table->foreignId('classtype_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('school_id')->constrained()->onDelete('cascade');
             $table->string('name');

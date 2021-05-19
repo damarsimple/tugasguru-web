@@ -33,15 +33,20 @@ class CreateUsersTable extends Migration
 
             $table->foreignId('school_id')->index()->nullable();
 
+
             // students
             $table->foreignId('parent_id')
                 ->nullable()
                 ->references('id')
                 ->on('users');
-                
+
             $table->foreignId('classtype_id')->nullable();
             $table->bigInteger('nisn')->nullable();
 
+            // teachers
+
+            $table->boolean('is_bimbel')->default(false);
+            $table->boolean('is_bk')->default(false);
 
             $table->rememberToken();
             $table->timestamps();

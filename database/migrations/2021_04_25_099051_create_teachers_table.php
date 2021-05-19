@@ -17,8 +17,7 @@ class CreateTeachersTable extends Migration
             $table->id();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('school_id')->nullable()->index()->constrained()->onDelete('cascade');
-            $table->boolean('is_bimbel')->default(false);
-            $table->boolean('is_bk')->default(false);
+     
             $table->timestamps();
         });
     }

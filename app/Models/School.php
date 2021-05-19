@@ -16,7 +16,7 @@ class School extends Model
 
     public function teachers(): HasMany
     {
-        return $this->hasMany('App\Models\Teacher');
+        return $this->hasMany('App\Models\User');
     }
 
     public function students(): HasMany
@@ -26,7 +26,7 @@ class School extends Model
 
     public function partteacher(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Teacher');
+        return $this->belongsToMany('App\Models\User');
     }
     public function province(): BelongsTo
     {

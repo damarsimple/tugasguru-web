@@ -81,7 +81,7 @@ class User extends Authenticatable
 
     public function teacher(): HasOne
     {
-        return $this->hasOne('App\Models\Teacher');
+        return $this->hasOne('App\Models\User');
     }
 
     public function attachments(): HasMany
@@ -102,7 +102,7 @@ class User extends Authenticatable
 
     // function followingteachers(): BelongsToMany
     // {
-    //     return $this->belongsToMany('App\Models\Teacher')->where('is_accepted', true);
+    //     return $this->belongsToMany('App\Models\User')->where('is_accepted', true);
     // }
 
     // function followingstudents(): belongsToMany
@@ -112,7 +112,7 @@ class User extends Authenticatable
 
     // function requestfollowingteachers(): BelongsToMany
     // {
-    //     return $this->belongsToMany('App\Models\Teacher')->where('is_accepted', false);
+    //     return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
     // }
 
     // function requestfollowingstudents(): belongsToMany

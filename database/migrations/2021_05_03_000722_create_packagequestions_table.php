@@ -16,7 +16,8 @@ class CreatePackagequestionsTable extends Migration
         Schema::create('packagequestions', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('teacher_id')->references('id')
+                ->on('users')->index()->constrained()->onDelete('cascade');
             $table->foreignId('classtype_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->boolean('editable')->default(true);

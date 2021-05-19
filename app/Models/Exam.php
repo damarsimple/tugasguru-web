@@ -42,7 +42,7 @@ class Exam extends Model
     public function supervisors(): BelongsToMany
     {
         return $this->belongsToMany(
-            'App\Models\Teacher',
+            'App\Models\User',
             'exam_supervisor',
             'supervisor_id',
             'exam_id',
@@ -59,7 +59,7 @@ class Exam extends Model
 
     public function teacher(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Teacher');
+        return $this->belongsTo('App\Models\User', 'teacher_id');
     }
 
     public function attendances()
