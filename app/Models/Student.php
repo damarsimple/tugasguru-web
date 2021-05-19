@@ -16,48 +16,5 @@ class Student extends Model
 
     public $with = ['user', 'school'];
 
-    public function school(): BelongsTo
-    {
-        return $this->belongsTo('App\Models\School');
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo('App\Models\User');
-    }
-
-    public function classrooms(): BelongsToMany
-    {
-        return $this->belongsToMany('App\Models\Classroom');
-    }
-
-    public function guardian(): BelongsTo
-    {
-        return $this->belongsTo('App\Models\User', 'parent_id');
-    }
-
-    public function events(): MorphMany
-    {
-        return $this->morphMany('App\Models\Event', 'eventable');
-    }
-
-    public function followers(): BelongsToMany
-    {
-        return $this->belongsToMany('App\Models\User')->where('is_accepted', true);
-    }
-
-    public function requestfollow(): BelongsToMany
-    {
-        return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
-    }
-
-    public function consultations(): HasMany
-    {
-        return $this->hasMany('App\Models\Consultation');
-    }
-
-    public function absents(): HasMany
-    {
-        return $this->hasMany('App\Models\Absent');
-    }
+  
 }

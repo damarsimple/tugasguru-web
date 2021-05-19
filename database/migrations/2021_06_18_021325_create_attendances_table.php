@@ -15,7 +15,7 @@ class CreateAttendancesTable extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('teacher_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');

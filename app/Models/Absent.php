@@ -15,8 +15,8 @@ class Absent extends Model
         return $this->belongsTo('App\Models\Teacher');
     }
 
-    public function student(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Student');
+        return $this->belongsTo('App\Models\User');
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -81,14 +80,14 @@ class CreateNewUser implements CreatesNewUsers
                 $user->teacher()->save($teacher);
                 break;
             case 'STUDENT':
-                $student = new Student();
-                $student->nisn = $input['nisn'];
-                $student->school_id = $input['school_id'];
-                $user->student()->save($student);
+                $user->nisn = $input['nisn'];
+                $user->school_id = $input['school_id'];
                 break;
             default:
                 break;
         }
+
+        $user->save();
 
         return $user;
     }

@@ -41,10 +41,10 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create('classroom_student', function (Blueprint $table) {
+        Schema::create('classroom_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('student_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
 

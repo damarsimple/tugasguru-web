@@ -14,7 +14,6 @@ use App\Models\Province;
 use App\Models\Room;
 use App\Models\School;
 use App\Models\Schooltype;
-use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\User;
@@ -460,14 +459,13 @@ class SeedData extends Command
             $user->phone = "08987181014";
             $user->roles = "STUDENT";
 
+
+            $user = new user();
+            $user->nisn = 1234568123;
+            $user->school_id = 1;
+            $user->classtype_id = 1;
+
             $user->save();
-
-            $student = new Student();
-            $student->nisn = 1234568123;
-            $student->school_id = 1;
-            $student->classtype_id = 1;
-            $user->student()->save($student);
-
 
             $school = School::first();
 
@@ -477,7 +475,7 @@ class SeedData extends Command
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
-            $classroom->students()->save($student);
+            $classroom->students()->save($user);
 
             $classroom = new Classroom();
             $classroom->name =  "Test";
@@ -485,11 +483,7 @@ class SeedData extends Command
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
-
-
-            // $teacher->user->followingteachers()->attach($student->user->id);
-
-            $classroom->students()->save($student);
+            $classroom->students()->save($user);
 
             $meeting = new Meeting();
 
@@ -511,7 +505,7 @@ class SeedData extends Command
 
                 $room->users()->attach($teacher->user->id, ['is_administrator' => true]);
 
-                $room->users()->attach($student->user->id);
+                $room->users()->attach($user->id);
             }
 
             $assigment = new Assigment();

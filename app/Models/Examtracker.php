@@ -16,7 +16,7 @@ class Examtracker extends Model
 
     protected $fillable = [
         'exam_id',
-        'student_id',
+        'user_id',
         'examsession_id'
     ];
 
@@ -30,8 +30,8 @@ class Examtracker extends Model
         return $this->belongsTo('App\Models');
     }
 
-    public function student(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Student');
+        return $this->belongsTo('App\Models\User');
     }
 }

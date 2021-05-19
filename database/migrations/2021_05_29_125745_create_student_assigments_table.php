@@ -16,7 +16,7 @@ class CreateStudentAssigmentsTable extends Migration
         Schema::create('student_assigments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('assigment_id')->constrained()->onDelete('cascade');
-            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->longText('content')->nullable();
             $table->string('external_url')->nullable();
             $table->float('grade', unsigned: true)->default(0);

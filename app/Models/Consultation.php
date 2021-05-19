@@ -10,9 +10,9 @@ class Consultation extends Model
 {
     use HasFactory;
 
-    public function student(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Student');
+        return $this->belongsTo('App\Models\User');
     }
 
     public function teacher(): BelongsTo

@@ -13,16 +13,16 @@ class StudentAssigment extends Model
 
     protected $with = ['attachments', 'student'];
 
-    protected $fillable = ['assigment_id', 'student_id'];
+    protected $fillable = ['assigment_id', 'user_id'];
 
     public function assigment(): BelongsTo
     {
         return $this->belongsTo('App\Models\Assigment');
     }
 
-    public function student(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Student');
+        return $this->belongsTo('App\Models\User');
     }
 
     public function attachments(): MorphMany

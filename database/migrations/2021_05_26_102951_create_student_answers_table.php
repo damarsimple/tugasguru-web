@@ -18,7 +18,7 @@ class CreateStudentAnswersTable extends Migration
             $table->foreignId('answer_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('examresult_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('question_id')->constrained()->onDelete('cascade');
-            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('exam_id')->constrained()->onDelete('cascade');
             $table->foreignId('examsession_id')->constrained()->onDelete('cascade');
             $table->string('content')->nullable();

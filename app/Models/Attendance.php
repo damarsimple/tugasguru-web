@@ -12,16 +12,16 @@ class Attendance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'student_id',
+        'user_id',
         'teacher_id',
         'subject_id',
         'classroom_id',
         'attendable_id',
         'attendable_type'
     ];
-    public function student(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Student');
+        return $this->belongsTo('App\Models\User');
     }
 
     public function classroom(): BelongsTo

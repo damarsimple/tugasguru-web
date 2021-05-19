@@ -30,6 +30,19 @@ class CreateUsersTable extends Migration
             $table->string('specialty')->nullable();
             $table->string('academic_degree')->nullable();
             $table->json('hidden_attribute')->nullable();
+
+            $table->foreignId('school_id')->index()->nullable();
+
+            // students
+            $table->foreignId('parent_id')
+                ->nullable()
+                ->references('id')
+                ->on('users');
+                
+            $table->foreignId('classtype_id')->nullable();
+            $table->bigInteger('nisn')->nullable();
+
+
             $table->rememberToken();
             $table->timestamps();
         });

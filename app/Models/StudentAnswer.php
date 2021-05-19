@@ -16,7 +16,7 @@ class StudentAnswer extends Model
     
     protected $fillable = [
         'question_id',
-        'student_id',
+        'user_id',
         'exam_id',
         'examsession_id',
         'examresult_id'
@@ -36,9 +36,9 @@ class StudentAnswer extends Model
         return $this->belongsTo('App\Models\Examsession');
     }
 
-    public function student(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Student');
+        return $this->belongsTo('App\Models\User');
     }
     public function exam(): BelongsTo
     {

@@ -54,7 +54,7 @@ class User extends Authenticatable
     ];
 
     public const PROFILEPICTURE = 'PROFILEPICTURE';
-
+    public const STUDENT = 'STUDENT';
     // protected $appends = ['following_count'];
 
     protected $with = ['profilepicture'];
@@ -72,11 +72,6 @@ class User extends Authenticatable
     public function district(): BelongsTo
     {
         return $this->belongsTo('App\Models\District');
-    }
-
-    public function student(): HasOne
-    {
-        return $this->hasOne('App\Models\Student');
     }
 
     public function childrens(): HasMany
@@ -153,5 +148,33 @@ class User extends Authenticatable
     public function profilepicture()
     {
         return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::PROFILEPICTURE);
+    }
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\School');
+    }
+    
+    // student
+
+   
+    public function classrooms(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Classroom');
+    }
+
+    public function guardian(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\User', 'parent_id');
+    }
+
+    public function consultations(): HasMany
+    {
+        return $this->hasMany('App\Models\Consultation');
+    }
+
+    public function absents(): HasMany
+    {
+        return $this->hasMany('App\Models\Absent');
     }
 }

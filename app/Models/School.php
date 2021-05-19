@@ -21,7 +21,7 @@ class School extends Model
 
     public function students(): HasMany
     {
-        return $this->hasMany('App\Models\Student');
+        return $this->hasMany('App\Models\User')->where('roles', User::STUDENT);
     }
 
     public function partteacher(): BelongsToMany

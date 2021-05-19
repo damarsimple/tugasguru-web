@@ -18,7 +18,7 @@ class Classroom extends Model
     
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Student');
+        return $this->belongsToMany('App\Models\User');
     }
 
     public function teacher(): BelongsTo

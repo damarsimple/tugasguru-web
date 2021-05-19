@@ -16,7 +16,7 @@ class CreateExamresultsTable extends Migration
         Schema::create('examresults', function (Blueprint $table) {
             $table->id();
             $table->foreignId('exam_id')->constrained()->onDelete('cascade');
-            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('examsession_id')->constrained()->onDelete('cascade');
             $table->timestamp('start_at')->useCurrent();
             $table->timestamp('finish_at')->nullable();

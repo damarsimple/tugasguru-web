@@ -32,7 +32,6 @@ use App\Models\Question;
 use App\Models\Room;
 use App\Models\School;
 use App\Models\Schooltype;
-use App\Models\Student;
 use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
@@ -107,7 +106,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
                 'teacher_id' => $meeting->teacher_id,
                 'subject_id' => $meeting->subject_id,
                 'classroom_id' => $meeting->classroom_id,
-                'student_id' => $user->student->id,
+                'user_id' => $user->student->id,
                 'attendable_id' => $meeting->id,
                 'attendable_type' => Meeting::class
             ]);
@@ -338,7 +337,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 
             $studentAssigment = StudentAssigment::firstOrCreate([
                 'assigment_id' => $assigment->id,
-                'student_id' => $student->id,
+                'user_id' => $student->id,
             ]);
 
             if ($studentAssigment->edited_times > 3) {
@@ -731,7 +730,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                 'teacher_id' => $exam->teacher_id,
                 'subject_id' => $exam->subject_id,
                 'classroom_id' => $exam->classroom_id,
-                'student_id' => $student->id,
+                'user_id' => $student->id,
                 'attendable_id' => $exam->id,
                 'attendable_type' => Exam::class
             ]);
@@ -757,17 +756,17 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $examtracker = Examtracker::firstOrCreate([
                 'exam_id' => $exam->id,
-                'student_id' => $student->id,
+                'user_id' => $student->id,
                 'examsession_id' => $examsession->id,
             ]);
 
             if ($examresult = Examresult::where('examsession_id', $request->examsession)
-                ->where('student_id', $student->id)
+                ->where('user_id', $student->id)
                 ->where('exam_id', $exam->id)->exists()
             ) {
 
                 $studentanswers = StudentAnswer::where([
-                    'student_id' => $student->id,
+                    'user_id' => $student->id,
                     'examsession_id' => $examsession->id,
                     'exam_id' => $exam->id
                 ])->get();
@@ -776,7 +775,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $examresult = Examresult::firstOrCreate([
                 'examsession_id' => $examsession->id,
-                'student_id' => $student->id,
+                'user_id' => $student->id,
                 'exam_id' => $exam->id
             ]);
 
@@ -801,7 +800,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $examtracker = Examtracker::firstOrCreate([
                 'exam_id' =>   $exam->id,
-                'student_id' =>   $student->id,
+                'user_id' =>   $student->id,
                 'examsession_id' =>   $examsession->id,
             ]);
 
@@ -833,11 +832,11 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             }
 
             $studentAnswer = StudentAnswer::where('examsession_id', $request->examsession)
-                ->where('student_id', $student->id)
+                ->where('user_id', $student->id)
                 ->where('exam_id', $exam->id);
 
             $examresult = Examresult::where('examsession_id', $request->examsession)
-                ->where('student_id', $student->id)
+                ->where('user_id', $student->id)
                 ->where('exam_id', $exam->id)->firstOrFail();
 
             $studentAnswer->update(['examresult_id' => $examresult->id]);
@@ -856,7 +855,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $exam = Exam::findOrFail($id);
 
             $check = $exam->classroom->students()->where('students.id', $student->id)->exists();
-            $examresult = Examresult::where('student_id', $student->id)
+            $examresult = Examresult::where('user_id', $student->id)
                 ->where('exam_id', $exam->id)->first();
 
             if ($examresult?->finish_at) {
@@ -903,7 +902,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             /**  @var App/Models/Student $student  */
             $student = $request->user()->student;
 
-            return Examresult::where('student_id', $student->id)
+            return Examresult::where('user_id', $student->id)
                 ->where('exam_id', $id)
                 ->with(
                     'exam.teacher',
@@ -931,7 +930,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $examtracker = Examtracker::where([
                 'exam_id' =>  $request->exam,
-                'student_id' =>   $student->id,
+                'user_id' =>   $student->id,
                 'examsession_id' =>   $examsession->id,
             ])->firstOrFail();
 
@@ -949,7 +948,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $answer  = StudentAnswer::firstOrCreate([
                 'question_id' => $request->question,
-                'student_id' => $student->id,
+                'user_id' => $student->id,
                 'exam_id' => $exam->id,
                 'examsession_id' => $request->examsession,
             ]);
@@ -997,7 +996,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 ->students()
                 ->whereHas('classrooms', fn ($e) => $e->whereIn('classroom_id', $classrooms))->get('id')->pluck('id');
 
-            return Consultation::whereIn('student_id', $students)->paginate(10);
+            return Consultation::whereIn('user_id', $students)->paginate(10);
         });
 
         Route::put('{id}', function (Request $request, $id) {
