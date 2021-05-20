@@ -1118,7 +1118,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $meeting->content = $request->content ??  $meeting->content;
 
-            $meeting->data = $request->data ?? null;
+            $meeting->data = $request->data ?? $meeting->data;
 
             if ($request->finish_at) {
                 $meeting->finish_at = now();
