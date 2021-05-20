@@ -16,26 +16,26 @@ class ExamsessionObserver
     public function created(Examsession $examsession)
     {
 
-        $exam = $examsession->exam;
+        // $exam = $examsession->exam;
 
-        $clasrooms = $examsession->classrooms()->with('students')->get();
+        // $clasrooms = $examsession->classrooms()->with('students')->get();
 
-        $events = [];
+        // $events = [];
 
-        foreach ($clasrooms as $clasroom) {
-            foreach ($clasroom->students as $student) {
-                $event = new Event();
-                $event->name = "Ulangan " . $exam->name;
-                $event->begin_at = $examsession->open_at;
-                $event->eventable_id = $examsession->id;
-                $event->eventable_type = Examsession::class;
-                $event->user_id = $student->user_id;
+        // foreach ($clasrooms as $clasroom) {
+        //     foreach ($clasroom->students as $student) {
+        //         $event = new Event();
+        //         $event->name = "Ulangan " . $exam->name;
+        //         $event->begin_at = $examsession->open_at;
+        //         $event->eventable_id = $examsession->id;
+        //         $event->eventable_type = Examsession::class;
+        //         $event->user_id = $student->user_id;
 
-                $events[] = $event;
-            }
-        }
+        //         $events[] = $event;
+        //     }
+        // }
 
-        Event::insert($events);
+        // Event::insert($events);
     }
 
     /**

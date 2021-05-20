@@ -162,7 +162,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
     Route::get('notifications', function (Request $request) {
 
-        return $request->user()->unreadNotifications;
+        return $request->user()->notifications;
     });
 
 
@@ -450,6 +450,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
 
         Route::get('/', fn (Request $request) => $request->user()->consultations()->paginate(10));
+        Route::get('{id}', fn (Request $request, $id) => $request->user()->consultations()->findOrFail($id));
     });
 
     Route::group(['prefix' => 'followers'], function () {
@@ -948,26 +949,31 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
 
 
+
+    Route::group(['prefix' => 'absents'], function () {
+        Route::get('/', fn (Request $request) => $request->user()->absents()->paginate(10));
+    });
+
     Route::group(['prefix' => 'consultations'], function () {
 
         Route::get('/', function (Request $request) {
             /**  @var App/Models/User $user  */
             $user = $request->user();
 
-            $classrooms = $user->classrooms()->get('id')->pluck('id');
+            return $user->studentconsultations()->latest()->paginate(10);
+        });
 
-            $students = $user
-                ->school
-                ->students()
-                ->whereHas('classrooms', fn ($e) => $e->whereIn('classroom_id', $classrooms))->get('id')->pluck('id');
+        Route::get('{id}', function (Request $request, $id) {
+            /**  @var App/Models/User $user  */
+            $user = $request->user();
 
-            return Consultation::whereIn('user_id', $students)->paginate(10);
+            return $user->studentconsultations()->findOrFail($id);
         });
 
         Route::put('{id}', function (Request $request, $id) {
             $constult = Consultation::findOrFail($id);
 
-            $constult->note = $request->note;
+            $constult->notes = $request->notes;
             $constult->advice = $request->advice;
 
             $constult->save();
