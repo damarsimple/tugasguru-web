@@ -483,7 +483,7 @@ class SeedData extends Command
 
             $classroom = new Classroom();
             $classroom->name =  "Test";
-            $classroom->teacher_id = 1;
+            $classroom->teacher_id = $teacher->id;
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
