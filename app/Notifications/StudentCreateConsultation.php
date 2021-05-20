@@ -81,7 +81,7 @@ class StudentCreateConsultation extends Notification
     {
         return [
             'type' => 'STUDENT_CREATE_CONSULTATION',
-            'data' => $this->meeting,
+            'data' => $this->consultation,
             'user' => $this->consultation->user
         ];
     }

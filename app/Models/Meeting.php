@@ -14,7 +14,7 @@ class Meeting extends Model
 
     protected $with = ['rooms', 'classroom.students', 'subject', 'teacher', 'article'];
 
-    protected $casts  = ['data' => 'object'];
+    protected $casts  = ['data' => 'object', 'content' => 'object'];
 
     public function classroom(): BelongsTo
     {

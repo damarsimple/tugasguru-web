@@ -19,7 +19,7 @@ class CreateMeetingsTable extends Migration
             $table->json('data')->nullable();
             $table->timestamp('start_at')->useCurrent();
             $table->string('description')->nullable();
-            $table->longText('content')->nullable();
+            $table->json('content')->nullable();
             $table->timestamp('finish_at')->nullable();
             $table->foreignId('article_id')->nullable()->index();
             $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
