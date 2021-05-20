@@ -951,7 +951,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
     Route::group(['prefix' => 'absents'], function () {
-        Route::get('/', fn (Request $request) => $request->user()->absents()->paginate(10));
+        Route::get('/', fn (Request $request) => $request->user()->studentabsents()->latest()->paginate(10));
     });
 
     Route::group(['prefix' => 'consultations'], function () {
