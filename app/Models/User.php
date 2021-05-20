@@ -245,6 +245,6 @@ class User extends Authenticatable
 
     public function studentconsultations(): HasMany
     {
-        return $this->hasMany('App\Models\Absent', foreignKey: 'teacher_id');
+        return $this->hasMany('App\Models\Consultation', foreignKey: 'teacher_id');
     }
 }
