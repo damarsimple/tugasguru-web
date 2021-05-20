@@ -485,9 +485,9 @@ class SeedData extends Command
             $firstclassroom->name =  "Test";
             $firstclassroom->teacher_id = 1;
             $firstclassroom->classtype_id = 1;
-            $school->classrooms()->save($classroom);
+            $school->classrooms()->save($firstclassroom);
 
-            $classroom->students()->save($user);
+            $firstclassroom->students()->save($user);
 
             $classroom = new Classroom();
             $classroom->name =  "Test";
