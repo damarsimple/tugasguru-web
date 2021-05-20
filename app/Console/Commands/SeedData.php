@@ -481,10 +481,10 @@ class SeedData extends Command
 
             $school = School::first();
 
-            $classroom = new Classroom();
-            $classroom->name =  "Test";
-            $classroom->teacher_id = $teacher->id;
-            $classroom->classtype_id = 1;
+            $firstclassroom = new Classroom();
+            $firstclassroom->name =  "Test";
+            $firstclassroom->teacher_id = 1;
+            $firstclassroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
             $classroom->students()->save($user);
@@ -507,7 +507,7 @@ class SeedData extends Command
 
             $meeting->start_at = now();
 
-            $classroom->meetings()->save($meeting);
+            $firstclassroom->meetings()->save($meeting);
 
             foreach (['Umum', 'Kelompok 1', 'Kelompok 2'] as $name) {
                 $room = new Room();
