@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -13,6 +15,8 @@ class Meeting extends Model
     use HasFactory;
 
     protected $with = ['rooms', 'classroom.students', 'subject', 'teacher', 'article'];
+
+    public $appends = ['absents'];
 
     protected $casts  = ['data' => 'object', 'content' => 'object'];
 
@@ -29,6 +33,19 @@ class Meeting extends Model
     public function subject(): BelongsTo
     {
         return $this->belongsTo('App\Models\Subject');
+    }
+
+    public function getAbsentsAttribute()
+    {
+        $builder =  $this->teacher->studentabsents()
+            ->whereHas('user.myclassrooms', fn ($e) => $e->where('classroom_id', $this->classroom_id))
+            ->whereDate('start_at', Carbon::today());
+
+        if ($this->finish_at) {
+            $builder->whereDate('finish_at', $this->finish_at);
+        }
+
+        return $builder->get();
     }
 
     public function teacher(): BelongsTo

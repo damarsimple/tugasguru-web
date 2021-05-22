@@ -18,6 +18,7 @@ class CreateAbsentsTable extends Migration
             $table->foreignId('teacher_id')->index()->constrained('users');
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->string('title');
+            $table->string('type');
             $table->longText('reason');
             $table->timestamp('start_at');
             $table->timestamp('finish_at')->nullable();

@@ -92,6 +92,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
 
         $user = $request->user();
 
+        $studentconsultations = $user->studentconsultations()->latest();
+
         if ($user->roles == "TEACHER") {
             return $user->meetings()->with('classroom.students')->findOrFail($id);
         } else {
@@ -425,12 +427,24 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         Route::post('/', function (Request $request) {
             $user = $request->user();
 
+            $startAt =  Carbon::parse($request->start_at);
+            $finishAt = Carbon::parse($request->finish_at);
+
+            $startAt->hour = now()->hour;
+            $startAt->minute = now()->minute;
+            $startAt->second = now()->second;
+
+            $finishAt->hour = $startAt->hour;
+            $finishAt->minute = $startAt->minute;
+            $finishAt->second = $startAt->second;
+
             $absent = new Absent();
             $absent->teacher_id = $request->teacher;
             $absent->title = $request->title;
+            $absent->type = $request->type;
             $absent->reason = $request->reason;
-            $absent->start_at = Carbon::parse($request->start_at);
-            $absent->finish_at = Carbon::parse($request->finish_at);
+            $absent->start_at = $startAt;
+            $absent->finish_at = $finishAt;
 
             $user->absents()->save($absent);
         });
@@ -960,14 +974,18 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/User $user  */
             $user = $request->user();
 
-            return $user->studentconsultations()->latest()->paginate(10);
+            $studentconsultations = $user->studentconsultations()->latest();
+
+            return $studentconsultations->paginate(10);
         });
 
         Route::get('{id}', function (Request $request, $id) {
             /**  @var App/Models/User $user  */
             $user = $request->user();
 
-            return $user->studentconsultations()->findOrFail($id);
+            return $user->studentconsultations()->with(['user.myclassrooms' => function ($e) use ($user) {
+                return $e->where('teacher_id', $user->id);
+            }])->findOrFail($id);
         });
 
         Route::put('{id}', function (Request $request, $id) {
