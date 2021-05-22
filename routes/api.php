@@ -440,7 +440,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $absent = new Absent();
             $absent->teacher_id = $request->teacher;
-            $absent->title = $request->title;
             $absent->type = $request->type;
             $absent->reason = $request->reason;
             $absent->start_at = $startAt;
