@@ -65,12 +65,9 @@ class SeedData extends Command
 
         $examsType = [
             'Latihan',
+            'Ulangan Harian',
             'PTS',
             'PAS',
-            'UAS',
-            'QUIZ',
-            'Ulangan Harian',
-            'Remedial'
         ];
 
 
