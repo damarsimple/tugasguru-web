@@ -79,7 +79,6 @@ Route::get('/cities/{id}/schools', function (Request $request, $id) {
     }
 });
 
-Route::get('/test1', fn () => ini_get('upload_max_filesize'));
 
 Route::post("/token", [ApiAuthController::class, "token"]);
 Route::post("/login", [ApiAuthController::class, "login"]);
@@ -960,6 +959,26 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     });
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
+
+
+    Route::group(['prefix' => 'reports'], function () {
+        Route::get('/grades/{classroomId}', function (Request $request, $classroomId) {
+            /**  @var App/Models/User $user  */
+            $user = $request->user();
+
+            $checkSemesterAndSubject = fn ($q) => $q->where('is_odd_semester', $request->isOdd  == "true" ?  true : false)->where('subject_id', $request->subject);
+
+            $studentIds = $user->classrooms()->findOrFail($classroomId)->students->pluck('id');
+
+            $checkInClass = fn ($q) => $q->whereHas('user', fn ($qy) => $qy->whereIn('id', $studentIds));
+
+            return $user->classrooms()->where('id', $classroomId)->with([
+                'exams' =>  $checkSemesterAndSubject, 'assigments' => $checkSemesterAndSubject,
+                'exams.examresults' => $checkInClass,
+                'assigments.studentassigments' => $checkInClass
+            ])->firstOrFail();
+        });
+    });
 
 
 

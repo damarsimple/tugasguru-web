@@ -25,7 +25,6 @@ class CreateExamsTable extends Migration
             $table->boolean('is_odd_semester')->default(true);
             $table->year('education_year_start');
             $table->year('education_year_end');
-            $table->string('token')->nullable();
             $table->integer('time_limit')->default(120);
             $table->boolean('allow_show_result')->default(true);
             $table->boolean('shuffle')->default(true);

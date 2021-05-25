@@ -2,18 +2,25 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Answer;
 use App\Models\Assigment;
 use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
 use App\Models\District;
 use App\Models\Exam;
+use App\Models\Examresult;
+use App\Models\Examsession;
 use App\Models\Examtype;
 use App\Models\Meeting;
+use App\Models\Packagequestion;
 use App\Models\Province;
+use App\Models\Question;
 use App\Models\Room;
 use App\Models\School;
 use App\Models\Schooltype;
+use App\Models\StudentAnswer;
+use App\Models\StudentAssigment;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -437,62 +444,83 @@ class SeedData extends Command
 
             $teacher->subjects()->attach(Subject::first());
 
-            $user = new User();
-            $user->name = "Damar Albaribin Guru 2";
-            $user->email = "damaralbaribin2@gmail.com";
-            $user->password = Hash::make("we5n9t5ReNV8gNE");
-            $user->city_id = 1;
-            $user->province_id = 1;
-            $user->school_id = 1;
-            $user->district_id = 1;
-            $user->gender = 1;
-            $user->phone = "08987181012";
-            $user->roles = "TEACHER";
+            $secondteacher = new User();
+            $secondteacher->name = "Damar Albaribin Guru 2";
+            $secondteacher->email = "damaralbaribin2@gmail.com";
+            $secondteacher->password = Hash::make("we5n9t5ReNV8gNE");
+            $secondteacher->city_id = 1;
+            $secondteacher->province_id = 1;
+            $secondteacher->school_id = 1;
+            $secondteacher->district_id = 1;
+            $secondteacher->gender = 1;
+            $secondteacher->phone = "08987181012";
+            $secondteacher->roles = "TEACHER";
 
-            $user->save();
+            $secondteacher->save();
 
-            $user->is_bimbel = false;
-            $user->school_id = 1;
-
-
-            $user->subjects()->attach(Subject::first());
-
-            $user = new User();
-            $user->name = "Damar Albaribin Siswa";
-            $user->email = "damara1@gmail.com";
-            $user->password = Hash::make("123456789");
-            $user->city_id = 1;
-            $user->school_id = 1;
-            $user->province_id = 1;
-            $user->district_id = 1;
-            $user->gender = 1;
-            $user->phone = "08987181014";
-            $user->roles = "STUDENT";
+            $secondteacher->is_bimbel = false;
+            $secondteacher->school_id = 1;
 
 
-            $user->nisn = 1234568123;
-            $user->school_id = 1;
-            $user->classtype_id = 1;
+            $secondteacher->subjects()->attach(Subject::first());
 
-            $user->save();
+            $student = new User();
+            $student->name = "Damar Albaribin Siswa";
+            $student->email = "damara1@gmail.com";
+            $student->password = Hash::make("123456789");
+            $student->city_id = 1;
+            $student->school_id = 1;
+            $student->province_id = 1;
+            $student->district_id = 1;
+            $student->gender = 1;
+            $student->phone = "08987181014";
+            $student->roles = "STUDENT";
+
+
+            $student->nisn = 1234568123;
+            $student->school_id = 1;
+            $student->classtype_id = 1;
+
+            $student->save();
+
+            $secondstudent = new User();
+            $secondstudent->name = "Damar Albaribin Siswa 2";
+            $secondstudent->email = "damara2@gmail.com";
+            $secondstudent->password = Hash::make("123456789");
+            $secondstudent->city_id = 1;
+            $secondstudent->school_id = 1;
+            $secondstudent->province_id = 1;
+            $secondstudent->district_id = 1;
+            $secondstudent->gender = 1;
+            $secondstudent->phone = "08987181015";
+            $secondstudent->roles = "STUDENT";
+
+
+            $secondstudent->nisn = 1234568123;
+            $secondstudent->school_id = 1;
+            $secondstudent->classtype_id = 1;
+
+            $secondstudent->save();
+
+            $studentIds = [$student->id, $secondstudent->id];
 
             $school = School::first();
 
             $firstclassroom = new Classroom();
-            $firstclassroom->name =  "Test";
+            $firstclassroom->name =  "Test Pertama ";
             $firstclassroom->teacher_id = 1;
             $firstclassroom->classtype_id = 1;
             $school->classrooms()->save($firstclassroom);
 
-            $firstclassroom->students()->save($user);
+            $firstclassroom->students()->attach($studentIds);
 
             $classroom = new Classroom();
-            $classroom->name =  "Test";
-            $classroom->teacher_id = 2;
+            $classroom->name =  "Test Kedua ";
+            $classroom->teacher_id = 1;
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
-            $classroom->students()->save($user);
+            $classroom->students()->attach($studentIds);
 
             $meeting = new Meeting();
 
@@ -509,29 +537,152 @@ class SeedData extends Command
             foreach (['Umum', 'Kelompok 1', 'Kelompok 2'] as $name) {
                 $room = new Room();
                 $room->name = $name;
-                $room->identifier = "meeeting.chat." . $meeting->id;
+                $room->identifier = "meeting.chat." . $meeting->id;
                 $meeting->rooms()->save($room);
 
                 $room->users()->attach($teacher->id, ['is_administrator' => true]);
 
-                $room->users()->attach($user->id);
+                $room->users()->attach($studentIds);
             }
 
-            $assigment = new Assigment();
 
-            $assigment->name = "Test Assigment";
 
-            $assigment->content = "Test";
 
-            $assigment->classroom_id = $classroom->id;
+            $rand = mt_rand(6, 10);
 
-            $assigment->subject_id = 1;
+            for ($i = 0; $i < $rand; $i++) {
+                $assigment = new Assigment();
+                $assigment->name = "Test Assigment";
+                $assigment->content = "Test";
+                $assigment->classroom_id = $classroom->id;
+                $assigment->subject_id = 1;
+                $assigment->close_at = now()->addHour(4);
 
-            $assigment->close_at = now()->addHour(4);
+                $teacher->assigments()->save($assigment);
+
+                foreach ($studentIds as $x) {
+                    $studentassigment = new StudentAssigment();
+                    $studentassigment->user_id = $x;
+                    $studentassigment->content = "aaa";
+                    $studentassigment->grade = mt_rand(40, 100);
+                    $studentassigment->is_graded = true;
+                    $studentassigment->comment = "Yes";
+                    $studentassigment->turned_at = now();
+                    $assigment->studentassigments()->save($studentassigment);
+                }
+                print("assigment $i\n");
+            }
+
+            $packagequestion = new Packagequestion();
+
+            $packagequestion->name = "TEST 1";
+            $packagequestion->classtype_id = Classtype::first()->id;
+            $packagequestion->subject_id = Subject::first()->id;
+            $teacher->packagequestions()->save($packagequestion);
+
+            for ($i = 0; $i < $rand; $i++) {
+                $question = new Question();
+                $question->user_id = $teacher->id;
+                $question->classtype_id = $packagequestion->classtype_id;
+                $question->subject_id = $packagequestion->subject_id;
+                $question->type = Question::MULTI_CHOICE;
+                $question->content = "Yes PG Test " . $i + 1;
+
+                $packagequestion->questions()->save($question);
+
+                for ($j = 0; $j < 4; $j++) {
+                    $answer = new Answer();
+                    $answer->content = "Yes Answer " . $j + 1;
+                    $answer->is_correct = $j == 0;
+                    $question->answers()->save($answer);
+                    print("answer $j\n");
+                }
+
+                print("question $i\n");
+            }
+
+            for ($i = 0; $i < $rand; $i++) {
+                $question = new Question();
+                $question->user_id = $teacher->id;
+                $question->classtype_id = $packagequestion->classtype_id;
+                $question->subject_id = $packagequestion->subject_id;
+                $question->type = $i % 2 == 0 ? Question::ESSAY : Question::FILLER;
+                $question->content = "Yes ESSAY / FILLER Test " . $i + 1;
+
+                $packagequestion->questions()->save($question);
+
+                $answer = new Answer();
+                $answer->content = "Yes Answer " . $i + 1;
+                $answer->is_correct = true;
+                $question->answers()->save($answer);
+
+                print("question $i\n");
+            }
+
+
+
+            $questions = Question::all();
+            $questionIds = $questions->pluck('id');
+            foreach (Examtype::all() as $examtype) {
+                for ($i = 0; $i < $rand; $i++) {
+                    $exam = new Exam();
+
+                    $exam->name = "Test Exam $i";
+                    $exam->teacher_id = $teacher->id;
+                    $exam->description = " test ";
+                    $exam->hint = "11";
+                    $exam->subject_id = 1;
+                    $exam->is_odd_semester = true;
+                    $exam->education_year_start = 2020;
+                    $exam->education_year_end = 2021;
+                    $exam->examtype_id = $examtype->id;
+                    $classroom->exams()->save($exam);
+
+                    $exam->questions()->attach($questionIds);
+
+                    $examsession = new Examsession();
+
+                    $examsession->name = "Test 1";
+                    $examsession->open_at = now();
+                    $examsession->close_at = now()->addHour(1);
+                    $exam->examsessions()->save($examsession);
+
+                    foreach ($studentIds as $x) {
+                        $user = User::find($x);
+
+                        $examresult = new Examresult();
+                        $examresult->examsession_id = $examsession->id;
+                        $examresult->exam_id = $exam->id;
+                        $examresult->start_at = now();
+                        $examresult->finish_at = now()->addHour(1);
+                        $examresult->grade = mt_rand(60, 100);
+                        $examresult->is_proccessed = true;
+                        $user->examresults()->save($examresult);
+
+                        foreach ($questions as $v => $y) {
+                            $studentanswer = new StudentAnswer();
+                            $studentanswer->answer_id = $v % 2 == 0 ? $y->correctanswer->id : $y->answers()->pluck('id')->random();
+                            $studentanswer->examsession_id = $examsession->id;
+                            $studentanswer->exam_id = $exam->id;
+                            $studentanswer->question_id = $y->id;
+                            $studentanswer->examresult_id = $examresult->id;
+
+                            $user->studentanswers()->save($studentanswer);
+                        }
+                    }
+                    print("exam $i\n");
+
+                    if ($examtype->name == "PAS" || $examtype->name == "PTS") break;
+                }
+            }
+
+
+
 
             $teacher->assigments()->save($assigment);
 
-            $teacher->followers()->attach([$user->id => ['is_accepted' => true]]);
+            $teacher->followers()->attach([$student->id => ['is_accepted' => true]]);
+            $teacher->followers()->attach([$secondstudent->id => ['is_accepted' => true]]);
         }
 
         print("finish at " . time() - $start . PHP_EOL);

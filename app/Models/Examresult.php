@@ -16,6 +16,9 @@ class Examresult extends Model
         'user_id',
         'exam_id'
     ];
+
+    protected $with = ['user'];
+
     public function exam(): BelongsTo
     {
         return $this->belongsTo('App\Models\Exam');

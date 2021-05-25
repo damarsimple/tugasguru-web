@@ -20,7 +20,7 @@ class CreateExamsessionsTable extends Migration
             $table->foreignId('exam_id')->constrained()->onDelete('cascade');
             $table->timestamp('open_at')->nullable();
             $table->timestamp('close_at')->nullable();
-            $table->string('token');
+            $table->string('token')->nullable();
             $table->timestamps();
         });
     }

@@ -14,8 +14,12 @@ class Question extends Model
     use HasFactory;
 
     protected $fillable = ['editable'];
-    
+
     public $with = ['attachments', 'answers', 'subject'];
+
+    const MULTI_CHOICE = 'MULTI_CHOICE';
+    const FILLER = 'FILLER';
+    const ESSAY = 'ESSAY';
 
     public function teacher(): BelongsTo
     {

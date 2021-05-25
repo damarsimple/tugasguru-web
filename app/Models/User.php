@@ -243,6 +243,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Absent', foreignKey: 'teacher_id');
     }
 
+    public function studentanswers()
+    {
+        return $this->hasMany('App\Models\StudentAnswer');
+    }
+
     public function studentconsultations(): HasMany
     {
         return $this->hasMany('App\Models\Consultation', foreignKey: 'teacher_id');
