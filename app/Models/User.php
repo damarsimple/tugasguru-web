@@ -185,6 +185,11 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\School');
     }
 
+    public function homeroomschools(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\School')->wherePivot('is_homeroom', true);
+    }
+
     public function subjects(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
@@ -264,5 +269,15 @@ class User extends Authenticatable
     public function forms(): HasMany
     {
         return $this->hasMany('App\Models\Form');
+    }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany('App\Models\Report');
+    }
+
+    public function receivereports(): HasMany
+    {
+        return $this->hasMany('App\Models\Report', 'to_id');
     }
 }

@@ -29,6 +29,7 @@ use App\Models\Price;
 use App\Models\PrivateRoom;
 use App\Models\Province;
 use App\Models\Question;
+use App\Models\Report;
 use App\Models\Room;
 use App\Models\School;
 use App\Models\Schooltype;
@@ -1603,6 +1604,49 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::get('/type', fn () => Examtype::all());
     });
 
+
+    Route::group(['prefix' => 'homerooms'], function () {
+        Route::get('/', function (Request $request) {
+            $user = $request->user();
+            return $user->homeroomschools()->with('homeroomteachers')->get();
+        });
+
+        Route::get('/reports', function (Request $request) {
+            $user = $request->user();
+            return $user->receivereports()->paginate(10);
+        });
+    });
+
+    Route::group(['prefix' => 'reports'], function () {
+        Route::get('/', function (Request $request) {
+            $user = $request->user();
+            return $user->reports()->paginate(10);
+        });
+
+        Route::get('/{id}', function (Request $request, $id) {
+            $user = $request->user();
+
+            try {
+                return $user->reports()->where('id', $id)->firstOrFail();
+            } catch (\Throwable $th) {
+                return $user->receivereports()->where('id', $id)->firstOrFail();
+            }
+        });
+
+        Route::post('/', function (Request $request) {
+
+            $report = new Report();
+            $report->title = $request->title;
+            $report->data = json_encode($request->data);
+            $report->type = json_encode($request->type);
+            $report->to_id = json_encode($request->receiver);
+
+
+            $request->user()->reports()->save($report);
+
+            return ['message' => 'ok'];
+        });
+    });
 
     Route::group(['prefix' => 'schools'], function () {
 

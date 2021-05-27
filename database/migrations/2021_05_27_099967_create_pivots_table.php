@@ -121,6 +121,7 @@ class CreatePivotsTable extends Migration
             $table->foreignId('school_id')->index()->constrained()->onDelete('cascade');
             $table->boolean('is_homeroom')->default(false);
             $table->boolean('is_headmaster')->default(false);
+            $table->boolean('is_ppdb_master')->default(false);
             $table->boolean('is_ppdb')->default(false);
             $table->timestamps();
         });
