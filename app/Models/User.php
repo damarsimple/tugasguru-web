@@ -56,9 +56,9 @@ class User extends Authenticatable
     public const PROFILEPICTURE = 'PROFILEPICTURE';
     public const STUDENT = 'STUDENT';
     public const TEACHER = 'TEACHER';
-    // protected $appends = ['following_count'];
+    protected $appends = ['mainschool'];
 
-    protected $with = ['profilepicture'];
+    protected $with = ['profilepicture', 'province'];
 
     public function province(): BelongsTo
     {
@@ -248,8 +248,21 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\StudentAnswer');
     }
 
+    public function getMainschoolAttribute(): School|null
+    {
+        if ($this->roles == self::TEACHER)
+            return $this->schools()->first();
+
+        return null;
+    }
+
     public function studentconsultations(): HasMany
     {
         return $this->hasMany('App\Models\Consultation', foreignKey: 'teacher_id');
+    }
+
+    public function forms(): HasMany
+    {
+        return $this->hasMany('App\Models\Form');
     }
 }

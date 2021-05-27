@@ -115,14 +115,15 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
-        // Schema::create('teacher_user', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->foreignId('teacher_id')->references('id')
-        // ->on('users')->index()->constrained()->onDelete('cascade');
-        //     $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
-        //     $table->boolean('is_accepted')->default(false);
-        //     $table->timestamps();
-        // });
+        Schema::create('school_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('school_id')->index()->constrained()->onDelete('cascade');
+            $table->boolean('is_homeroom')->default(false);
+            $table->boolean('is_headmaster')->default(false);
+            $table->boolean('is_ppdb')->default(false);
+            $table->timestamps();
+        });
 
         Schema::create('user_user', function (Blueprint $table) {
             $table->id();

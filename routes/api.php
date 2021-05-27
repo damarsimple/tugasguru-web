@@ -5,6 +5,7 @@ use App\Events\MeetingChangeEvent;
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
+use App\Jobs\FormApproveTest;
 use App\Models\Absent;
 use App\Models\Answer;
 use App\Models\Article;
@@ -20,6 +21,7 @@ use App\Models\Examresult;
 use App\Models\Examsession;
 use App\Models\Examtracker;
 use App\Models\Examtype;
+use App\Models\Form;
 use App\Models\Meeting;
 use App\Models\Message;
 use App\Models\Packagequestion;
@@ -220,7 +222,11 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             Route::get('/targets', function (Request $request) {
                 $user = $request->user();
 
-                $y = $user->school;
+                if ($user->roles == User::TEACHER) {
+                    $y = $user->schools()->first();
+                } else {
+                    $y = $user->school;
+                }
 
                 return array_merge($y->teachers->toArray(), $y->students->toArray());
             });
@@ -544,7 +550,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $article->visibility = 'PUBLIK';
             $article->user_id = $user->id;
             $article->role = Article::POST;
-            $article->school_id = $request?->school ?? $user?->school?->id;
+            $article->school_id = $request?->school ?? $user?->schools()?->first()?->id;
             $user->articles()->save($article);
             return ['message' => 'ok'];
         });
@@ -604,10 +610,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         Route::get('/', function (Request $request) {
             $user = $request->user();
 
-            return $user->school()->with(
-                'schooltype',
-                'teachers.province',
-            )->first();
+            return $user->school()->with('homeroomteacher', 'counselors', 'teachers', 'students')->first();
         });
     });
 
@@ -961,6 +964,43 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
 
 
+    Route::group(['prefix' => 'forms'], function () {
+        Route::get('/status', function () {
+
+            $maps = [];
+
+            foreach ([
+                Form::REQUEST_TUTOR,
+                Form::REQUEST_COUNSELOR,
+                Form::REQUEST_HEADMASTER,
+                Form::REQUEST_PPDB,
+                Form::REQUEST_HOMEROOM
+            ] as $v) {
+                $maps[$v] = Form::where('type', $v)->where('status', Form::PENDING)->exists();
+            }
+
+            return $maps;
+        });
+
+        Route::post('/', function (Request $request) {
+            $form = new Form();
+
+            $form->type = $request->type;
+
+            $form->data = json_encode($request->data);
+
+            $user = $request->user();
+
+            $user->forms()->save($form);
+
+            if (config('app.env') == 'local' || config('app.debug') == true) {
+                dispatch(new FormApproveTest($form));
+            }
+
+            return ['message' => 'ok'];
+        });
+    });
+
     Route::group(['prefix' => 'reports'], function () {
         Route::get('/grades/{classroomId}', function (Request $request, $classroomId) {
             /**  @var App/Models/User $user  */
@@ -1299,7 +1339,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $article->visibility = 'PUBLIK';
             $article->user_id = $user->id;
             $article->role = Article::POST;
-            $article->school_id = $request?->school ?? $user?->school?->id;
             $user->articles()->save($article);
             return ['message' => 'ok'];
         });
@@ -1412,7 +1451,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::get('/', function (Request $request) {
             return Article::latest()
-                ->where('school_id', $request->user()?->school?->id)
+                ->where('school_id', $request->user()?->schools()?->first()?->id)
                 ->where('role', Article::ANNOUNCEMENT)
                 ->paginate(10);
         });
@@ -1425,7 +1464,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $article->visibility = 'PUBLIK';
             $article->user_id = $user->id;
             $article->role = Article::ANNOUNCEMENT;
-            $article->school_id = $request?->school ?? $user?->school?->id;
+            $article->school_id = $request?->school ?? $user?->schools()?->first()?->id;
             $user->articles()->save($article);
 
             if ($request->thumbnail) {
@@ -1455,7 +1494,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $article->visibility = $request->visibility;
             $article->user_id = $user->id;
             $article->role = Article::THEORY;
-            $article->school_id = $request?->school ?? $user?->school?->id;
+            $article->school_id = $request?->school ?? $user?->schools()?->first()?->id;
             $user->articles()->save($article);
 
             if ($article->is_paid) {
@@ -1483,7 +1522,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'schooltypes'], function () {
         Route::get('/', function (Request $request) {
-            return [$request->user()->school?->schooltype];
+            return [$request->user()->schools()->first()->schooltype];
         });
     });
 
@@ -1561,22 +1600,41 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::get('/', function (Request $request) {
 
-            return $request->user()->schools;
+            return $request->user()->schools()->with(
+                'homeroomteachers',
+                'counselors',
+                'teachers',
+                'students',
+                'headmasters',
+                'ppdbadmins'
+            )->get();
         });
 
         Route::get('/teachers', function (Request $request) {
             $user = $request->user();
-            return $user->school->teachers()->with('user')->get();
+            return $user->schools()->first()->teachers()->with('user')->get();
         });
 
         Route::get('/myschool', function (Request $request) {
             $user = $request->user();
-            return $user->school()->with('students', 'teachers')->first();
+            return $user->schools()->with('students', 'teachers', 'homeroomteachers', 'counselors')->first();
         });
 
         Route::get('/subjects/{id}', function (Request $request, $id) {
             $user = $request->user();
-            return $user->school()->subjects()->where('subjects.id', $id)->firstOrFail();
+            return $user->schools()->first()->subjects()->where('subjects.id', $id)->firstOrFail();
+        });
+
+        Route::get('/{id}', function (Request $request, $id) {
+            $user = $request->user();
+            return $user->schools()->with(
+                'homeroomteachers',
+                'counselors',
+                'teachers',
+                'students',
+                'headmasters',
+                'ppdbadmins'
+            )->findOrFail($id);
         });
     });
 

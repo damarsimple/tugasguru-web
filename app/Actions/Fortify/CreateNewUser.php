@@ -70,9 +70,9 @@ class CreateNewUser implements CreatesNewUsers
 
         switch ($input['roles']) {
             case 'TEACHER':
+                $user->schools()->attach($input['school_id']);
             case 'TEACHER_BIMBEL':
                 $user->is_bimbel = $input['roles'] == 'TEACHER_BIMBEL' ? true : false;
-                $user->school_id = $input['school_id'] ?? null;
                 break;
             case 'STUDENT':
                 $user->nisn = $input['nisn'];

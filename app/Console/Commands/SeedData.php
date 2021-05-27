@@ -430,16 +430,17 @@ class SeedData extends Command
             $teacher->city_id = 1;
             $teacher->province_id = 1;
             $teacher->district_id = 1;
-            $teacher->school_id = 1;
+
             $teacher->gender = 1;
             $teacher->phone = "08987181017";
+            $teacher->is_bk = true;
             $teacher->roles = "TEACHER";
 
             $teacher->save();
 
+            $teacher->schools()->attach(1);
 
             $teacher->is_bimbel = false;
-            $teacher->school_id = 1;
 
 
             $teacher->subjects()->attach(Subject::first());
@@ -450,13 +451,14 @@ class SeedData extends Command
             $secondteacher->password = Hash::make("we5n9t5ReNV8gNE");
             $secondteacher->city_id = 1;
             $secondteacher->province_id = 1;
-            $secondteacher->school_id = 1;
             $secondteacher->district_id = 1;
             $secondteacher->gender = 1;
             $secondteacher->phone = "08987181012";
             $secondteacher->roles = "TEACHER";
 
             $secondteacher->save();
+
+            $secondteacher->schools()->attach([1 => ['is_homeroom' => true]]);
 
             $secondteacher->is_bimbel = false;
             $secondteacher->school_id = 1;

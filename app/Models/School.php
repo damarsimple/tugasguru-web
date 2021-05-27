@@ -14,9 +14,29 @@ class School extends Model
 
     public $with = ['subjects', 'schooltype'];
 
-    public function teachers(): HasMany
+    public function teachers(): BelongsToMany
     {
-        return $this->hasMany('App\Models\User')->where('roles', User::TEACHER);
+        return $this->belongsToMany('App\Models\User')->where('roles', User::TEACHER);
+    }
+
+    public function homeroomteachers(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\User')->where('roles', User::TEACHER)->wherePivot('is_homeroom', true);
+    }
+
+    public function headmasters(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\User')->where('roles', User::TEACHER)->wherePivot('is_headmaster', true);
+    }
+    public function ppdbadmins(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\User')->where('roles', User::TEACHER)->wherePivot('is_ppdb', true);
+    }
+
+
+    public function counselors(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\User')->where('roles', User::TEACHER)->where('is_bk', true);
     }
 
     public function students(): HasMany
