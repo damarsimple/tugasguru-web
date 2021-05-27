@@ -1533,7 +1533,15 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return Classtype::all();
         });
         Route::get('/myschool', function (Request $request) {
-            return $request->user()?->school?->schooltype?->classtypes;
+            $classtypes = [];
+            foreach ($request->user()->schools()->with('schooltype.classtypes')->get() as $school) {
+                foreach ($school->schooltype->classtypes as $classtype) {
+                    if (!in_array($classtype, $classtypes)) {
+                        $classtypes[] = $classtype;
+                    }
+                }
+            }
+            return $classtypes;
         });
     });
 
@@ -1691,7 +1699,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::post('/add', function (Request $request) {
             $user = $request->user();
             /**  @var App/Models/School $school  */
-            $school = $user->school;
+            $school = School::findOrFail($request->school);
 
 
             if (Classroom::where(['teacher_id' => $user->id, 'name' => $request->name, 'classtype_id' => $request->classtype_id])->exists()) {
