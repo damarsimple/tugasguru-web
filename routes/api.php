@@ -610,7 +610,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         Route::get('/', function (Request $request) {
             $user = $request->user();
 
-            return $user->school()->with('homeroomteacher', 'counselors', 'teachers', 'students')->first();
+            return $user->school()->with('homeroomteachers', 'counselors', 'teachers', 'students')->first();
         });
     });
 
