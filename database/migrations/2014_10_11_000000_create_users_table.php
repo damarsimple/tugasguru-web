@@ -35,6 +35,7 @@ class CreateUsersTable extends Migration
 
             $table->double('balance')->default(0);
 
+            $table->json('access')->nullable();
             // students
             $table->foreignId('parent_id')
                 ->nullable()
@@ -47,7 +48,6 @@ class CreateUsersTable extends Migration
             // teachers
 
             $table->boolean('is_bimbel')->default(false);
-            $table->boolean('is_bk')->default(false);
 
             $table->rememberToken();
             $table->timestamps();

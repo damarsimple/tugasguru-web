@@ -51,7 +51,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'hidden_attribute' => 'array'
+        'hidden_attribute' => 'array',
+        'access' => 'array'
     ];
 
     public const PROFILEPICTURE = 'PROFILEPICTURE';
@@ -292,19 +293,12 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\Subscription')->wherePivot('expired_at', '>', now())->withPivot('expired_at');
     }
 
-    public function getMyAccessAttribute()
+    public function rawsubscriptions(): BelongsToMany
     {
-        $abilities = [];
-        foreach ($this->subscriptions as $subscription) {
-            foreach ($subscription->ability as $ability) {
-                $abilities[] = $ability;
-            }
-        }
-
-        return $abilities;
+        return $this->belongsToMany('App\Models\Subscription')->withPivot('expired_at');
     }
 
-    public function transactions() : HasMany
+    public function transactions(): HasMany
     {
         return $this->hasMany('App\Models\Transaction');
     }

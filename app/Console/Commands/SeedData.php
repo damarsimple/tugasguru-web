@@ -437,7 +437,6 @@ class SeedData extends Command
 
             $teacher->gender = 1;
             $teacher->phone = "08987181017";
-            $teacher->is_bk = true;
             $teacher->roles = "TEACHER";
 
             $teacher->save();
@@ -462,7 +461,7 @@ class SeedData extends Command
 
             $secondteacher->save();
 
-            $secondteacher->schools()->attach([1 => ['is_homeroom' => true]]);
+            $secondteacher->schools()->attach(1);
 
             $secondteacher->is_bimbel = false;
             $secondteacher->school_id = 1;
@@ -552,52 +551,94 @@ class SeedData extends Command
 
             $firstclassroom->meetings()->save($meeting);
 
-            $subscription = new Subscription();
-            $subscription->name = "Akses Kehadiran dan Nilai 1 Bulan";
-            $subscription->duration = 30;
-            $subscription->price = 10000;
-            $subscription->ability_formatted = json_encode(['Akses ke menu kehadiran & nilai']);
-            $subscription->ability = json_encode([Ability::GRADE_REPORT]);
 
-            $subscription->save();
 
-            $subscription = new Subscription();
-            $subscription->name = "Akses Wali Kelas Nilai 1 Bulan";
-            $subscription->duration = 30;
-            $subscription->price = 10000;
-            $subscription->ability_formatted = json_encode(['Akses ke menu wali kelas & data']);
-            $subscription->ability = json_encode([Ability::HOMEROOM]);
+            for ($i = 6; $i < 24; $i = $i + 6) {
 
-            $subscription->save();
+                $price = match ($i) {
+                    6 => 30000,
+                    12 => 50000,
+                    18 => 70000,
+                    24 => 90000,
+                };
 
-            $transaction = new Transaction();
+                $subscription = new Subscription();
+                $subscription->name = "Akun Gold 1 $i bulan";
+                $subscription->duration = $i * 30;
+                $subscription->price = $price;
+                $subscription->ability_formatted = json_encode([
+                    'Akses ke Wali Kelas dan Data'
+                ]);
+                $subscription->ability = json_encode([Ability::GRADE_REPORT]);
 
-            $transaction->amount = $subscription->price;
-            $transaction->payment_method = Transaction::XENDIT;
+                $subscription->save();
 
-            $transaction->transactionable_id = $subscription->id;
-            $transaction->transactionable_type = $subscription::class;
-            $transaction->uuid = Str::uuid();
+                $subscription = new Subscription();
+                $subscription->name = "Akun Gold 2 $i bulan";
+                $subscription->duration = $i * 30;
+                $subscription->price = $price;
+                $subscription->ability_formatted = json_encode([
+                    'Akses ke Guru BK dan Data'
+                ]);
+                $subscription->ability = json_encode([Ability::GRADE_REPORT]);
 
-            try {
-                $model = app($transaction->transactionable_type)->findOrFail($transaction->transactionable_id);
-            } catch (\Throwable $th) {
-                return ['message' => 'model invalid'];
+                $subscription->save();
+
+                $subscription = new Subscription();
+                $subscription->name = "Akun Gold 3 $i bulan";
+                $subscription->duration = $i * 30;
+                $subscription->price = $price;
+                $subscription->ability_formatted = json_encode([
+                    'Akses ke Kepsek dan Data'
+                ]);
+                $subscription->ability = json_encode([Ability::GRADE_REPORT]);
+
+                $subscription->save();
+
+
+                $subscription = new Subscription();
+                $subscription->name = "Akun Premium $i bulan";
+                $subscription->duration = $i * 30;
+                $subscription->price = $price;
+                $subscription->ability_formatted = json_encode([
+                    'Akses ke Kehadiran dan Nilai'
+                ]);
+                $subscription->ability = json_encode([Ability::GRADE_REPORT]);
+
+                $subscription->save();
             }
 
-            $transaction->description = 'Pembelian ' . $model->name . ' sebesar ' . $transaction->amount;
 
-            $invoice = Xendit::makePayment(
-                $transaction->amount,
-                $transaction->uuid,
-                $transaction->description,
-                $teacher->email
-            );
-            $transaction->invoice_request = json_encode($invoice);
 
-            $transaction->staging_url = $invoice['invoice_url'];
 
-            $teacher->transactions()->save($transaction);
+            // $transaction = new Transaction();
+
+            // $transaction->amount = $subscription->price;
+            // $transaction->payment_method = Transaction::XENDIT;
+
+            // $transaction->transactionable_id = $subscription->id;
+            // $transaction->transactionable_type = $subscription::class;
+            // $transaction->uuid = Str::uuid();
+
+            // try {
+            //     $model = app($transaction->transactionable_type)->findOrFail($transaction->transactionable_id);
+            // } catch (\Throwable $th) {
+            //     return ['message' => 'model invalid'];
+            // }
+
+            // $transaction->description = 'Pembelian ' . $model->name . ' sebesar ' . $transaction->amount;
+
+            // $invoice = Xendit::makePayment(
+            //     $transaction->amount,
+            //     $transaction->uuid,
+            //     $transaction->description,
+            //     $teacher->email
+            // );
+            // $transaction->invoice_request = json_encode($invoice);
+
+            // $transaction->staging_url = $invoice['invoice_url'];
+
+            // $teacher->transactions()->save($transaction);
 
             foreach (['Umum', 'Kelompok 1', 'Kelompok 2'] as $name) {
                 $room = new Room();

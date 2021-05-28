@@ -38,7 +38,7 @@ class FormApproveTest implements ShouldQueue
         switch ($form->type) {
             case Form::REQUEST_COUNSELOR:
                 $user = $form->user;
-                $user->is_bk = true;
+                $user->is_counselor = true;
                 $user->save();
                 break;
             case Form::REQUEST_HOMEROOM:

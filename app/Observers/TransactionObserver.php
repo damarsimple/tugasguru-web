@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enum\Ability;
 use App\Events\TransactionEvent;
 use App\Models\Subscription;
 use App\Models\Transaction;
@@ -53,21 +54,48 @@ class TransactionObserver
 
     public function handlePaid(Transaction $transaction)
     {
+        $user = $transaction->user;
+
+        $abilities = is_array($user->access) ? $user->access :  json_decode($user->access) ?? [];
+
         switch ($transaction->transactionable_type) {
             case 'App\Models\Subscription':
                 $subscription = $transaction->transactionable;
 
-                $transaction->user->subscriptions()->attach(
+                $user->subscriptions()->attach(
                     $subscription,
                     ['expired_at' =>
                     now()->addDay($subscription->duration)]
                 );
+
+                foreach ($subscription->ability_alt as $ability) {
+                    $abilities[] = $ability;
+                }
 
                 break;
 
             default:
                 break;
         }
+
+        $abilities = array_unique($abilities);
+
+        $user->access = $abilities;
+
+        foreach ($user->schools as $school) {
+            $school->teachers()->updateExistingPivot(
+                $user->id,
+                [
+                    'is_homeroom'  => in_array(Ability::HOMEROOM, $user->access),
+                    'is_headmaster'  => in_array(Ability::HEADMASTER, $user->access),
+                    'is_ppdb_master'  => in_array(Ability::PPDB, $user->access),
+                    'is_ppdb'  => in_array(Ability::PPDB, $user->access),
+                    'is_counselor'  => in_array(Ability::COUNSELING, $user->access)
+                ]
+            );
+        }
+
+        $user->save();
 
         $this->callNotification($transaction);
     }

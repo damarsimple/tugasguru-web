@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('meeting:rmattachment')->daily();
+        $schedule->command('subscription:deactivate')->daily();
     }
 
     /**

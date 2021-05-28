@@ -20,7 +20,7 @@ class EnsureCounselor
 
         $user = $request->user();
         
-        if (!in_array(Ability::COUNSELING, $user->my_access)) {
+        if (!in_array(Ability::COUNSELING, $user->access)) {
             return response(['message' => 'Unauthorized'], 401);
         }
 

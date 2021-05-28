@@ -19,7 +19,7 @@ class EnsureGradeReport
     {
         $user = $request->user();
 
-        if (!in_array(Ability::GRADE_REPORT, $user->my_access)) {
+        if (!in_array(Ability::GRADE_REPORT, $user->access)) {
             return response(['message' => 'Unauthorized'], 401);
         }
 

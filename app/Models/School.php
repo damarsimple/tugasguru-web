@@ -37,7 +37,7 @@ class School extends Model
 
     public function counselors(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\User')->where('roles', User::TEACHER)->where('is_bk', true);
+        return $this->belongsToMany('App\Models\User')->where('roles', User::TEACHER)->wherePivot('is_counselor', true);
     }
 
     public function students(): HasMany

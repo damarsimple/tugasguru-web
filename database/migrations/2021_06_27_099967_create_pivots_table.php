@@ -131,6 +131,7 @@ class CreatePivotsTable extends Migration
             $table->boolean('is_headmaster')->default(false);
             $table->boolean('is_ppdb_master')->default(false);
             $table->boolean('is_ppdb')->default(false);
+            $table->boolean('is_counselor')->default(false);
             $table->timestamps();
         });
 
