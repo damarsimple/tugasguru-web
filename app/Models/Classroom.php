@@ -50,4 +50,9 @@ class Classroom extends Model
     {
         return $this->hasMany('App\Models\Assigment');
     }
+
+    public function absents(): HasMany
+    {
+        return $this->hasMany('App\Models\Absent');
+    }
 }

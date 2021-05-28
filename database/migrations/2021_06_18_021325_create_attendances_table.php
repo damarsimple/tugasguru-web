@@ -16,11 +16,12 @@ class CreateAttendancesTable extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('classroom_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('classroom_id')->nullable()->index()->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->nullable()->index()->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('attendable_id')->nullable();
             $table->string('attendable_type')->nullable();
             $table->boolean('attended')->default(false);
+            $table->string('reason')->nullable();
             $table->timestamps();
         });
     }

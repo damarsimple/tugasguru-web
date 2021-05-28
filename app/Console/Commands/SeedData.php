@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Absent;
 use App\Models\Answer;
 use App\Models\Assigment;
 use App\Models\City;
@@ -485,6 +486,7 @@ class SeedData extends Command
 
             $student->save();
 
+
             $secondstudent = new User();
             $secondstudent->name = "Damar Albaribin Siswa 2";
             $secondstudent->email = "damara2@gmail.com";
@@ -523,6 +525,17 @@ class SeedData extends Command
             $school->classrooms()->save($classroom);
 
             $classroom->students()->attach($studentIds);
+
+            $absent = new Absent();
+
+            $absent->teacher_id = $teacher->id;
+            $absent->type = 'IZIN';
+            $absent->reason = 'test';
+            $absent->start_at = now();
+            $absent->finish_at = now()->addDay(1);
+
+            $student->absents()->save($absent);
+
 
             $meeting = new Meeting();
 

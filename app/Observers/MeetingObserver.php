@@ -33,14 +33,34 @@ class MeetingObserver
 
         $room->users()->attach(array_merge([$meeting->teacher->id], $studentUserIds->toArray()));
 
+        $absents = $meeting->teacher->studentabsents()->whereDate('finish_at', '>', now())->get();
+
+        $absentsMap = [];
+
+        foreach ($absents as $value) {
+            $absentsMap[$value->user_id] = $value;
+        }
+
         foreach ($studentUserIds as $id) {
-            Attendance::firstOrCreate([
-                'subject_id' => $meeting->subject_id,
-                'classroom_id' => $meeting->classroom_id,
-                'user_id' => $id,
-                'attendable_id' => $meeting->id,
-                'attendable_type' => Meeting::class
-            ]);
+            if (array_key_exists($id, $absentsMap)) {
+                Attendance::firstOrCreate([
+                    'subject_id' => $meeting->subject_id,
+                    'classroom_id' => $meeting->classroom_id,
+                    'user_id' => $id,
+                    'attendable_id' => $meeting->id,
+                    'attendable_type' => Meeting::class,
+                    'attended' => false,
+                    'reason' => $absentsMap[$id]->reason,
+                ]);
+            } else {
+                Attendance::firstOrCreate([
+                    'subject_id' => $meeting->subject_id,
+                    'classroom_id' => $meeting->classroom_id,
+                    'user_id' => $id,
+                    'attendable_id' => $meeting->id,
+                    'attendable_type' => Meeting::class
+                ]);
+            }
         }
     }
 
