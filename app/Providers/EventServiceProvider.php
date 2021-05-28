@@ -10,6 +10,7 @@ use App\Models\Form;
 use App\Models\Meeting;
 use App\Models\Message;
 use App\Models\StudentAssigment;
+use App\Models\Transaction;
 use App\Observers\ArticleObserver;
 use App\Observers\AttachmentObserver;
 use App\Observers\ConsultationObserver;
@@ -18,6 +19,7 @@ use App\Observers\FormObserver;
 use App\Observers\MeetingObserver;
 use App\Observers\MessageObserver;
 use App\Observers\StudentAssigmentObserver;
+use App\Observers\TransactionObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -52,5 +54,6 @@ class EventServiceProvider extends ServiceProvider
         Consultation::observe(ConsultationObserver::class);
         Form::observe(FormObserver::class);
         Exam::observe(ExamObserver::class);
+        Transaction::observe(TransactionObserver::class);
     }
 }

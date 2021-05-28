@@ -33,6 +33,7 @@ class CreateUsersTable extends Migration
 
             $table->foreignId('school_id')->index()->nullable();
 
+            $table->double('balance')->default(0);
 
             // students
             $table->foreignId('parent_id')

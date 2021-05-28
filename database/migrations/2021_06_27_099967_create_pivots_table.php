@@ -115,6 +115,14 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('subscription_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('subscription_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
+            $table->timestamp('expired_at');
+            $table->timestamps();
+        });
+
         Schema::create('school_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');

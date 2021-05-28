@@ -3,8 +3,11 @@
 use App\Actions\Attachment\Upload;
 use App\Events\MeetingChangeEvent;
 use App\Http\Controllers\ApiAuthController;
+use App\Http\Middleware\EnsureGradeReport;
+use App\Http\Middleware\EnsureHomeroom;
 use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
+use App\Http\Middleware\EnsureXendit;
 use App\Jobs\FormApproveTest;
 use App\Models\Absent;
 use App\Models\Answer;
@@ -36,13 +39,16 @@ use App\Models\Schooltype;
 use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
+use App\Models\Subscription;
+use App\Models\Transaction;
 use App\Models\User;
+use App\Payment\Xendit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Broadcast;
 use Laravel\Octane\Facades\Octane;
-
+use Illuminate\Support\Str;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -89,12 +95,90 @@ Route::post("/register", [ApiAuthController::class, "register"]);
 Route::middleware('auth:sanctum')->get("/user", [ApiAuthController::class, 'profile']);
 Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'refresh']);
 
+Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], function () {
+    Route::post('/invoices/paid', function (Request $request) {
+
+        $transaction = Transaction::where('uuid', $request->external_id)->firstOrFail();
+
+        if ($request->status == "PAID" || $request->status == "SETTLED") {
+
+            $transaction->is_paid = true;
+            $transaction->status = Transaction::SUCCESS;
+            $transaction->invoice_response = json_encode($request->toArray());
+
+            $transaction->save();
+        } else {
+            $transaction->status = Transaction::FAILED;
+            $transaction->invoice_response = json_encode($request->toArray());
+
+            $transaction->save();
+        }
+
+        return ['message' => 'validated', 'transaction' => $transaction];
+    });
+});
+
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], function () {
+    Route::post('/subscriptions', function (Request $request) {
+        $user = $request->user();
+
+        $subscription = Subscription::findOrFail($request->subscription);
+
+        $transaction = new Transaction();
+
+        $transaction->amount = $subscription->price;
+
+        $transaction->payment_method = $request->payment_method;
+
+        $transaction->transactionable_id = $subscription->id;
+        $transaction->transactionable_type = $subscription::class;
+        $transaction->uuid = Str::uuid();
+
+        $transaction->description = 'Pembelian ' . $subscription->name . ' sebesar ' . $transaction->amount;
+
+        $transaction->staging_url = null;
+
+        switch ($request->payment_method) {
+            case 'XENDIT':
+
+                $invoice = Xendit::makePayment(
+                    $transaction->amount,
+                    $transaction->uuid,
+                    $transaction->description,
+                    $user->email
+                );
+                $transaction->invoice_request = json_encode($invoice);
+
+                $transaction->staging_url = $invoice['invoice_url'];
+
+                break;
+            case 'BALANCE':
+                if ($user->balance < $transaction->amount) {
+                    return ['message' => 'Uang anda tidak cukup'];
+                }
+
+                $transaction->is_paid = true;
+                $transaction->status = Transaction::SUCCESS;
+
+                break;
+            default:
+                return ['message' => 'Metode pembayaran invalid'];
+                break;
+        }
+
+        $user->transactions()->save($transaction);
+
+        return [
+            'message' => 'ok',
+            'transaction' => $transaction,
+            'staging_url' => $transaction->staging_url
+        ];
+    });
+});
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], function () {
     Route::get('/{id}', function (Request $request, $id) {
 
         $user = $request->user();
-
-        $studentconsultations = $user->studentconsultations()->latest();
 
         if ($user->roles == "TEACHER") {
             return $user->meetings()->with('classroom.students')->findOrFail($id);
@@ -155,7 +239,23 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
 
+    Route::group(['prefix' => 'transactions'], function () {
+        Route::get('/{id}', function (Request $request, $id) {
+            if ($id == 0) return null;
+            return $request->user()->transactions()->findOrFail($id);
+        });
+    });
 
+
+    Route::group(['prefix' => 'subscriptions'], function () {
+        Route::get('/', function () {
+            return Subscription::all();
+        });
+
+        Route::get('/my', function (Request $request) {
+            return $request->user()->subscriptions;
+        });
+    });
 
     Route::get('mark-read-all', function (Request $request) {
 
@@ -1614,7 +1714,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     });
 
 
-    Route::group(['prefix' => 'homerooms'], function () {
+    Route::group(['prefix' => 'homerooms', 'middleware' => [EnsureHomeroom::class]], function () {
         Route::get('/', function (Request $request) {
             $user = $request->user();
             return $user->homeroomschools()->with('homeroomteachers')->get();
@@ -1626,7 +1726,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
     });
 
-    Route::group(['prefix' => 'reports'], function () {
+    Route::group(['prefix' => 'reports', 'middleware' => [[EnsureGradeReport::class]]], function () {
         Route::get('/', function (Request $request) {
             $user = $request->user();
             return $user->reports()->paginate(10);

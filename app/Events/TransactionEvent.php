@@ -2,8 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Message;
-use App\Models\PrivateRoom;
+use App\Models\Transaction;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NewPrivateMessageEvent  implements ShouldBroadcastNow
+class TransactionEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,10 +21,9 @@ class NewPrivateMessageEvent  implements ShouldBroadcastNow
      *
      * @return void
      */
-
-
-    public function __construct(public Message $message)
+    public function __construct(public Transaction $transaction)
     {
+        //
     }
 
     /**
@@ -35,8 +33,8 @@ class NewPrivateMessageEvent  implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PresenceChannel(
-            "private_message" . "." . $this->message->messageable_id
+        return new PrivateChannel(
+            "transaction" . "." . $this->transaction->id
         );
     }
 }

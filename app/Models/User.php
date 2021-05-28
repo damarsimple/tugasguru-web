@@ -284,6 +284,28 @@ class User extends Authenticatable
 
     public function studentattendances(): HasManyThrough
     {
-        return $this->hasManyThrough('App\Models\Attendance', 'App\Models\Classroom',firstKey: 'teacher_id');
+        return $this->hasManyThrough('App\Models\Attendance', 'App\Models\Classroom', firstKey: 'teacher_id');
+    }
+
+    public function subscriptions(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Subscription')->wherePivot('expired_at', '>', now())->withPivot('expired_at');
+    }
+
+    public function getMyAccessAttribute()
+    {
+        $abilities = [];
+        foreach ($this->subscriptions as $subscription) {
+            foreach ($subscription->ability as $ability) {
+                $abilities[] = $ability;
+            }
+        }
+
+        return $abilities;
+    }
+
+    public function transactions() : HasMany
+    {
+        return $this->hasMany('App\Models\Transaction');
     }
 }

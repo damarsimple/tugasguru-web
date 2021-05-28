@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enum\Ability;
 use App\Models\Absent;
 use App\Models\Answer;
 use App\Models\Assigment;
@@ -23,12 +24,14 @@ use App\Models\Schooltype;
 use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
+use App\Models\Subscription;
+use App\Models\Transaction;
 use App\Models\User;
+use App\Payment\Xendit;
 use Illuminate\Console\Command;
 use Faker\Factory;
 use Illuminate\Support\Facades\Hash;
-
-use function Safe\file_get_contents;
+use Illuminate\Support\Str;
 
 class SeedData extends Command
 {
@@ -548,6 +551,53 @@ class SeedData extends Command
             $meeting->start_at = now();
 
             $firstclassroom->meetings()->save($meeting);
+
+            $subscription = new Subscription();
+            $subscription->name = "Akses Kehadiran dan Nilai 1 Bulan";
+            $subscription->duration = 30;
+            $subscription->price = 10000;
+            $subscription->ability_formatted = json_encode(['Akses ke menu kehadiran & nilai']);
+            $subscription->ability = json_encode([Ability::GRADE_REPORT]);
+
+            $subscription->save();
+
+            $subscription = new Subscription();
+            $subscription->name = "Akses Wali Kelas Nilai 1 Bulan";
+            $subscription->duration = 30;
+            $subscription->price = 10000;
+            $subscription->ability_formatted = json_encode(['Akses ke menu wali kelas & data']);
+            $subscription->ability = json_encode([Ability::HOMEROOM]);
+
+            $subscription->save();
+
+            $transaction = new Transaction();
+
+            $transaction->amount = $subscription->price;
+            $transaction->payment_method = Transaction::XENDIT;
+
+            $transaction->transactionable_id = $subscription->id;
+            $transaction->transactionable_type = $subscription::class;
+            $transaction->uuid = Str::uuid();
+
+            try {
+                $model = app($transaction->transactionable_type)->findOrFail($transaction->transactionable_id);
+            } catch (\Throwable $th) {
+                return ['message' => 'model invalid'];
+            }
+
+            $transaction->description = 'Pembelian ' . $model->name . ' sebesar ' . $transaction->amount;
+
+            $invoice = Xendit::makePayment(
+                $transaction->amount,
+                $transaction->uuid,
+                $transaction->description,
+                $teacher->email
+            );
+            $transaction->invoice_request = json_encode($invoice);
+
+            $transaction->staging_url = $invoice['invoice_url'];
+
+            $teacher->transactions()->save($transaction);
 
             foreach (['Umum', 'Kelompok 1', 'Kelompok 2'] as $name) {
                 $room = new Room();
