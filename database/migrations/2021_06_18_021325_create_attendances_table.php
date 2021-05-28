@@ -20,6 +20,7 @@ class CreateAttendancesTable extends Migration
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('attendable_id')->nullable();
             $table->string('attendable_type')->nullable();
+            $table->boolean('attended')->default(false);
             $table->timestamps();
         });
     }

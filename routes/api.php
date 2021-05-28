@@ -112,7 +112,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
             ]);
 
             $attendance->updated_at = now();
-
+            $attendance->attended = true;
             $attendance->save();
 
             return $meeting;
@@ -724,7 +724,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             ]);
 
             $attendance->updated_at = now();
-
+            $attendance->attended = true;
             $attendance->save();
 
 
@@ -964,6 +964,15 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
 
+    Route::group(['prefix' => 'attendances'], function () {
+        Route::get('/school/{id}', function (Request $request, $id) {
+            $school =  $request->user()->schools()->findOrFail($id);
+            return $school->attendances()->paginate(10);
+        });
+        Route::get('/', function (Request $request) {
+            return $request->user()->studentattendances()->paginate(10);
+        });
+    });
 
     Route::group(['prefix' => 'forms'], function () {
         Route::get('/status', function () {

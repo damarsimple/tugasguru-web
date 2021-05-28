@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Events\MeetingChangeEvent;
+use App\Models\Attendance;
 use App\Models\Meeting;
 use App\Models\Room;
 use App\Notifications\NewMeeting;
@@ -31,7 +32,16 @@ class MeetingObserver
         $meeting->rooms()->save($room);
 
         $room->users()->attach(array_merge([$meeting->teacher->id], $studentUserIds->toArray()));
-        
+
+        foreach ($studentUserIds as $id) {
+            Attendance::firstOrCreate([
+                'subject_id' => $meeting->subject_id,
+                'classroom_id' => $meeting->classroom_id,
+                'user_id' => $id,
+                'attendable_id' => $meeting->id,
+                'attendable_type' => Meeting::class
+            ]);
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Article;
 use App\Models\Attachment;
 use App\Models\Consultation;
+use App\Models\Exam;
 use App\Models\Form;
 use App\Models\Meeting;
 use App\Models\Message;
@@ -12,6 +13,7 @@ use App\Models\StudentAssigment;
 use App\Observers\ArticleObserver;
 use App\Observers\AttachmentObserver;
 use App\Observers\ConsultationObserver;
+use App\Observers\ExamObserver;
 use App\Observers\FormObserver;
 use App\Observers\MeetingObserver;
 use App\Observers\MessageObserver;
@@ -49,5 +51,6 @@ class EventServiceProvider extends ServiceProvider
         StudentAssigment::observe(StudentAssigmentObserver::class);
         Consultation::observe(ConsultationObserver::class);
         Form::observe(FormObserver::class);
+        Exam::observe(ExamObserver::class);
     }
 }

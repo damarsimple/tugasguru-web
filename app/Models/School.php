@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class School extends Model
 {
@@ -82,5 +83,10 @@ class School extends Model
     public function district(): BelongsTo
     {
         return $this->belongsTo('App\Models\District');
+    }
+
+    public function attendances(): HasManyThrough
+    {
+        return $this->hasManyThrough('App\Models\Attendance', 'App\Models\Classroom');
     }
 }
