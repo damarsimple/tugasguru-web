@@ -14,7 +14,13 @@ class Report extends Model
 
     protected $with = ['user', 'to'];
 
-    protected $casts = ['data' => 'object'];
+    protected $casts = [
+        'data' => 'object',
+    ];
+
+    protected $appends = [
+        'data_alt',
+    ];
 
     public function user(): BelongsTo
     {
@@ -24,5 +30,10 @@ class Report extends Model
     public function to(): BelongsTo
     {
         return $this->belongsTo('App\Models\User');
+    }
+
+    public function getDataAltAttribute()
+    {
+        return json_decode($this->data);
     }
 }
