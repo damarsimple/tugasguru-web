@@ -551,68 +551,46 @@ class SeedData extends Command
 
             $firstclassroom->meetings()->save($meeting);
 
+            $subscription = new Subscription();
+            $subscription->name = "Guru Plus 1 Tahun";
+            $subscription->duration = 12 * 30;
+            $subscription->price = 50000;
+            $subscription->ability = json_encode([
+                Ability::GRADE_REPORT
+            ]);
+
+            $subscription->save();
+
+            $subscription = new Subscription();
+            $subscription->name = "Wali Kelas 1 Tahun";
+            $subscription->duration = 12 * 30;
+            $subscription->price = 50000;
+            $subscription->ability = json_encode([
+                Ability::HOMEROOM
+            ]);
+
+            $subscription->save();
+
+            $subscription = new Subscription();
+            $subscription->name = "Guru BK 1 Tahun";
+            $subscription->duration = 12 * 30;
+            $subscription->price = 50000;
+            $subscription->ability = json_encode([
+                Ability::COUNSELING
+            ]);
+
+            $subscription->save();
+
+            $subscription = new Subscription();
+            $subscription->name = "Kepala Sekolah 1 Tahun";
+            $subscription->duration = 12 * 30;
+            $subscription->price = 50000;
+            $subscription->ability = json_encode([
+                Ability::HEADMASTER
+            ]);
 
 
-            for ($i = 6; $i < 24; $i = $i + 6) {
-
-                $price = match ($i) {
-                    6 => 30000,
-                    12 => 50000,
-                    18 => 70000,
-                    24 => 90000,
-                };
-
-                $subscription = new Subscription();
-                $subscription->name = "Guru Plus $i Bulan";
-                $subscription->duration = $i * 30;
-                $subscription->price = $price;
-                $subscription->ability = json_encode([
-                    Ability::GRADE_REPORT
-                ]);
-
-                $subscription->save();
-
-                $subscription = new Subscription();
-                $subscription->name = "Guru Plus 1 $i Bulan";
-                $subscription->duration = $i * 30;
-                $subscription->price = $price;
-                $subscription->ability = json_encode([
-                    Ability::GRADE_REPORT,
-                    Ability::HOMEROOM
-                ]);
-
-                $subscription->save();
-
-                $subscription = new Subscription();
-                $subscription->name = "Guru Plus 2 $i Bulan";
-                $subscription->duration = $i * 30;
-                $subscription->price = $price;
-                $subscription->ability = json_encode([
-                    Ability::GRADE_REPORT,
-                    Ability::COUNSELING
-                ]);
-
-                $subscription = new Subscription();
-                $subscription->name = "Guru Plus 3 $i Bulan";
-                $subscription->duration = $i * 30;
-                $subscription->price = $price;
-                $subscription->ability = json_encode([
-                    Ability::GRADE_REPORT,
-                    Ability::HEADMASTER
-                ]);
-
-                $subscription = new Subscription();
-                $subscription->name = "Guru Plus 3 $i Bulan";
-                $subscription->duration = $i * 30;
-                $subscription->price = $price;
-                $subscription->ability = json_encode([
-                    Ability::GRADE_REPORT,
-                    Ability::HEADMASTER
-                ]);
-
-
-                $subscription->save();
-            }
+            $subscription->save();
 
 
 
