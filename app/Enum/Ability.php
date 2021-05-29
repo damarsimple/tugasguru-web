@@ -9,5 +9,6 @@ class Ability
     const HOMEROOM = 'HOMEROOM';
     const COUNSELING = 'COUNSELING';
     const HEADMASTER = 'HEADMASTER';
+    const ABSENT_CONSULT = "ABSENT_CONSULT";
     const PPDB = 'PPDB';
 }
