@@ -18,7 +18,6 @@ class CreateSubscriptionsTable extends Migration
             $table->string('name');
             $table->unsignedBigInteger('price');
             $table->unsignedBigInteger('duration');
-            $table->json('ability_formatted');
             $table->json('ability');
             $table->timestamps();
         });

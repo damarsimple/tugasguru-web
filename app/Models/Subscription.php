@@ -9,17 +9,12 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    protected $casts = ['ability' => 'object', 'ability_formatted' => 'object'];
+    protected $casts = ['ability' => 'array'];
 
-    protected $appends = ['ability_alt', 'ability_formatted_alt'];
+    protected $appends = ['ability_alt'];
 
     public function getAbilityAltAttribute()
     {
         return json_decode($this->ability);
-    }
-
-    public function getAbilityFormattedAltAttribute()
-    {
-        return json_decode($this->ability_formatted);
     }
 }

@@ -563,47 +563,53 @@ class SeedData extends Command
                 };
 
                 $subscription = new Subscription();
-                $subscription->name = "Akun Gold 1 $i bulan";
+                $subscription->name = "Guru Plus $i Bulan";
                 $subscription->duration = $i * 30;
                 $subscription->price = $price;
-                $subscription->ability_formatted = json_encode([
-                    'Akses ke Wali Kelas dan Data'
+                $subscription->ability = json_encode([
+                    Ability::GRADE_REPORT
                 ]);
-                $subscription->ability = json_encode([Ability::GRADE_REPORT]);
 
                 $subscription->save();
 
                 $subscription = new Subscription();
-                $subscription->name = "Akun Gold 2 $i bulan";
+                $subscription->name = "Guru Plus 1 $i Bulan";
                 $subscription->duration = $i * 30;
                 $subscription->price = $price;
-                $subscription->ability_formatted = json_encode([
-                    'Akses ke Guru BK dan Data'
+                $subscription->ability = json_encode([
+                    Ability::GRADE_REPORT,
+                    Ability::HOMEROOM
                 ]);
-                $subscription->ability = json_encode([Ability::GRADE_REPORT]);
 
                 $subscription->save();
 
                 $subscription = new Subscription();
-                $subscription->name = "Akun Gold 3 $i bulan";
+                $subscription->name = "Guru Plus 2 $i Bulan";
                 $subscription->duration = $i * 30;
                 $subscription->price = $price;
-                $subscription->ability_formatted = json_encode([
-                    'Akses ke Kepsek dan Data'
+                $subscription->ability = json_encode([
+                    Ability::GRADE_REPORT,
+                    Ability::COUNSELING
                 ]);
-                $subscription->ability = json_encode([Ability::GRADE_REPORT]);
-
-                $subscription->save();
-
 
                 $subscription = new Subscription();
-                $subscription->name = "Akun Premium $i bulan";
+                $subscription->name = "Guru Plus 3 $i Bulan";
                 $subscription->duration = $i * 30;
                 $subscription->price = $price;
-                $subscription->ability_formatted = json_encode([
-                    'Akses ke Kehadiran dan Nilai'
+                $subscription->ability = json_encode([
+                    Ability::GRADE_REPORT,
+                    Ability::HEADMASTER
                 ]);
-                $subscription->ability = json_encode([Ability::GRADE_REPORT]);
+
+                $subscription = new Subscription();
+                $subscription->name = "Guru Plus 3 $i Bulan";
+                $subscription->duration = $i * 30;
+                $subscription->price = $price;
+                $subscription->ability = json_encode([
+                    Ability::GRADE_REPORT,
+                    Ability::HEADMASTER
+                ]);
+
 
                 $subscription->save();
             }
