@@ -556,6 +556,7 @@ class SeedData extends Command
             $subscription->duration = 12 * 30;
             $subscription->price = 50000;
             $subscription->ability = json_encode([
+                Ability::ABSENT_CONSULT,
                 Ability::GRADE_REPORT
             ]);
 
@@ -566,7 +567,6 @@ class SeedData extends Command
             $subscription->duration = 12 * 30;
             $subscription->price = 50000;
             $subscription->ability = json_encode([
-                Ability::ABSENT_CONSULT,
                 Ability::HOMEROOM
             ]);
 
