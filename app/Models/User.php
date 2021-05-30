@@ -278,11 +278,6 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Report');
     }
 
-    public function receivereports(): HasMany
-    {
-        return $this->hasMany('App\Models\Report', 'to_id');
-    }
-
     public function studentattendances(): HasManyThrough
     {
         return $this->hasManyThrough('App\Models\Attendance', 'App\Models\Classroom', firstKey: 'teacher_id');

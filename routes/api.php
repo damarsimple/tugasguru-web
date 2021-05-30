@@ -1123,7 +1123,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $checkInClass = fn ($q) => $q->whereHas('user', fn ($qy) => $qy->whereIn('id', $studentIds));
 
             return $user->classrooms()->where('id', $classroomId)->with([
-                'exams' =>  $checkSemesterAndSubject, 'assigments' => $checkSemesterAndSubject,
+                'exams' =>  $checkSemesterAndSubject,
+                'assigments' => $checkSemesterAndSubject,
                 'exams.examresults' => $checkInClass,
                 'assigments.studentassigments' => $checkInClass
             ])->firstOrFail();
@@ -1722,7 +1723,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::get('/reports', function (Request $request) {
             $user = $request->user();
-            return $user->receivereports()->paginate(10);
+            return $user->myreports()->paginate(10);
         });
     });
 
@@ -1738,7 +1739,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             try {
                 return $user->reports()->where('id', $id)->firstOrFail();
             } catch (\Throwable $th) {
-                return $user->receivereports()->where('id', $id)->firstOrFail();
+                return $user->myreports()->where('report_id', $id)->firstOrFail();
             }
         });
 
