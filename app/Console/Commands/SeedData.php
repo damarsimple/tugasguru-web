@@ -434,7 +434,7 @@ class SeedData extends Command
             $teacher->city_id = 1;
             $teacher->province_id = 1;
             $teacher->district_id = 1;
-
+            $teacher->access = [Ability::GRADE_REPORT];
             $teacher->gender = 1;
             $teacher->phone = "08987181017";
             $teacher->roles = "TEACHER";

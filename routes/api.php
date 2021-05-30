@@ -1726,7 +1726,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
     });
 
-    Route::group(['prefix' => 'reports', 'middleware' => [[EnsureGradeReport::class]]], function () {
+    Route::group(['prefix' => 'reports', 'middleware' => [EnsureGradeReport::class]], function () {
         Route::get('/', function (Request $request) {
             $user = $request->user();
             return $user->reports()->paginate(10);
@@ -1747,13 +1747,33 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $report = new Report();
             $report->title = $request->title;
             $report->data = json_encode($request->data);
-            $report->type = json_encode($request->type);
-            $report->to_id = json_encode($request->receiver);
+            $report->type = $request->type;
+
+            if ($request->receiver) {
+                $report->users()->sync($request->receiver);
+            }
 
 
             $request->user()->reports()->save($report);
 
-            return ['message' => 'ok'];
+            return $report;
+        });
+
+        Route::put('/{id}', function (Request $request, $id) {
+
+            $report = $request->user()->reports()->findOrFail($id);
+            $report->title = $request->title;
+            $report->data = json_encode($request->data);
+            $report->type = $request->type;
+
+            if ($request->receiver) {
+                $report->users()->attach($request->receiver);
+            }
+
+
+            $report->save();
+
+            return $report;
         });
     });
 

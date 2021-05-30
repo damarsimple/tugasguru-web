@@ -17,7 +17,6 @@ class CreateReportsTable extends Migration
             $table->id();
             $table->string('title')->nullable();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('to_id')->index()->constrained('users')->onDelete('cascade');
             $table->json('data');
             $table->string('type');
             $table->timestamps();

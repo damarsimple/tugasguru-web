@@ -123,6 +123,13 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('report_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('report_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+
         Schema::create('school_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Report extends Model
 {
@@ -12,7 +13,7 @@ class Report extends Model
 
     const GRADE = 'GRADE';
 
-    protected $with = ['user', 'to'];
+    protected $with = ['user', 'users'];
 
     protected $casts = [
         'data' => 'object',
@@ -27,9 +28,9 @@ class Report extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function to(): BelongsTo
+    public function users(): BelongsToMany
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsToMany('App\Models\User');
     }
 
     public function getDataAltAttribute()

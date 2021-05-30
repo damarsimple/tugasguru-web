@@ -302,4 +302,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Transaction');
     }
+
+    public function myreports(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Report');
+    }
 }
