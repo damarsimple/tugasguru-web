@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Article extends Model
 {
@@ -29,7 +30,7 @@ class Article extends Model
         return $this->morphOne('App\Models\Price', 'priceable');
     }
 
-    public function thumbnail()
+    public function thumbnail(): MorphOne
     {
         return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::THUMBNAIL);
     }

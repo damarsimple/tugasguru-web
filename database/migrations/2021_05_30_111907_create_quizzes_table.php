@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateQuestionsTable extends Migration
+class CreateQuizzesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,14 @@ class CreateQuestionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('questions', function (Blueprint $table) {
+        Schema::create('quizzes', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('classtype_id')->nullable()->index()->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('classtype_id')->index()->constrained()->onDelete('cascade');
-            $table->boolean('editable')->default(true);
-            $table->enum('type', ['MULTI_CHOICE', 'ESSAY', 'FILLER', 'SURVEY', 'SLIDE', 'MANY_ANSWERS']);
-            $table->longText('content');
+            $table->longText('description');
+            $table->enum('difficulty', ['EASY', 'MEDIUM', 'HARD'])->default('EASY');
             $table->enum('visibility', ['PUBLIK', 'PRIVAT', 'SELECTPEOPLE'])->default('PUBLIK');
             $table->timestamps();
         });
@@ -33,6 +33,6 @@ class CreateQuestionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('questions');
+        Schema::dropIfExists('quizzes');
     }
 }

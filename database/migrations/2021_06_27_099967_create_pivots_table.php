@@ -70,6 +70,13 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('question_quiz', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('quiz_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('question_id')->index()->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+
         Schema::create('packagequestion_question', function (Blueprint $table) {
             $table->id();
             $table->foreignId('packagequestion_id')->index()->constrained()->onDelete('cascade');

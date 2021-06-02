@@ -2,6 +2,7 @@
 
 use App\Actions\Attachment\Upload;
 use App\Events\MeetingChangeEvent;
+use App\Events\QuizRoomChangeEvent;
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureGradeReport;
 use App\Http\Middleware\EnsureHomeroom;
@@ -32,6 +33,9 @@ use App\Models\Price;
 use App\Models\PrivateRoom;
 use App\Models\Province;
 use App\Models\Question;
+use App\Models\Quiz;
+use App\Models\QuizAnswer;
+use App\Models\Quizresult;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\School;
@@ -70,6 +74,8 @@ Route::get('me', fn (Request $request) => $request->user());
 
 Route::get('examtypes', fn () => Examtype::all());
 Route::get('/provinces', fn () => Province::all());
+Route::get('/subjects', fn () => Subject::all());
+Route::get('/classtypes', fn () => Classtype::all());
 Route::get('/provinces/{id}/city', fn ($id) => Province::findOrFail($id)->cities);
 Route::get('/cities/{id}/districts', fn ($id) => City::findOrFail($id)->districts);
 Route::get('/cities/{id}/schools', function (Request $request, $id) {
@@ -115,6 +121,138 @@ Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], func
         }
 
         return ['message' => 'validated', 'transaction' => $transaction];
+    });
+});
+
+
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function () {
+
+    Route::post('/', function (Request $request) {
+        $quiz = new Quiz();
+        $quiz->subject_id = $request->subject;
+        $quiz->classtype_id = $request->classtype;
+
+        $quiz->name = $request->name;
+        $quiz->description = $request->description;
+        $quiz->visibility = $request->visibility;
+
+        $user = $request->user();
+
+        $user->quizzes()->save($quiz);
+
+        $questionIds = [];
+
+        foreach ($request->questions as $questionData) {
+            if (!array_key_exists('id', $questionData)) {
+
+                $question = new Question();
+
+                $question->content = $questionData['content'];
+
+                $question->visibility = $request['visibility'];
+
+                $question->classtype_id = $request['classtype'];
+
+                $question->type = $questionData['type'];
+
+                $question->subject_id = $request['subject'];
+
+                $user->questions()->save($question);
+                $questionIds[] = $question->id;
+                $answers = [];
+                foreach ($questionData['answers'] as $i => $answerData) {
+                    $answer = new Answer();
+
+                    if ($questionData['type'] !== 'MULTI_CHOICE') {
+                        $answer->is_correct = true;
+                    } else {
+                        $answer->is_correct = $i == $questionData['correctanswer'];
+                    }
+
+                    $answer->content = $answerData['content'] ?? '';
+                    $answers[] = $answer;
+                }
+
+                $question->answers()->saveMany($answers);
+
+                foreach ($questionData['answerattachments'] as $i => $attachment) {
+                    if (!empty($attachment)) {
+                        Attachment::find($attachment)->attachable()->associate($answers[$i])->save();
+                    }
+                }
+
+                foreach (Attachment::whereIn('id', $questionData['attachments'])->get() as $attachment) {
+                    $attachment->attachable()->associate($question)->save();
+                }
+            } else {
+                $questionIds[] = $questionData['id'];
+            }
+        }
+
+
+        $quiz->questions()->attach($questionIds);
+
+        if ($request->attachment) {
+            $attachment = Attachment::findOrFail($request->attachment);
+            $attachment->role = Quiz::THUMBNAIL;
+            $attachment->save();
+            $quiz->thumbnail()->save($attachment);
+        }
+
+        return ['message' => 'ok'];
+    });
+
+    Route::get('/', function () {
+        return Quiz::latest()->paginate(10);
+    });
+
+    Route::get('{id}', function ($id) {
+        return Quiz::with('questions.answers')->findOrFail($id);
+    });
+
+    Route::group(['prefix' => 'rooms'], function () {
+        Route::post('/create', function (Request $request) {
+            $user = $request->user();
+
+            $quiz = Quiz::findOrFail($request->quiz);
+
+            $room = new Room();
+
+            $room->name = $request->name;
+
+            $room->identifier = 'meeting.' . $quiz->id;
+
+            $quiz->rooms()->save($room);
+
+            $room->users()->attach($user->id, ['is_administrator' => true]);
+
+            broadcast(new QuizRoomChangeEvent($quiz));
+        });
+        Route::post('/submitanswer', function (Request $request) {
+            $user = $request->user();
+
+            $quizresult = Quizresult::firstOrCreate([
+                'quiz_id' => $request->quiz,
+                'room_id' => $request->room,
+                'user_id' => $user->id,
+            ]);
+
+            $quizanswer  = StudentAnswer::firstOrCreate([
+                'question_id' => $request->question,
+                'user_id' => $user->id,
+                'quiz_id' => $request->quiz,
+                'room_id' => $request->room,
+                'quizresult_id' => $quizresult->id
+            ]);
+
+            $quizanswer->answer_id = $request->answer_id;
+            $quizanswer->quizresult_id = $request->quizresult_id;
+
+            $quizanswer->content = $request->content;
+            $quizanswer->is_correct = $request->is_correct;
+
+            $quizanswer->save();
+        });
     });
 });
 
@@ -563,7 +701,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             $constult = new Consultation();
             $constult->teacher_id = User::findOrFail($request->teacher)->id;
-            $constult->title = $request->title;
+            $constult->name = $request->name;
             $constult->problem = $request->problem;
             $user->consultations()->save($constult);
         });
@@ -1746,7 +1884,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::post('/', function (Request $request) {
 
             $report = new Report();
-            $report->title = $request->title;
+            $report->name = $request->name;
             $report->data = json_encode($request->data);
             $report->type = $request->type;
 
@@ -1763,7 +1901,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         Route::put('/{id}', function (Request $request, $id) {
 
             $report = $request->user()->reports()->findOrFail($id);
-            $report->title = $request->title;
+            $report->name = $request->name;
             $report->data = json_encode($request->data);
             $report->type = $request->type;
 

@@ -20,10 +20,14 @@ class Question extends Model
     const MULTI_CHOICE = 'MULTI_CHOICE';
     const FILLER = 'FILLER';
     const ESSAY = 'ESSAY';
+    const SURVEY = 'SURVEY';
+    const SLIDE = 'SLIDE';
+    const MANY_ANSWERS = 'MANY_ANSWERS';
 
-    public function teacher(): BelongsTo
+
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User', 'teacher_id');
+        return $this->belongsTo('App\Models\User');
     }
 
     public function answers(): HasMany
