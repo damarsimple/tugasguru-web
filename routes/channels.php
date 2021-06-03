@@ -82,3 +82,14 @@ Broadcast::channel('room.{id}', function ($user, $id) {
 
     return false;
 });
+
+Broadcast::channel('quiz.rooms.{id}', function ($user, $id) {
+
+    $room = Room::findOrFail($id);
+
+    if (in_array($user->id, $room->users->pluck('id')->toArray())) {
+        return $user;
+    }
+
+    return false;
+});

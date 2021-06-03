@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Quiz;
+use App\Models\Room;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -21,7 +22,7 @@ class QuizRoomChangeEvent implements ShouldBroadcastNow
      *
      * @return void
      */
-    public function __construct(public Quiz $quiz)
+    public function __construct(public Room $room)
     {
     }
 
@@ -32,8 +33,9 @@ class QuizRoomChangeEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
+        $this->room->quizresults = $this->room->quizresults;
         return new PresenceChannel(
-            "quiz.rooms." . "." . $this->meeting->id
+            "quiz.rooms."  . $this->room->id
         );
     }
 }

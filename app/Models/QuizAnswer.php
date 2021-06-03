@@ -10,6 +10,8 @@ class QuizAnswer extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['question_id', 'user_id', 'quiz_id', 'room_id', 'quizresult_id'];
+
     public function quizresult(): BelongsTo
     {
         return $this->belongsTo('App\Models\Quizresult');

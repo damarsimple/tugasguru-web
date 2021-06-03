@@ -220,15 +220,41 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
 
             $room->name = $request->name;
 
-            $room->identifier = 'meeting.' . $quiz->id;
+            $room->identifier = Str::uuid();
+            $room->is_enabled = false;
 
             $quiz->rooms()->save($room);
 
             $room->users()->attach($user->id, ['is_administrator' => true]);
 
-            broadcast(new QuizRoomChangeEvent($quiz));
+            broadcast(new QuizRoomChangeEvent($room));
+
+            return Room::with('users')->find($room->id);
         });
-        Route::post('/submitanswer', function (Request $request) {
+        Route::post('/join', function (Request $request) {
+            $room = Room::where('identifier', $request->identifier)->firstOrFail();
+            $room->users()->attach($request->user()->id);
+            broadcast(new QuizRoomChangeEvent($room));
+            return [
+                'room' => Room::with('users')->find($room->id),
+                'quiz' => Quiz::with('questions.answers')->findOrFail($room->roomable_id)
+            ];
+        });
+        Route::put('{id}', function (Request $request, $id) {
+            $room = Room::find($id);
+            $room->is_enabled = $request->is_enabled;
+            if ($room->is_enabled) {
+                foreach ($room->users as $user) {
+                    $quizresult  = new Quizresult();
+                    $quizresult->user_id = $user->id;
+                    $quizresult->quiz_id = $room->roomable_id;
+                    $room->quizresults()->save($quizresult);
+                }
+            }
+            $room->save();
+            broadcast(new QuizRoomChangeEvent($room));
+        });
+        Route::post('/answer', function (Request $request) {
             $user = $request->user();
 
             $quizresult = Quizresult::firstOrCreate([
@@ -237,7 +263,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
                 'user_id' => $user->id,
             ]);
 
-            $quizanswer  = StudentAnswer::firstOrCreate([
+            $quizanswer  = QuizAnswer::firstOrCreate([
                 'question_id' => $request->question,
                 'user_id' => $user->id,
                 'quiz_id' => $request->quiz,
@@ -246,12 +272,17 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
             ]);
 
             $quizanswer->answer_id = $request->answer_id;
-            $quizanswer->quizresult_id = $request->quizresult_id;
-
             $quizanswer->content = $request->content;
+            $quizanswer->grade = $request->grade;
             $quizanswer->is_correct = $request->is_correct;
 
+            $quizresult->grade = $request->accumulateGrade;
+            
+            $quizresult->save();
+
             $quizanswer->save();
+            broadcast(new QuizRoomChangeEvent(Room::findOrFail($request->room)));
+            return 'ok';
         });
     });
 });
