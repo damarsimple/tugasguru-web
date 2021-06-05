@@ -277,7 +277,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
             $quizanswer->is_correct = $request->is_correct;
 
             $quizresult->grade = $request->accumulateGrade;
-            
+
             $quizresult->save();
 
             $quizanswer->save();
@@ -407,6 +407,91 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
+
+    Route::group(['prefix' => 'followers'], function () {
+
+        Route::get('/following', function (Request $request) {
+            $user = $request->user();
+
+            return $user->followings;
+        });
+
+        Route::get('/myfollowing', function (Request $request) {
+
+            return $request->user()->followings;
+        });
+
+        Route::post('/accept', function (Request $request) {
+            $user = $request->user();
+
+            $user->requestfollowers()->whereIn('follower_id', $request->acceptIds)->update(['is_accepted' => true]);
+
+            return ['message' => 'ok'];
+        });
+
+
+        Route::get('/myfollower', function (Request $request) {
+
+            return $request->user()->followers;
+        });
+
+        Route::post('/deny', function (Request $request) {
+
+            $request->user()->requestfollowers()->detach($request->userId);
+
+            return ['message' => 'ok'];
+        });
+
+        Route::post('/unfollow', function (Request $request) {
+            $student = $request->user();
+
+            $student->followings()->detach($request->user);
+
+            return ['message' => 'ok'];
+        });
+
+
+        Route::post('/request', function (Request $request) {
+            $user = $request->user();
+
+            if ($user->id == $request->user) {
+                return ['message' => 'Anda tidak bisa mengikuti diri sendiri'];
+            }
+
+            $candidate = User::findOrFail($request->user);
+
+
+            if ($user->roles == User::TEACHER) {
+
+                if ($candidate->roles !== "TEACHER" || !$candidate->teacher) {
+                    return ['message' => 'invalid follow target'];
+                }
+
+                $candidate->teacher->requestfollowers()->syncWithoutDetaching([$user?->id]);
+            } else {
+                if (
+                    $candidate->roles == "TEACHER" &&
+                    !$user->school->teachers->pluck('id')->contains($request->user)
+                ) {
+                    return ['message' => 'Guru tidak ada di sekolah'];
+                }
+
+                if ($candidate->roles == "TEACHER") {
+                    $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
+                } else {
+                    $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
+                }
+            }
+
+
+            return ['message' => 'ok'];
+        });
+
+        Route::get('/myrequests', function (Request $request) {
+            $user = $request->user();
+            return $user->requestfollowers()->with('province')->get();
+        });
+    });
 
     Route::group(['prefix' => 'transactions'], function () {
         Route::get('/{id}', function (Request $request, $id) {
@@ -741,70 +826,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         Route::get('{id}', fn (Request $request, $id) => $request->user()->consultations()->findOrFail($id));
     });
 
-    Route::group(['prefix' => 'followers'], function () {
-
-        Route::get('/following', function (Request $request) {
-            $user = $request->user();
-
-            return $user->followings;
-        });
-
-        Route::get('/myfollowing', function (Request $request) {
-
-            return $request->user()->followings;
-        });
-
-        Route::get('/myfollower', function (Request $request) {
-
-            return $request->user()->followers;
-        });
-
-        Route::post('/deny', function (Request $request) {
-
-            $request->user()->requestfollowers()->detach($request->userId);
-
-            return ['message' => 'ok'];
-        });
-
-        Route::post('/unfollow', function (Request $request) {
-            $student = $request->user();
-
-            $student->followings()->detah($request->user);
-
-            return ['message' => 'ok'];
-        });
-
-
-        Route::post('/request', function (Request $request) {
-            $user = $request->user();
-
-            if ($user->id == $request->user) {
-                return ['message' => 'Anda tidak bisa mengikuti diri sendiri'];
-            }
-
-            $candidate = User::findOrFail($request->user);
-
-            if (
-                $candidate->roles == "TEACHER" &&
-                !$user->school->teachers->pluck('id')->contains($request->user)
-            ) {
-                return ['message' => 'Guru tidak ada di sekolah'];
-            }
-
-            if ($candidate->roles == "TEACHER") {
-                $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
-            } else {
-                $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
-            }
-
-            return ['message' => 'ok'];
-        });
-
-        Route::get('/myrequests', function (Request $request) {
-            $user = $request->user();
-            return $user->requestfollowers()->with('province')->get();
-        });
-    });
 
     Route::group(['prefix' => 'posts'], function () {
 
@@ -1335,68 +1356,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $constult->save();
 
             return ['message' => 'ok'];
-        });
-    });
-    Route::group(['prefix' => 'followers'], function () {
-
-        Route::get('/myfollowing', function (Request $request) {
-            $user = $request->user();
-            return $user->followings;
-        });
-
-        Route::post('/unfollow', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
-            $user = $request->user();
-
-            $user->followings()->detach($request->user);
-
-            return ['message' => 'ok'];
-        });
-
-        Route::get('/myfollower', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
-            $user = $request->user();
-            return $user->followers;
-        });
-
-        Route::post('/accept', function (Request $request) {
-            $user = $request->user();
-
-            $user->requestfollowers()->whereIn('follower_id', $request->acceptIds)->update(['is_accepted' => true]);
-
-            return ['message' => 'ok'];
-        });
-
-        Route::post('/deny', function (Request $request) {
-            $user = $request->user();
-
-            $user->requestfollowers()->detach($request->userId);
-
-            return ['message' => 'ok'];
-        });
-
-        Route::post('/request', function (Request $request) {
-            $user = $request->user();
-
-            if ($user->id == $request->user) {
-                return ['message' => 'you cannot follow yourself'];
-            }
-            $candidate = User::findOrFail($request->user);
-
-
-            if ($candidate->roles !== "TEACHER" || !$candidate->teacher) {
-                return ['message' => 'invalid follow target'];
-            }
-
-            $candidate->teacher->requestfollowers()->syncWithoutDetaching([$user?->id]);
-
-            return ['message' => 'ok'];
-        });
-
-        Route::get('/myrequests', function (Request $request) {
-            /**  @var App/Models/User $teacher  */
-            $user = $request->user();
-            return $user->requestfollowers()->with('province')->get();
         });
     });
 
