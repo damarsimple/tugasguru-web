@@ -27,6 +27,7 @@ use App\Models\Subject;
 use App\Models\Subscription;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Voucher;
 use App\Payment\Xendit;
 use Illuminate\Console\Command;
 use Faker\Factory;
@@ -774,7 +775,18 @@ class SeedData extends Command
 
             $teacher->followers()->attach([$student->id => ['is_accepted' => true]]);
             $teacher->followers()->attach([$secondstudent->id => ['is_accepted' => true]]);
+
+            $voucher = new Voucher();
+            $voucher->name = "test voucher";
+            $voucher->code =  'test';
+            $voucher->percentage = 0.69;
+            $voucher->description = 'test voucher';
+            $voucher->expired_at = now()->addDay(1);
+            $voucher->save();
         }
+
+
+
 
         print("finish at " . time() - $start . PHP_EOL);
         return 0;

@@ -46,6 +46,7 @@ use App\Models\Subject;
 use App\Models\Subscription;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Voucher;
 use App\Payment\Xendit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -295,7 +296,20 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
 
         $transaction = new Transaction();
 
-        $transaction->amount = $subscription->price;
+        if ($request->voucher) {
+            $voucher = Voucher::where(['code' => $request->voucher])->firstOrFail();
+
+            if (!$voucher->expired_at->lt(now())) {
+                $transaction->amount = ($subscription->price - $subscription->price * $voucher->percentage);
+                $transaction->voucher_id = $voucher->id;
+            } else {
+                return response([
+                    'message' => 'Voucher sudah kadaluarsa',
+                ], 403);
+            }
+        } else {
+            $transaction->amount = $subscription->price;
+        }
 
         $transaction->payment_method = $request->payment_method;
 

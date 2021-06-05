@@ -20,6 +20,7 @@ class CreateTransactionsTable extends Migration
             $table->unsignedBigInteger('from')->default(0);
             $table->unsignedBigInteger('to')->default(0);
             $table->unsignedBigInteger('amount');
+            $table->foreignId('voucher_id')->nullable()->constrained();
             $table->string('uuid');
             $table->string('payment_method');
             $table->string('status')->default(Transaction::PENDING);
