@@ -288,6 +288,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
     });
 });
 
+
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], function () {
     Route::post('/subscriptions', function (Request $request) {
         $user = $request->user();
@@ -421,7 +422,11 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
-
+    Route::group(['prefix' => 'transactions'], function () {
+        Route::get('/', function (Request $request) {
+            return  $request->user()->transactions()->paginate(10);
+        });
+    });
     Route::group(['prefix' => 'followers'], function () {
 
         Route::get('/following', function (Request $request) {
