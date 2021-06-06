@@ -5,6 +5,7 @@ use App\Events\MeetingChangeEvent;
 use App\Events\QuizRoomChangeEvent;
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Middleware\EnsureGradeReport;
+use App\Http\Middleware\EnsureHeadmaster;
 use App\Http\Middleware\EnsureHomeroom;
 use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
@@ -1275,6 +1276,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'attendances'], function () {
         Route::get('/school/{id}', function (Request $request, $id) {
+            if ($id == 'undefined') return ['data' => []];
             $school =  $request->user()->schools()->findOrFail($id);
             return $school->attendances()->paginate(10);
         });
@@ -1860,6 +1862,18 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
         Route::get('/type', fn () => Examtype::all());
     });
+
+    Route::group(['prefix' => 'headmasters', 'middleware' => [EnsureHeadmaster::class]], function () {
+        Route::get('/', function (Request $request) {
+            $user = $request->user();
+            return $user->headmasterschools()->get();
+        });
+        Route::get('/reports', function (Request $request) {
+            $user = $request->user();
+            return $user->myreports()->paginate(10);
+        });
+    });
+
 
 
     Route::group(['prefix' => 'homerooms', 'middleware' => [EnsureHomeroom::class]], function () {

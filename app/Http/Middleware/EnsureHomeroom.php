@@ -19,7 +19,7 @@ class EnsureHomeroom
     {
         $user = $request->user();
 
-        if (!in_array(Ability::HOMEROOM, $user->access)) {
+        if (!in_array(Ability::HOMEROOM, is_array($user->access) ?  $user->access : json_decode($user->access))) {
             return response(['message' => 'Unauthorized'], 401);
         }
 

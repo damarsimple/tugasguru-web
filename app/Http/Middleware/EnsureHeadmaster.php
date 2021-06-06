@@ -6,7 +6,7 @@ use App\Enum\Ability;
 use Closure;
 use Illuminate\Http\Request;
 
-class EnsureGradeReport
+class EnsureHeadmaster
 {
     /**
      * Handle an incoming request.
@@ -19,7 +19,7 @@ class EnsureGradeReport
     {
         $user = $request->user();
 
-        if (!in_array(Ability::GRADE_REPORT, is_array($user->access) ?  $user->access : json_decode($user->access))) {
+        if (!in_array(Ability::HEADMASTER, is_array($user->access) ?  $user->access : json_decode($user->access))) {
             return response(['message' => 'Unauthorized'], 401);
         }
 

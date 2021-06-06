@@ -192,6 +192,11 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\School')->wherePivot('is_homeroom', true);
     }
 
+    public function headmasterschools(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\School')->wherePivot('is_headmaster', true);
+    }
+
     public function subjects(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
