@@ -164,6 +164,7 @@ class SeedData extends Command
 
 
         $subjectsData = [
+
             "Pendidikan Agama",
             "Pendidikan Kewarganegaraan",
             "Bahasa Indonesia",
@@ -173,7 +174,7 @@ class SeedData extends Command
             "Bahasa Inggris",
             "Seni Budaya",
             "Pendidikan Jasmani",
-            "Prakarya"
+            "Prakarya",
         ];
 
         // $faker = new Factory();
@@ -186,7 +187,21 @@ class SeedData extends Command
             $subject->save();
         }
 
+
+
         $subjectsIds = Subject::all()->map(fn ($e) => $e->id);
+
+        foreach ([
+            "Komedi",
+            "Penalaran Umum"
+        ] as $subjectdata) {
+            $subject = new Subject();
+
+            $subject->name = $subjectdata;
+            $subject->type = "QUIZ";
+            $subject->save();
+        }
+
 
         $schoolTypeMap = [];
 
