@@ -246,6 +246,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
             $room = Room::find($id);
             $room->is_enabled = $request->is_enabled;
             if ($room->is_enabled) {
+                $quiz = Quiz::findOrFail($room->roomable_id);
+                $quiz->increment('played_count');
                 foreach ($room->users as $user) {
                     $quizresult  = new Quizresult();
                     $quizresult->user_id = $user->id;
@@ -312,6 +314,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
         } else {
             $transaction->amount = $subscription->price;
         }
+
+        $transaction->from = $user->balance;
+        $transaction->to = $user->balance;
 
         $transaction->payment_method = $request->payment_method;
 

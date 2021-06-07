@@ -13,7 +13,7 @@ class Transaction extends Model
 
     public const BALANCE = 'BALANCE';
     public const XENDIT = 'XENDIT';
-
+    public const ADMIN = 'ADMIN';
 
     public const STAGING = 'STAGING';
     public const PENDING = 'PENDING';

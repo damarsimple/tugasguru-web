@@ -18,6 +18,8 @@ use App\Models\Meeting;
 use App\Models\Packagequestion;
 use App\Models\Province;
 use App\Models\Question;
+use App\Models\Quiz;
+use App\Models\Reward;
 use App\Models\Room;
 use App\Models\School;
 use App\Models\Schooltype;
@@ -791,6 +793,17 @@ class SeedData extends Command
             $teacher->followers()->attach([$student->id => ['is_accepted' => true]]);
             $teacher->followers()->attach([$secondstudent->id => ['is_accepted' => true]]);
 
+            $quiz = new Quiz();
+            $quiz->subject_id = 1;
+            $quiz->classtype_id = 1;
+
+            $quiz->name = 'TEST QUIZ';
+            $quiz->description = 'TEST QUIZ';
+            $quiz->visibility = 'PUBLIK';
+
+            $user->quizzes()->save($quiz);
+            $quiz->questions()->attach([1]);
+
             $voucher = new Voucher();
             $voucher->name = "test voucher";
             $voucher->code =  'test';
@@ -798,6 +811,18 @@ class SeedData extends Command
             $voucher->description = 'test voucher';
             $voucher->expired_at = now()->addDay(1);
             $voucher->save();
+
+            $reward = new Reward();
+            $reward->name = "test reward";
+            $reward->prize_pool = 100.00;
+            // ^total hadiah
+            $reward->reward = 100.00;
+            // ^hadiah per pencapaian 
+            $reward->is_active = true;
+            $reward->description = 'test reward';
+            $reward->minimum_play_count = 1;
+            // ^minimum orang bermain untuk mendapatkan hadiah
+            $reward->save();
         }
 
 

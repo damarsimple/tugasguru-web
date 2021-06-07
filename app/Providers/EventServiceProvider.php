@@ -9,6 +9,7 @@ use App\Models\Exam;
 use App\Models\Form;
 use App\Models\Meeting;
 use App\Models\Message;
+use App\Models\Quiz;
 use App\Models\StudentAssigment;
 use App\Models\Transaction;
 use App\Observers\ArticleObserver;
@@ -18,6 +19,7 @@ use App\Observers\ExamObserver;
 use App\Observers\FormObserver;
 use App\Observers\MeetingObserver;
 use App\Observers\MessageObserver;
+use App\Observers\QuizObserver;
 use App\Observers\StudentAssigmentObserver;
 use App\Observers\TransactionObserver;
 use Illuminate\Auth\Events\Registered;
@@ -55,5 +57,6 @@ class EventServiceProvider extends ServiceProvider
         Form::observe(FormObserver::class);
         Exam::observe(ExamObserver::class);
         Transaction::observe(TransactionObserver::class);
+        Quiz::observe(QuizObserver::class);
     }
 }

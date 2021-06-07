@@ -18,6 +18,12 @@ class Quiz extends Model
 
     protected $with = ['thumbnail', 'firstquestion', 'subject', 'classtype', 'user'];
 
+
+    public function quizreward(): HasOne
+    {
+        return $this->hasOne('App\Models\QuizReward');
+    }
+
     public function questions(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Question');
