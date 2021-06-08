@@ -807,8 +807,6 @@ class SeedData extends Command
 
             $quiz = new Quiz();
             $quiz->subject_id = 1;
-            $quiz->classtype_id = 1;
-
             $quiz->name = "TEST QUIZ";
             $quiz->description = "TEST QUIZ";
             $quiz->visibility = "PUBLIK";
