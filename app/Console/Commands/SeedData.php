@@ -176,7 +176,7 @@ class SeedData extends Command
             $subject->save();
         }
 
-        $subjectsIds = Subject::all()->map(fn($e) => $e->id);
+        $subjectsIds = Subject::all()->map(fn ($e) => $e->id);
 
         foreach (["Komedi", "Penalaran Umum"] as $subjectdata) {
             $subject = new Subject();
@@ -401,9 +401,7 @@ class SeedData extends Command
                                 case "sma":
                                     for ($i = 0; $i < 3; $i++) {
                                         $level = $i + 10;
-                                        $classTypeMap[
-                                            $level
-                                        ] = Classtype::where(
+                                        $classTypeMap[$level] = Classtype::where(
                                             "level",
                                             $level
                                         )->first()->id;
@@ -414,9 +412,7 @@ class SeedData extends Command
                                 case "smp":
                                     for ($i = 0; $i < 3; $i++) {
                                         $level = $i + 7;
-                                        $classTypeMap[
-                                            $level
-                                        ] = Classtype::where(
+                                        $classTypeMap[$level] = Classtype::where(
                                             "level",
                                             $level
                                         )->first()->id;
@@ -427,9 +423,7 @@ class SeedData extends Command
                                 case "sd":
                                     for ($i = 0; $i < 6; $i++) {
                                         $level = $i + 1;
-                                        $classTypeMap[
-                                            $level
-                                        ] = Classtype::where(
+                                        $classTypeMap[$level] = Classtype::where(
                                             "level",
                                             $level
                                         )->first()->id;
@@ -473,7 +467,7 @@ class SeedData extends Command
             $teacher->city_id = 1;
             $teacher->province_id = 1;
             $teacher->district_id = 1;
-            $teacher->access = [Ability::GRADE_REPORT];
+            $teacher->access = [Ability::GRADE_REPORT, Ability::HEADMASTER];
             $teacher->gender = 1;
             $teacher->phone = "08987181017";
             $teacher->roles = "TEACHER";
@@ -775,11 +769,11 @@ class SeedData extends Command
                             $studentanswer = new StudentAnswer();
                             $studentanswer->answer_id =
                                 $v % 2 == 0
-                                    ? $y->correctanswer->id
-                                    : $y
-                                        ->answers()
-                                        ->pluck("id")
-                                        ->random();
+                                ? $y->correctanswer->id
+                                : $y
+                                ->answers()
+                                ->pluck("id")
+                                ->random();
                             $studentanswer->examsession_id = $examsession->id;
                             $studentanswer->exam_id = $exam->id;
                             $studentanswer->question_id = $y->id;
@@ -836,13 +830,15 @@ class SeedData extends Command
 
             $agenda = new Agenda();
             $agenda->name = "test";
-            $agenda->description = "test reward";
+            $agenda->description = "test agenda";
+            $agenda->school_id = 1;
             $agenda->finish_at = now()->addHour(2);
             $teacher->agendas()->save($agenda);
 
             foreach (School::first()->teachers->pluck("id") as $id) {
                 Attendance::firstOrCreate([
                     "user_id" => $id,
+                    "school_id" => 1,
                     "attendable_id" => $agenda->id,
                     "attendable_type" => Agenda::class,
                 ]);

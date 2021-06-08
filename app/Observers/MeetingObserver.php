@@ -51,6 +51,7 @@ class MeetingObserver
         foreach ($studentUserIds as $id) {
             if (array_key_exists($id, $absentsMap)) {
                 Attendance::firstOrCreate([
+                    "school_id" => $meeting->classroom->school_id,
                     "user_id" => $id,
                     "attendable_id" => $meeting->id,
                     "attendable_type" => Meeting::class,
@@ -59,6 +60,7 @@ class MeetingObserver
                 ]);
             } else {
                 Attendance::firstOrCreate([
+                    "school_id" => $meeting->classroom->school_id,
                     "user_id" => $id,
                     "attendable_id" => $meeting->id,
                     "attendable_type" => Meeting::class,

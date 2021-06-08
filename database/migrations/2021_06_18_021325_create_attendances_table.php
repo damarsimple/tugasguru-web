@@ -17,13 +17,7 @@ class CreateAttendancesTable extends Migration
                 ->constrained()
                 ->onDelete("cascade");
             $table
-                ->foreignId("classroom_id")
-                ->nullable()
-                ->index()
-                ->constrained()
-                ->onDelete("cascade");
-            $table
-                ->foreignId("subject_id")
+                ->foreignId("school_id")
                 ->nullable()
                 ->index()
                 ->constrained()

@@ -13,27 +13,22 @@ class Attendance extends Model
 
     protected $fillable = [
         "user_id",
-        "subject_id",
-        "classroom_id",
+        "school_id",
         "attendable_id",
         "attendable_type",
     ];
 
-    protected $with = ["user", "subject", "attendable", "classroom.teacher"];
+    protected $with = ["user", "attendable"];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");
     }
 
-    public function classroom(): BelongsTo
-    {
-        return $this->belongsTo("App\Models\Classroom");
-    }
 
-    public function subject(): BelongsTo
+    public function school(): BelongsTo
     {
-        return $this->belongsTo("App\Models\Subject");
+        return $this->belongsTo("App\Models\School");
     }
 
     public function attendable(): MorphTo

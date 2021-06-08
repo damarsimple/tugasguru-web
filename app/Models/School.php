@@ -94,11 +94,10 @@ class School extends Model
         return $this->belongsTo("App\Models\District");
     }
 
-    public function attendances(): HasManyThrough
+    public function attendances(): HasMany
     {
-        return $this->hasManyThrough(
+        return $this->hasMany(
             "App\Models\Attendance",
-            "App\Models\Classroom"
         );
     }
 }

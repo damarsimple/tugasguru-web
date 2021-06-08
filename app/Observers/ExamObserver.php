@@ -31,6 +31,7 @@ class ExamObserver
         foreach ($studentUserIds as $id) {
             if (array_key_exists($id, $absentsMap)) {
                 Attendance::firstOrCreate([
+                    "school_id" => $exam->classroom->school_id,
                     "user_id" => $id,
                     "attendable_id" => $exam->id,
                     "attendable_type" => Exam::class,
@@ -39,6 +40,7 @@ class ExamObserver
                 ]);
             } else {
                 Attendance::firstOrCreate([
+                    "school_id" => $exam->classroom->school_id,
                     "user_id" => $id,
                     "attendable_id" => $exam->id,
                     "attendable_type" => Exam::class,

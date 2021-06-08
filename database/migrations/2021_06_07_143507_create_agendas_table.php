@@ -15,6 +15,11 @@ class CreateAgendasTable extends Migration
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");
+            $table
+                ->foreignId("school_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
             $table->string("name");
             $table->longText("description")->nullable();
             $table->timestamp("finish_at")->nullable();
