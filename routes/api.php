@@ -170,6 +170,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
                 $question->subject_id = $request['subject'];
 
                 $user->questions()->save($question);
+                
                 $questionIds[] = $question->id;
                 $answers = [];
                 foreach ($questionData['answers'] as $i => $answerData) {
