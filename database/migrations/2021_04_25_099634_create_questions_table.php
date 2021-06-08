@@ -21,10 +21,10 @@ class CreateQuestionsTable extends Migration
                 ->constrained()
                 ->onDelete("cascade");
             $table
+                ->nullable()
                 ->foreignId("classtype_id")
                 ->index()
                 ->constrained()
-                ->nullable()
                 ->onDelete("cascade");
             $table->boolean("editable")->default(true);
             $table->enum("type", [
