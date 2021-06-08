@@ -21,11 +21,11 @@ class CreateQuestionsTable extends Migration
                 ->constrained()
                 ->onDelete("cascade");
             $table
-                ->nullable()
                 ->foreignId("classtype_id")
                 ->index()
                 ->constrained()
-                ->onDelete("cascade");
+                ->onDelete("cascade")
+                ->nullable();
             $table->boolean("editable")->default(true);
             $table->enum("type", [
                 "MULTI_CHOICE",
