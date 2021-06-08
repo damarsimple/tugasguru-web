@@ -10,8 +10,8 @@ class Examtype extends Model
 {
     use HasFactory;
 
-    public function exams() : HasMany
+    public function exams(): HasMany
     {
-        return $this->hasMany('App\Models\Exam');
+        return $this->hasMany("App\Models\Exam");
     }
 }

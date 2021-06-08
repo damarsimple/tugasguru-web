@@ -11,15 +11,15 @@ class Message extends Model
 {
     use HasFactory;
 
-    protected $with = ['user'];
+    protected $with = ["user"];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo("App\Models\User");
     }
 
     public function messageable(): MorphTo
     {
-        return  $this->morphTo();
+        return $this->morphTo();
     }
 }

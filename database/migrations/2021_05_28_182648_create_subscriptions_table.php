@@ -6,30 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateSubscriptionsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('subscriptions', function (Blueprint $table) {
+        Schema::create("subscriptions", function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->unsignedBigInteger('price');
-            $table->unsignedBigInteger('duration');
-            $table->json('ability');
+            $table->string("name");
+            $table->unsignedBigInteger("price");
+            $table->unsignedBigInteger("duration");
+            $table->json("ability");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('subscriptions');
+        Schema::dropIfExists("subscriptions");
     }
 }

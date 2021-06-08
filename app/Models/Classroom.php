@@ -12,47 +12,47 @@ class Classroom extends Model
 {
     use HasFactory;
 
-    public $with = ['classtype', 'assigments'];
+    public $with = ["classtype", "assigments"];
 
-    public $appends = ['name_formatted'];
+    public $appends = ["name_formatted"];
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\User');
+        return $this->belongsToMany("App\Models\User");
     }
 
     public function teacher(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User', 'teacher_id');
+        return $this->belongsTo("App\Models\User", "teacher_id");
     }
 
     public function exams(): HasMany
     {
-        return $this->hasMany('App\Models\Exam');
+        return $this->hasMany("App\Models\Exam");
     }
 
     public function classtype(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Classtype');
+        return $this->belongsTo("App\Models\Classtype");
     }
 
     public function getNameFormattedAttribute()
     {
-        return "Kelas "  . $this->classtype->level . " $this->name";
+        return "Kelas " . $this->classtype->level . " $this->name";
     }
 
     public function meetings(): HasMany
     {
-        return $this->hasMany('App\Models\Meeting');
+        return $this->hasMany("App\Models\Meeting");
     }
 
     public function assigments(): HasMany
     {
-        return $this->hasMany('App\Models\Assigment');
+        return $this->hasMany("App\Models\Assigment");
     }
 
     public function absents(): HasMany
     {
-        return $this->hasMany('App\Models\Absent');
+        return $this->hasMany("App\Models\Absent");
     }
 }

@@ -15,9 +15,12 @@ class ExamObserver
      */
     public function created(Exam $exam)
     {
-        $studentUserIds = $exam->classroom->students->pluck('id');
+        $studentUserIds = $exam->classroom->students->pluck("id");
 
-        $absents = $exam->teacher->studentabsents()->whereDate('finish_at', '>', now())->get();
+        $absents = $exam->teacher
+            ->studentabsents()
+            ->whereDate("finish_at", ">", now())
+            ->get();
 
         $absentsMap = [];
 
@@ -28,21 +31,17 @@ class ExamObserver
         foreach ($studentUserIds as $id) {
             if (array_key_exists($id, $absentsMap)) {
                 Attendance::firstOrCreate([
-                    'subject_id' => $exam->subject_id,
-                    'classroom_id' => $exam->classroom_id,
-                    'user_id' => $id,
-                    'attendable_id' => $exam->id,
-                    'attendable_type' => Exam::class,
-                    'attended' => false,
-                    'reason' => $absentsMap[$id]->reason,
+                    "user_id" => $id,
+                    "attendable_id" => $exam->id,
+                    "attendable_type" => Exam::class,
+                    "attended" => false,
+                    "reason" => $absentsMap[$id]->reason,
                 ]);
             } else {
                 Attendance::firstOrCreate([
-                    'subject_id' => $exam->subject_id,
-                    'classroom_id' => $exam->classroom_id,
-                    'user_id' => $id,
-                    'attendable_id' => $exam->id,
-                    'attendable_type' => Exam::class
+                    "user_id" => $id,
+                    "attendable_id" => $exam->id,
+                    "attendable_type" => Exam::class,
                 ]);
             }
         }

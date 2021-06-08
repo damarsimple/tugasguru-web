@@ -13,16 +13,16 @@ class QuizReward extends Model
 
     public function transaction(): MorphOne
     {
-        return $this->morphOne('App\Models\Transaction', 'transactionable');
+        return $this->morphOne("App\Models\Transaction", "transactionable");
     }
 
     public function quiz(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Quiz');
+        return $this->belongsTo("App\Models\Quiz");
     }
 
     public function reward(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Reward');
+        return $this->belongsTo("App\Models\Reward");
     }
 }

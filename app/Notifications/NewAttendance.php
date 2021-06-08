@@ -2,25 +2,26 @@
 
 namespace App\Notifications;
 
-use App\Models\Transaction;
+use App\Models\Attendance;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TransactionFailed extends Notification
+class NewAttendance extends Notification
 {
     use Queueable;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(public Transaction $transaction)
-    {
+    public function __construct(
+        public Attendance $attendance
+    ) {
         //
     }
-
     /**
      * Get the notification's delivery channels.
      *
@@ -32,15 +33,6 @@ class TransactionFailed extends Notification
         return ['broadcast', 'database'];
     }
 
-    /**
-     * Get the type of the notification being broadcast.
-     *
-     * @return string
-     */
-    public function broadcastType()
-    {
-        return 'notification.TRANSACTION_FAILED';
-    }
     /**
      * Get the mail representation of the notification.
      *
@@ -54,7 +46,15 @@ class TransactionFailed extends Notification
             ->action('Notification Action', url('/'))
             ->line('Thank you for using our application!');
     }
-
+    /**
+     * Get the type of the notification being broadcast.
+     *
+     * @return string
+     */
+    public function broadcastType()
+    {
+        return 'notification.NEW_ATTENDANCE';
+    }
     /**
      * Get the broadcastable representation of the notification.
      *
@@ -64,9 +64,9 @@ class TransactionFailed extends Notification
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'type' => 'TRANSACTION_FAILED',
-            'data' => $this->transaction,
-            'user' => $this->transaction->user
+            'type' => 'NEW_ATTENDANCE',
+            'data' => $this->attendance,
+            'user' => $this->attendance->user
         ]);
     }
 
@@ -79,9 +79,9 @@ class TransactionFailed extends Notification
     public function toArray($notifiable)
     {
         return [
-            'type' => 'TRANSACTION_FAILED',
-            'data' => $this->transaction,
-            'user' => $this->transaction->user
+            'type' => 'NEW_ATTENDANCE',
+            'data' => $this->attendance,
+            'user' => $this->attendance->user
         ];
     }
 }

@@ -9,7 +9,7 @@ class Attachment extends Model
 {
     use HasFactory;
 
-    protected $appends = ['path'];
+    protected $appends = ["path"];
 
     public function attachable()
     {
@@ -18,24 +18,26 @@ class Attachment extends Model
 
     function getPathAttribute()
     {
-        return env('APP_URL', 'http://localhost') . '/attachments/' . $this->name;
+        return env("APP_URL", "http://localhost") .
+            "/attachments/" .
+            $this->name;
     }
 
     public function getFilePathAttribute()
     {
-        return public_path('attachments')  . '/' . $this->name;
+        return public_path("attachments") . "/" . $this->name;
     }
 
     public function getTempFilePathAttribute()
     {
-        return public_path('attachments')  . '/temp.' . $this->name;
+        return public_path("attachments") . "/temp." . $this->name;
     }
 
     public function getExtAttribute()
     {
         try {
-            return explode('.', $this->name)[1];
-        } catch (\Throwable $th) {  
+            return explode(".", $this->name)[1];
+        } catch (\Throwable $th) {
             return null;
         }
     }

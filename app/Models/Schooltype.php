@@ -10,13 +10,13 @@ class Schooltype extends Model
 {
     use HasFactory;
 
-    public function classtypes() : HasMany
+    public function classtypes(): HasMany
     {
-        return $this->hasMany('App\Models\Classtype');
+        return $this->hasMany("App\Models\Classtype");
     }
 
-    public function schools() : HasMany
+    public function schools(): HasMany
     {
-        return $this->hasMany('App\Models\School');
+        return $this->hasMany("App\Models\School");
     }
 }

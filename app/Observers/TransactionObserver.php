@@ -21,12 +21,13 @@ class TransactionObserver
     public function created(Transaction $transaction)
     {
         if (
-            $transaction->payment_method == Transaction::BALANCE
-            && $transaction->is_paid
-            && $transaction->status == Transaction::SUCCESS
+            $transaction->payment_method == Transaction::BALANCE &&
+            $transaction->is_paid &&
+            $transaction->status == Transaction::SUCCESS
         ) {
             $transaction->from = $transaction->user->balance;
-            $transaction->to = $transaction->user->balance - $transaction->amount;
+            $transaction->to =
+                $transaction->user->balance - $transaction->amount;
             $transaction->saveQuietly();
             $this->handlePaid($transaction);
         }
@@ -56,17 +57,19 @@ class TransactionObserver
     {
         $user = $transaction->user;
 
-        $abilities = is_array($user->access) ? $user->access :  json_decode($user->access) ?? [];
+        $abilities = is_array($user->access)
+            ? $user->access
+            : json_decode($user->access) ?? [];
 
         switch ($transaction->transactionable_type) {
-            case 'App\Models\Subscription':
+            case "App\Models\Subscription":
                 $subscription = $transaction->transactionable;
 
-                $user->subscriptions()->attach(
-                    $subscription,
-                    ['expired_at' =>
-                    now()->addDay($subscription->duration)]
-                );
+                $user
+                    ->subscriptions()
+                    ->attach($subscription, [
+                        "expired_at" => now()->addDay($subscription->duration),
+                    ]);
 
                 foreach ($subscription->ability_alt as $ability) {
                     $abilities[] = $ability;
@@ -83,16 +86,13 @@ class TransactionObserver
         $user->access = $abilities;
 
         foreach ($user->schools as $school) {
-            $school->teachers()->updateExistingPivot(
-                $user->id,
-                [
-                    'is_homeroom'  => in_array(Ability::HOMEROOM, $user->access),
-                    'is_headmaster'  => in_array(Ability::HEADMASTER, $user->access),
-                    'is_ppdb_master'  => in_array(Ability::PPDB, $user->access),
-                    'is_ppdb'  => in_array(Ability::PPDB, $user->access),
-                    'is_counselor'  => in_array(Ability::COUNSELING, $user->access)
-                ]
-            );
+            $school->teachers()->updateExistingPivot($user->id, [
+                "is_homeroom" => in_array(Ability::HOMEROOM, $user->access),
+                "is_headmaster" => in_array(Ability::HEADMASTER, $user->access),
+                "is_ppdb_master" => in_array(Ability::PPDB, $user->access),
+                "is_ppdb" => in_array(Ability::PPDB, $user->access),
+                "is_counselor" => in_array(Ability::COUNSELING, $user->access),
+            ]);
         }
 
         $user->save();
@@ -108,9 +108,11 @@ class TransactionObserver
      */
     public function updated(Transaction $transaction)
     {
-
         if (
-            $transaction->payment_method == Transaction::XENDIT && $transaction->is_paid && ($transaction->status == Transaction::SUCCESS || $transaction->status == Transaction::STAGING)
+            $transaction->payment_method == Transaction::XENDIT &&
+            $transaction->is_paid &&
+            ($transaction->status == Transaction::SUCCESS ||
+                $transaction->status == Transaction::STAGING)
         ) {
             $this->handlePaid($transaction);
         }

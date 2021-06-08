@@ -12,28 +12,28 @@ class Attendance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'subject_id',
-        'classroom_id',
-        'attendable_id',
-        'attendable_type'
+        "user_id",
+        "subject_id",
+        "classroom_id",
+        "attendable_id",
+        "attendable_type",
     ];
 
+    protected $with = ["user", "subject", "attendable", "classroom.teacher"];
 
-    protected $with = ['user', 'subject', 'attendable', 'classroom.teacher'];
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo("App\Models\User");
     }
 
     public function classroom(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Classroom');
+        return $this->belongsTo("App\Models\Classroom");
     }
 
     public function subject(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Subject');
+        return $this->belongsTo("App\Models\Subject");
     }
 
     public function attendable(): MorphTo

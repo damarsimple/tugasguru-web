@@ -15,7 +15,6 @@ class ArticleObserver
      */
     public function created(Article $article)
     {
-
         $article->slug = Str::slug($article->name);
 
         $article->saveQuietly();
@@ -29,8 +28,6 @@ class ArticleObserver
      */
     public function updated(Article $article)
     {
-
-
         $article->slug = Str::slug($article->name);
 
         $article->saveQuietly();

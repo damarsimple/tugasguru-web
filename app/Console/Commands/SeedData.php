@@ -4,8 +4,10 @@ namespace App\Console\Commands;
 
 use App\Enum\Ability;
 use App\Models\Absent;
+use App\Models\Agenda;
 use App\Models\Answer;
 use App\Models\Assigment;
+use App\Models\Attendance;
 use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
@@ -27,14 +29,10 @@ use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
 use App\Models\Subscription;
-use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
-use App\Payment\Xendit;
 use Illuminate\Console\Command;
-use Faker\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class SeedData extends Command
 {
@@ -43,14 +41,14 @@ class SeedData extends Command
      *
      * @var string
      */
-    protected $signature = 'seed:data {--test}';
+    protected $signature = "seed:data {--test}";
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Populate database with Indonesian data';
+    protected $description = "Populate database with Indonesian data";
 
     /**
      * Create a new command instance.
@@ -70,20 +68,13 @@ class SeedData extends Command
     public function handle()
     {
         $start = time();
-        $places = file_get_contents(base_path() . '/data/places.json');
+        $places = file_get_contents(base_path() . "/data/places.json");
 
         $places = json_decode($places);
 
-        $onTest = $this->option('test');
+        $onTest = $this->option("test");
 
-
-        $examsType = [
-            'Latihan',
-            'Ulangan Harian',
-            'PTS',
-            'PAS',
-        ];
-
+        $examsType = ["Latihan", "Ulangan Harian", "PTS", "PAS"];
 
         foreach ($examsType as $examstype) {
             $examtype = new Examtype();
@@ -92,8 +83,9 @@ class SeedData extends Command
         }
         foreach ($places as $place) {
             $provinceName = $place->nama;
-            if ($onTest && $provinceName !== "Kalimantan Timur")
+            if ($onTest && $provinceName !== "Kalimantan Timur") {
                 continue;
+            }
             $province = new Province();
 
             $province->name = $provinceName;
@@ -109,7 +101,7 @@ class SeedData extends Command
                 if (str_contains($city, "Kabupaten")) {
                     $cityName = str_replace("Kabupaten ", "", $city);
 
-                    $city = new City;
+                    $city = new City();
 
                     $city->province_id = $province->id;
 
@@ -149,14 +141,11 @@ class SeedData extends Command
             $provinceMap[$province->name] = $province->id;
         }
 
-
         $cityMap = [];
 
         foreach (City::all() as $city) {
             $cityMap[$city->type . " " . $city->name] = $city->id;
         }
-
-
 
         $districtMap = [];
 
@@ -164,9 +153,7 @@ class SeedData extends Command
             $districtMap[$district->name] = $district->id;
         }
 
-
         $subjectsData = [
-
             "Pendidikan Agama",
             "Pendidikan Kewarganegaraan",
             "Bahasa Indonesia",
@@ -189,14 +176,9 @@ class SeedData extends Command
             $subject->save();
         }
 
+        $subjectsIds = Subject::all()->map(fn($e) => $e->id);
 
-
-        $subjectsIds = Subject::all()->map(fn ($e) => $e->id);
-
-        foreach ([
-            "Komedi",
-            "Penalaran Umum"
-        ] as $subjectdata) {
+        foreach (["Komedi", "Penalaran Umum"] as $subjectdata) {
             $subject = new Subject();
 
             $subject->name = $subjectdata;
@@ -204,12 +186,11 @@ class SeedData extends Command
             $subject->save();
         }
 
-
         $schoolTypeMap = [];
 
         $classTypeMap = [];
 
-        foreach (glob(base_path() . '/data/schools/*.json') as $filename) {
+        foreach (glob(base_path() . "/data/schools/*.json") as $filename) {
             $schoolsData = file_get_contents($filename);
 
             $schoolsData = json_decode($schoolsData);
@@ -217,43 +198,68 @@ class SeedData extends Command
             // var_dump($schoolsData);
 
             foreach ($schoolsData as $key => $schools) {
-
                 foreach ($schools as $key => $school) {
+                    if (str_contains($school->sekolah, "SD")) {
+                        continue;
+                    }
+                    if (str_contains($school->sekolah, "SMP")) {
+                        continue;
+                    }
+                    if (str_contains($school->sekolah, "SMA")) {
+                        continue;
+                    }
 
-                    if (str_contains($school->sekolah, 'SD')) {
-                        continue;
-                    }
-                    if (str_contains($school->sekolah, 'SMP')) {
-                        continue;
-                    }
-                    if (str_contains($school->sekolah, 'SMA')) {
-                        continue;
-                    }
-
-                    $disctrictName = preg_replace(['/Kec./', '/KEC. /', '/Kecamatan/'], "", $school->kecamatan);
+                    $disctrictName = preg_replace(
+                        ["/Kec./", "/KEC. /", "/Kecamatan/"],
+                        "",
+                        $school->kecamatan
+                    );
                     if (str_contains($school->kabupaten_kota, "Kab.")) {
-                        $cityName = str_replace("Kab. ", "Kabupaten ", $school->kabupaten_kota);
+                        $cityName = str_replace(
+                            "Kab. ",
+                            "Kabupaten ",
+                            $school->kabupaten_kota
+                        );
                     }
 
-                    $provinceName = str_replace("Prov. ", "", $school->propinsi);
-                    if ($onTest && $provinceName !== "Kalimantan Timur")
+                    $provinceName = str_replace(
+                        "Prov. ",
+                        "",
+                        $school->propinsi
+                    );
+                    if ($onTest && $provinceName !== "Kalimantan Timur") {
                         continue;
+                    }
 
-                    print($school->sekolah . PHP_EOL);
+                    print $school->sekolah . PHP_EOL;
                     if (str_contains($provinceName, "D.K.I. ")) {
-                        $provinceName = str_replace("D.K.I.", "DKI", $provinceName);
+                        $provinceName = str_replace(
+                            "D.K.I.",
+                            "DKI",
+                            $provinceName
+                        );
                     }
                     if (str_contains($provinceName, "D.I. ")) {
-                        $provinceName = str_replace("D.I.", "DI", $provinceName);
+                        $provinceName = str_replace(
+                            "D.I.",
+                            "DI",
+                            $provinceName
+                        );
                     }
                     try {
                         $provinceId = $provinceMap[$provinceName];
 
                         if (!array_key_exists($cityName, $cityMap)) {
                             $city = new City();
-                            $city->name = preg_replace(['/Kota /', '/Kabupaten /'], "", $cityName);
+                            $city->name = preg_replace(
+                                ["/Kota /", "/Kabupaten /"],
+                                "",
+                                $cityName
+                            );
                             $city->province_id = $provinceId;
-                            $city->type = str_contains($cityName, 'Kabupaten') ? 'Kabupaten' : 'Kota';
+                            $city->type = str_contains($cityName, "Kabupaten")
+                                ? "Kabupaten"
+                                : "Kota";
                             $city->save();
                             $cityMap[$cityName] = $city->id;
                         }
@@ -268,19 +274,21 @@ class SeedData extends Command
                         }
 
                         $districtId = $districtMap[$disctrictName];
-                        if (!array_key_exists($school->bentuk, $schoolTypeMap)) {
+                        if (
+                            !array_key_exists($school->bentuk, $schoolTypeMap)
+                        ) {
                             $schooltype = new Schooltype();
 
                             switch (strtolower($school->bentuk)) {
-                                case 'smk':
-                                case 'sma':
+                                case "smk":
+                                case "sma":
                                     $schooltype->level = 3;
                                     break;
 
-                                case 'smp':
+                                case "smp":
                                     $schooltype->level = 2;
                                     break;
-                                case 'sd':
+                                case "sd":
                                     $schooltype->level = 1;
                                     break;
                                 default:
@@ -300,8 +308,8 @@ class SeedData extends Command
                             $classtypes = [];
 
                             switch (strtolower($school->bentuk)) {
-                                case 'smk':
-                                case 'sma':
+                                case "smk":
+                                case "sma":
                                     for ($i = 0; $i < 3; $i++) {
                                         $classtype = new Classtype();
 
@@ -310,9 +318,8 @@ class SeedData extends Command
                                         $classtypes[] = $classtype;
                                     }
 
-
                                     break;
-                                case 'smp':
+                                case "smp":
                                     for ($i = 0; $i < 3; $i++) {
                                         $classtype = new Classtype();
 
@@ -321,8 +328,8 @@ class SeedData extends Command
                                         $classtypes[] = $classtype;
                                     }
                                     break;
-                                case 'slb':
-                                case 'sd':
+                                case "slb":
+                                case "sd":
                                     for ($i = 0; $i < 6; $i++) {
                                         $classtype = new Classtype();
 
@@ -332,8 +339,8 @@ class SeedData extends Command
                                     }
                                     break;
                                 default:
-                                    print(strtolower($school->bentuk) . PHP_EOL);
-                                    exit;
+                                    print strtolower($school->bentuk) . PHP_EOL;
+                                    exit();
                                     break;
                             }
 
@@ -344,7 +351,7 @@ class SeedData extends Command
 
                         $schoolModel = new School();
 
-                        $schoolModel->name =  $school->sekolah;
+                        $schoolModel->name = $school->sekolah;
                         $schoolModel->province_id = $provinceId;
                         $schoolModel->npsn = $school->npsn;
                         $schoolModel->city_id = $cityId;
@@ -354,64 +361,80 @@ class SeedData extends Command
                         $schoolModel->latitude = $school->lintang;
                         $schoolModel->longtitude = $school->bujur;
 
-
-
                         $schoolModel->save();
-
 
                         $schoolModel->subjects()->attach($subjectsIds);
 
                         $classtypesIds = [];
 
                         try {
-
-
                             switch (strtolower($school->bentuk)) {
-                                case 'smk':
-                                case 'sma':
+                                case "smk":
+                                case "sma":
                                     for ($i = 0; $i < 3; $i++) {
                                         $level = $i + 10;
-                                        $classtypesIds[] = $classTypeMap[$level];
+                                        $classtypesIds[] =
+                                            $classTypeMap[$level];
                                     }
                                     break;
-                                case 'smp':
+                                case "smp":
                                     for ($i = 0; $i < 3; $i++) {
                                         $level = $i + 7;
-                                        $classtypesIds[] = $classTypeMap[$level];
+                                        $classtypesIds[] =
+                                            $classTypeMap[$level];
                                     }
                                     break;
-                                case 'sd':
+                                case "sd":
                                     for ($i = 0; $i < 6; $i++) {
                                         $level = $i + 1;
-                                        $classtypesIds[] = $classTypeMap[$level];
+                                        $classtypesIds[] =
+                                            $classTypeMap[$level];
                                     }
                                     break;
                                 default:
                                     break;
                             }
                         } catch (\Throwable $th) {
-                            print($th->getMessage() . PHP_EOL);
+                            print $th->getMessage() . PHP_EOL;
                             switch (strtolower($school->bentuk)) {
-                                case 'smk':
-                                case 'sma':
+                                case "smk":
+                                case "sma":
                                     for ($i = 0; $i < 3; $i++) {
                                         $level = $i + 10;
-                                        $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
-                                        $classtypesIds[] = $classTypeMap[$level];
+                                        $classTypeMap[
+                                            $level
+                                        ] = Classtype::where(
+                                            "level",
+                                            $level
+                                        )->first()->id;
+                                        $classtypesIds[] =
+                                            $classTypeMap[$level];
                                     }
                                     break;
-                                case 'smp':
+                                case "smp":
                                     for ($i = 0; $i < 3; $i++) {
                                         $level = $i + 7;
-                                        $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
-                                        $classtypesIds[] = $classTypeMap[$level];
+                                        $classTypeMap[
+                                            $level
+                                        ] = Classtype::where(
+                                            "level",
+                                            $level
+                                        )->first()->id;
+                                        $classtypesIds[] =
+                                            $classTypeMap[$level];
                                     }
                                     break;
-                                case 'sd':
+                                case "sd":
                                     for ($i = 0; $i < 6; $i++) {
                                         $level = $i + 1;
-                                        $classTypeMap[$level] = Classtype::where('level', $level)->first()->id;
-                                        $classtypesIds[] = $classTypeMap[$level];
+                                        $classTypeMap[
+                                            $level
+                                        ] = Classtype::where(
+                                            "level",
+                                            $level
+                                        )->first()->id;
+                                        $classtypesIds[] =
+                                            $classTypeMap[$level];
                                     }
                                     break;
                                 default:
@@ -432,19 +455,17 @@ class SeedData extends Command
                         // }
 
                         // $schoolModel->classrooms()->saveMany($classrooms);
-                        print($schoolModel->id . PHP_EOL);
+                        print $schoolModel->id . PHP_EOL;
                     } catch (\Throwable $th) {
-                        print($th->getMessage() . PHP_EOL);
-                        print($th->getLine() . PHP_EOL);
+                        print $th->getMessage() . PHP_EOL;
+                        print $th->getLine() . PHP_EOL;
                         continue;
                     }
                 }
             }
         }
 
-
         if ($onTest) {
-
             $teacher = new User();
             $teacher->name = "Damar Albaribin Guru 1";
             $teacher->email = "damaralbaribin@gmail.com";
@@ -462,7 +483,6 @@ class SeedData extends Command
             $teacher->schools()->attach(1);
 
             $teacher->is_bimbel = false;
-
 
             $teacher->subjects()->attach(Subject::first());
 
@@ -484,7 +504,6 @@ class SeedData extends Command
             $secondteacher->is_bimbel = false;
             $secondteacher->school_id = 1;
 
-
             $secondteacher->subjects()->attach(Subject::first());
 
             $student = new User();
@@ -499,13 +518,11 @@ class SeedData extends Command
             $student->phone = "08987181014";
             $student->roles = "STUDENT";
 
-
             $student->nisn = 1234568123;
             $student->school_id = 1;
             $student->classtype_id = 1;
 
             $student->save();
-
 
             $secondstudent = new User();
             $secondstudent->name = "Damar Albaribin Siswa 2";
@@ -519,7 +536,6 @@ class SeedData extends Command
             $secondstudent->phone = "08987181015";
             $secondstudent->roles = "STUDENT";
 
-
             $secondstudent->nisn = 1234568123;
             $secondstudent->school_id = 1;
             $secondstudent->classtype_id = 1;
@@ -531,7 +547,7 @@ class SeedData extends Command
             $school = School::first();
 
             $firstclassroom = new Classroom();
-            $firstclassroom->name =  "Test Pertama ";
+            $firstclassroom->name = "Test Pertama ";
             $firstclassroom->teacher_id = 1;
             $firstclassroom->classtype_id = 1;
             $school->classrooms()->save($firstclassroom);
@@ -539,7 +555,7 @@ class SeedData extends Command
             $firstclassroom->students()->attach($studentIds);
 
             $classroom = new Classroom();
-            $classroom->name =  "Test Kedua ";
+            $classroom->name = "Test Kedua ";
             $classroom->teacher_id = 1;
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
@@ -549,17 +565,16 @@ class SeedData extends Command
             $absent = new Absent();
 
             $absent->teacher_id = $teacher->id;
-            $absent->type = 'IZIN';
-            $absent->reason = 'test';
+            $absent->type = "IZIN";
+            $absent->reason = "test";
             $absent->start_at = now();
             $absent->finish_at = now()->addDay(1);
 
             $student->absents()->save($absent);
 
-
             $meeting = new Meeting();
 
-            $meeting->subject_id  = Subject::first()->id;
+            $meeting->subject_id = Subject::first()->id;
 
             $meeting->name = "Pertemuan oleh kian santang";
 
@@ -575,7 +590,7 @@ class SeedData extends Command
             $subscription->price = 50000;
             $subscription->ability = json_encode([
                 Ability::ABSENT_CONSULT,
-                Ability::GRADE_REPORT
+                Ability::GRADE_REPORT,
             ]);
 
             $subscription->save();
@@ -584,9 +599,7 @@ class SeedData extends Command
             $subscription->name = "Wali Kelas 1 Tahun";
             $subscription->duration = 12 * 30;
             $subscription->price = 50000;
-            $subscription->ability = json_encode([
-                Ability::HOMEROOM
-            ]);
+            $subscription->ability = json_encode([Ability::HOMEROOM]);
 
             $subscription->save();
 
@@ -594,9 +607,7 @@ class SeedData extends Command
             $subscription->name = "Guru BK 1 Tahun";
             $subscription->duration = 12 * 30;
             $subscription->price = 50000;
-            $subscription->ability = json_encode([
-                Ability::COUNSELING
-            ]);
+            $subscription->ability = json_encode([Ability::COUNSELING]);
 
             $subscription->save();
 
@@ -604,15 +615,9 @@ class SeedData extends Command
             $subscription->name = "Kepala Sekolah 1 Tahun";
             $subscription->duration = 12 * 30;
             $subscription->price = 50000;
-            $subscription->ability = json_encode([
-                Ability::HEADMASTER
-            ]);
-
+            $subscription->ability = json_encode([Ability::HEADMASTER]);
 
             $subscription->save();
-
-
-
 
             // $transaction = new Transaction();
 
@@ -643,19 +648,18 @@ class SeedData extends Command
 
             // $teacher->transactions()->save($transaction);
 
-            foreach (['Umum', 'Kelompok 1', 'Kelompok 2'] as $name) {
+            foreach (["Umum", "Kelompok 1", "Kelompok 2"] as $name) {
                 $room = new Room();
                 $room->name = $name;
                 $room->identifier = "meeting.chat." . $meeting->id;
                 $meeting->rooms()->save($room);
 
-                $room->users()->attach($teacher->id, ['is_administrator' => true]);
+                $room
+                    ->users()
+                    ->attach($teacher->id, ["is_administrator" => true]);
 
                 $room->users()->attach($studentIds);
             }
-
-
-
 
             $rand = mt_rand(6, 10);
 
@@ -679,7 +683,7 @@ class SeedData extends Command
                     $studentassigment->turned_at = now();
                     $assigment->studentassigments()->save($studentassigment);
                 }
-                print("assigment $i\n");
+                print "assigment $i\n";
             }
 
             $packagequestion = new Packagequestion();
@@ -704,10 +708,10 @@ class SeedData extends Command
                     $answer->content = "Yes Answer " . $j + 1;
                     $answer->is_correct = $j == 0;
                     $question->answers()->save($answer);
-                    print("answer $j\n");
+                    print "answer $j\n";
                 }
 
-                print("question $i\n");
+                print "question $i\n";
             }
 
             for ($i = 0; $i < $rand; $i++) {
@@ -715,7 +719,8 @@ class SeedData extends Command
                 $question->user_id = $teacher->id;
                 $question->classtype_id = $packagequestion->classtype_id;
                 $question->subject_id = $packagequestion->subject_id;
-                $question->type = $i % 2 == 0 ? Question::ESSAY : Question::FILLER;
+                $question->type =
+                    $i % 2 == 0 ? Question::ESSAY : Question::FILLER;
                 $question->content = "Yes ESSAY / FILLER Test " . $i + 1;
 
                 $packagequestion->questions()->save($question);
@@ -725,13 +730,11 @@ class SeedData extends Command
                 $answer->is_correct = true;
                 $question->answers()->save($answer);
 
-                print("question $i\n");
+                print "question $i\n";
             }
 
-
-
             $questions = Question::all();
-            $questionIds = $questions->pluck('id');
+            $questionIds = $questions->pluck("id");
             foreach (Examtype::all() as $examtype) {
                 for ($i = 0; $i < $rand; $i++) {
                     $exam = new Exam();
@@ -770,7 +773,13 @@ class SeedData extends Command
 
                         foreach ($questions as $v => $y) {
                             $studentanswer = new StudentAnswer();
-                            $studentanswer->answer_id = $v % 2 == 0 ? $y->correctanswer->id : $y->answers()->pluck('id')->random();
+                            $studentanswer->answer_id =
+                                $v % 2 == 0
+                                    ? $y->correctanswer->id
+                                    : $y
+                                        ->answers()
+                                        ->pluck("id")
+                                        ->random();
                             $studentanswer->examsession_id = $examsession->id;
                             $studentanswer->exam_id = $exam->id;
                             $studentanswer->question_id = $y->id;
@@ -779,56 +788,70 @@ class SeedData extends Command
                             $user->studentanswers()->save($studentanswer);
                         }
                     }
-                    print("exam $i\n");
+                    print "exam $i\n";
 
-                    if ($examtype->name == "PAS" || $examtype->name == "PTS") break;
+                    if ($examtype->name == "PAS" || $examtype->name == "PTS") {
+                        break;
+                    }
                 }
             }
 
-
-
-
             $teacher->assigments()->save($assigment);
 
-            $teacher->followers()->attach([$student->id => ['is_accepted' => true]]);
-            $teacher->followers()->attach([$secondstudent->id => ['is_accepted' => true]]);
+            $teacher
+                ->followers()
+                ->attach([$student->id => ["is_accepted" => true]]);
+            $teacher
+                ->followers()
+                ->attach([$secondstudent->id => ["is_accepted" => true]]);
 
             $quiz = new Quiz();
             $quiz->subject_id = 1;
             $quiz->classtype_id = 1;
 
-            $quiz->name = 'TEST QUIZ';
-            $quiz->description = 'TEST QUIZ';
-            $quiz->visibility = 'PUBLIK';
+            $quiz->name = "TEST QUIZ";
+            $quiz->description = "TEST QUIZ";
+            $quiz->visibility = "PUBLIK";
 
             $user->quizzes()->save($quiz);
             $quiz->questions()->attach([1]);
 
             $voucher = new Voucher();
             $voucher->name = "test voucher";
-            $voucher->code =  'test';
+            $voucher->code = "test";
             $voucher->percentage = 0.69;
-            $voucher->description = 'test voucher';
+            $voucher->description = "test voucher";
             $voucher->expired_at = now()->addDay(1);
             $voucher->save();
 
             $reward = new Reward();
             $reward->name = "test reward";
-            $reward->prize_pool = 100.00;
+            $reward->prize_pool = 100.0;
             // ^total hadiah
-            $reward->reward = 100.00;
-            // ^hadiah per pencapaian 
+            $reward->reward = 100.0;
+            // ^hadiah per pencapaian
             $reward->is_active = true;
-            $reward->description = 'test reward';
+            $reward->description = "test reward";
             $reward->minimum_play_count = 1;
             // ^minimum orang bermain untuk mendapatkan hadiah
             $reward->save();
+
+            $agenda = new Agenda();
+            $agenda->name = "test";
+            $agenda->description = "test reward";
+            $agenda->finish_at = now()->addHour(2);
+            $teacher->agendas()->save($agenda);
+
+            foreach (School::first()->teachers->pluck("id") as $id) {
+                Attendance::firstOrCreate([
+                    "user_id" => $id,
+                    "attendable_id" => $agenda->id,
+                    "attendable_type" => Agenda::class,
+                ]);
+            }
         }
 
-
-
-
-        print("finish at " . time() - $start . PHP_EOL);
+        print "finish at " . time() - $start . PHP_EOL;
         return 0;
     }
 }

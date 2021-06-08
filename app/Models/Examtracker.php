@@ -11,27 +11,23 @@ class Examtracker extends Model
     use HasFactory;
 
     protected $casts = [
-        'last_activity' => 'datetime',
+        "last_activity" => "datetime",
     ];
 
-    protected $fillable = [
-        'exam_id',
-        'user_id',
-        'examsession_id'
-    ];
+    protected $fillable = ["exam_id", "user_id", "examsession_id"];
 
     public function examsession(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Examsession');
+        return $this->belongsTo("App\Models\Examsession");
     }
 
     public function exam(): BelongsTo
     {
-        return $this->belongsTo('App\Models');
+        return $this->belongsTo("App\Models");
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo("App\Models\User");
     }
 }

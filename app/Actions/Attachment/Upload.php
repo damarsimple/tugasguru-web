@@ -2,7 +2,6 @@
 
 namespace App\Actions\Attachment;
 
-use App\Jobs\ProcessAttachmentJob;
 use App\Models\Attachment;
 use Illuminate\Support\Str;
 

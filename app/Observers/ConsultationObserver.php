@@ -16,7 +16,9 @@ class ConsultationObserver
      */
     public function created(Consultation $consultation)
     {
-        $consultation->teacher->notify(new StudentCreateConsultation($consultation));
+        $consultation->teacher->notify(
+            new StudentCreateConsultation($consultation)
+        );
     }
 
     /**
@@ -27,7 +29,9 @@ class ConsultationObserver
      */
     public function updated(Consultation $consultation)
     {
-        $consultation->user->notify(new TeacherRespondConsultation($consultation));
+        $consultation->user->notify(
+            new TeacherRespondConsultation($consultation)
+        );
     }
 
     /**

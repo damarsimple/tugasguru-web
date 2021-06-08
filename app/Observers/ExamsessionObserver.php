@@ -15,7 +15,6 @@ class ExamsessionObserver
      */
     public function created(Examsession $examsession)
     {
-
         // $exam = $examsession->exam;
 
         // $clasrooms = $examsession->classrooms()->with('students')->get();

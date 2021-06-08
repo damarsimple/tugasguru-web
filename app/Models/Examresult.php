@@ -11,31 +11,27 @@ class Examresult extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'examsession_id',
-        'user_id',
-        'exam_id'
-    ];
+    protected $fillable = ["examsession_id", "user_id", "exam_id"];
 
-    protected $with = ['user'];
+    protected $with = ["user"];
 
     public function exam(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Exam');
+        return $this->belongsTo("App\Models\Exam");
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo("App\Models\User");
     }
 
     public function examsession(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Examsession');
+        return $this->belongsTo("App\Models\Examsession");
     }
 
     public function studentanswers(): HasMany
     {
-        return $this->hasMany('App\Models\StudentAnswer');
+        return $this->hasMany("App\Models\StudentAnswer");
     }
 }

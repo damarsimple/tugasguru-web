@@ -12,27 +12,27 @@ class PrivateRoom extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['first_id', 'second_id'];
+    protected $fillable = ["first_id", "second_id"];
 
-    protected $with = ['firstmessage', 'first', 'second'];
+    protected $with = ["firstmessage", "first", "second"];
 
     public function messages(): MorphMany
     {
-        return $this->morphMany('App\Models\Message', 'messageable');
+        return $this->morphMany("App\Models\Message", "messageable");
     }
 
     public function firstmessage(): MorphOne
     {
-        return $this->morphOne('App\Models\Message', 'messageable')->latest();
+        return $this->morphOne("App\Models\Message", "messageable")->latest();
     }
 
     public function first(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User', 'first_id');
+        return $this->belongsTo("App\Models\User", "first_id");
     }
 
     public function second(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User', 'second_id');
+        return $this->belongsTo("App\Models\User", "second_id");
     }
 }

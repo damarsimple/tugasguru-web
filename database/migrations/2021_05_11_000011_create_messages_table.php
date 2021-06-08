@@ -6,30 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateMessagesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create("messages", function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('messageable_id')->nullable();
-            $table->string('messageable_type')->nullable();
-            $table->longText('content');
+            $table
+                ->foreignId("user_id")
+                ->constrained()
+                ->onDelete("cascade");
+            $table->unsignedBigInteger("messageable_id")->nullable();
+            $table->string("messageable_type")->nullable();
+            $table->longText("content");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists("messages");
     }
 }

@@ -6,31 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateExamtrackersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('examtrackers', function (Blueprint $table) {
+        Schema::create("examtrackers", function (Blueprint $table) {
             $table->id();
-            $table->foreignId('exam_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('examsession_id')->constrained()->onDelete('cascade');
-            $table->timestamp('last_activity')->useCurrent();
-            $table->unsignedBigInteger('minute_passed')->default(0);
+            $table
+                ->foreignId("exam_id")
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("user_id")
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("examsession_id")
+                ->constrained()
+                ->onDelete("cascade");
+            $table->timestamp("last_activity")->useCurrent();
+            $table->unsignedBigInteger("minute_passed")->default(0);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('examtrackers');
+        Schema::dropIfExists("examtrackers");
     }
 }

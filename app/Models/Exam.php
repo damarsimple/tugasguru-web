@@ -13,58 +13,57 @@ class Exam extends Model
 {
     use HasFactory;
 
-    public $with = ['teacher', 'subject', 'examtype', 'classroom'];
+    public $with = ["teacher", "subject", "examtype", "classroom"];
 
     public function examsessions(): HasMany
     {
-        return $this->hasMany('App\Models\Examsession');
+        return $this->hasMany("App\Models\Examsession");
     }
 
     public function examresults(): HasMany
     {
-        return $this->hasMany('App\Models\Examresult');
+        return $this->hasMany("App\Models\Examresult");
     }
 
     public function questions(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Question');
+        return $this->belongsToMany("App\Models\Question");
     }
 
     public function subject(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Subject');
+        return $this->belongsTo("App\Models\Subject");
     }
 
     public function classroom(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Classroom');
+        return $this->belongsTo("App\Models\Classroom");
     }
 
     public function supervisors(): BelongsToMany
     {
         return $this->belongsToMany(
-            'App\Models\User',
-            'exam_supervisor',
-            'user_id',
-            'exam_id',
-            'id',
-            'id'
+            "App\Models\User",
+            "exam_supervisor",
+            "user_id",
+            "exam_id",
+            "id",
+            "id"
         );
     }
 
-
     public function examtype(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Examtype');
+        return $this->belongsTo("App\Models\Examtype");
     }
 
     public function teacher(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User', 'teacher_id');
+        return $this->belongsTo("App\Models\User", "teacher_id");
     }
 
-    public function attendances() : MorphMany
+    public function attendances(): MorphMany
     {
-        return $this->morphMany('App\Models\Attachment', 'attendable');
+        return $this->morphMany("App\Models\Attachment", "attendable");
     }
 }

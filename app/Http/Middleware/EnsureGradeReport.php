@@ -19,8 +19,15 @@ class EnsureGradeReport
     {
         $user = $request->user();
 
-        if (!in_array(Ability::GRADE_REPORT, is_array($user->access) ?  $user->access : json_decode($user->access))) {
-            return response(['message' => 'Unauthorized'], 401);
+        if (
+            !in_array(
+                Ability::GRADE_REPORT,
+                is_array($user->access)
+                    ? $user->access
+                    : json_decode($user->access)
+            )
+        ) {
+            return response(["message" => "Unauthorized"], 401);
         }
 
         return $next($request);

@@ -6,30 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateSubjectsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('subjects', function (Blueprint $table) {
+        Schema::create("subjects", function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('abbreviation')->nullable();
-            $table->longText('description')->nullable();
-            $table->string('type')->default('GENERAL'); //VOCATIONAL , LOCAL CONTENT, SPECIAL DEVELOPMENT
+            $table->string("name");
+            $table->string("abbreviation")->nullable();
+            $table->longText("description")->nullable();
+            $table->string("type")->default("GENERAL"); //VOCATIONAL , LOCAL CONTENT, SPECIAL DEVELOPMENT
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('subjects');
+        Schema::dropIfExists("subjects");
     }
 }

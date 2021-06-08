@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Cross-Origin Resource Sharing (CORS) Configuration
@@ -15,33 +14,32 @@ return [
     |
     */
 
-    'paths' => [
-        'api/*',
-        'attachments/*',
-        'graphql',
-        'login',
-        'logout',
-        'register',
-        'user/password',
-        'forgot-password',
-        'reset-password',
-        'sanctum/csrf-cookie',
-        'user/profile-information',
-        'email/verification-notification',
+    "paths" => [
+        "api/*",
+        "attachments/*",
+        "graphql",
+        "login",
+        "logout",
+        "register",
+        "user/password",
+        "forgot-password",
+        "reset-password",
+        "sanctum/csrf-cookie",
+        "user/profile-information",
+        "email/verification-notification",
     ],
 
-    'allowed_methods' => ['*'],
+    "allowed_methods" => ["*"],
 
-    'allowed_origins' => ['*'],
+    "allowed_origins" => ["*"],
 
-    'allowed_origins_patterns' => [],
+    "allowed_origins_patterns" => [],
 
-    'allowed_headers' => ['*'],
+    "allowed_headers" => ["*"],
 
-    'exposed_headers' => [],
+    "exposed_headers" => [],
 
-    'max_age' => 0,
+    "max_age" => 0,
 
-    'supports_credentials' => true,
-
+    "supports_credentials" => true,
 ];

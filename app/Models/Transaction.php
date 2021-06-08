@@ -11,20 +11,19 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    public const BALANCE = 'BALANCE';
-    public const XENDIT = 'XENDIT';
-    public const ADMIN = 'ADMIN';
+    public const BALANCE = "BALANCE";
+    public const XENDIT = "XENDIT";
+    public const ADMIN = "ADMIN";
 
-    public const STAGING = 'STAGING';
-    public const PENDING = 'PENDING';
-    public const SUCCESS = 'SUCCESS';
-    public const FAILED = 'FAILED';
+    public const STAGING = "STAGING";
+    public const PENDING = "PENDING";
+    public const SUCCESS = "SUCCESS";
+    public const FAILED = "FAILED";
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo("App\Models\User");
     }
-
 
     public function transactionable(): MorphTo
     {

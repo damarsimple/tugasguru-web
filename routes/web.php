@@ -13,11 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get("/", function () {
+    return view("welcome");
 });
 
-Route::get('/attachments/{path}', function ($path) {
-    return response()
-        ->file(public_path('attachments')  . '/' . $path, ['Access-Control-Allow-Origin' => '*']);
+Route::get("/attachments/{path}", function ($path) {
+    return response()->file(public_path("attachments") . "/" . $path, [
+        "Access-Control-Allow-Origin" => "*",
+    ]);
 });

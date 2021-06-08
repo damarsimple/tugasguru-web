@@ -10,11 +10,11 @@ class Classtype extends Model
 {
     use HasFactory;
 
-    protected $appends = ['name'];
-    
-    public function schooltype() : BelongsTo
+    protected $appends = ["name"];
+
+    public function schooltype(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Schooltype');
+        return $this->belongsTo("App\Models\Schooltype");
     }
 
     public function getNameAttribute()

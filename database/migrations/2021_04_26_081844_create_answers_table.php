@@ -6,29 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateAnswersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('answers', function (Blueprint $table) {
+        Schema::create("answers", function (Blueprint $table) {
             $table->id();
-            $table->longText('content');
-            $table->foreignId('question_id')->constrained()->onDelete('cascade');
-            $table->boolean('is_correct')->default(false);
+            $table->longText("content");
+            $table
+                ->foreignId("question_id")
+                ->constrained()
+                ->onDelete("cascade");
+            $table->boolean("is_correct")->default(false);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('answers');
+        Schema::dropIfExists("answers");
     }
 }

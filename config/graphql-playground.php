@@ -13,9 +13,9 @@ return [
     |
     */
 
-    'route' => [
-        'uri' => '/graphql-playground',
-        'name' => 'graphql-playground',
+    "route" => [
+        "uri" => "/graphql-playground",
+        "name" => "graphql-playground",
         // 'middleware' => ['web']
         // 'prefix' => '',
         // 'domain' => 'graphql.' . env('APP_DOMAIN', 'localhost'),
@@ -32,7 +32,7 @@ return [
     |
     */
 
-    'endpoint' => '/graphql',
+    "endpoint" => "/graphql",
 
     /*
     |--------------------------------------------------------------------------
@@ -46,7 +46,10 @@ return [
     |
     */
 
-    'subscriptionEndpoint' => env('GRAPHQL_PLAYGROUND_SUBSCRIPTION_ENDPOINT', null),
+    "subscriptionEndpoint" => env(
+        "GRAPHQL_PLAYGROUND_SUBSCRIPTION_ENDPOINT",
+        null
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -59,5 +62,5 @@ return [
     |
     */
 
-    'enabled' => env('GRAPHQL_PLAYGROUND_ENABLED', true),
+    "enabled" => env("GRAPHQL_PLAYGROUND_ENABLED", true),
 ];

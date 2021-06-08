@@ -11,26 +11,24 @@ class Report extends Model
 {
     use HasFactory;
 
-    const GRADE = 'GRADE';
+    const GRADE = "GRADE";
 
-    protected $with = ['user', 'users'];
+    protected $with = ["user", "users"];
 
     protected $casts = [
-        'data' => 'object',
+        "data" => "object",
     ];
 
-    protected $appends = [
-        'data_alt',
-    ];
+    protected $appends = ["data_alt"];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo("App\Models\User");
     }
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\User');
+        return $this->belongsToMany("App\Models\User");
     }
 
     public function getDataAltAttribute()

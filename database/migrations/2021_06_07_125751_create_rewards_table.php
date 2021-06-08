@@ -6,32 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateRewardsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('rewards', function (Blueprint $table) {
+        Schema::create("rewards", function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->longText('description');
-            $table->double('prize_pool');
-            $table->double('reward');
-            $table->integer('minimum_play_count');
-            $table->boolean('is_active')->default(false);
+            $table->string("name");
+            $table->longText("description");
+            $table->double("prize_pool");
+            $table->double("reward");
+            $table->integer("minimum_play_count");
+            $table->boolean("is_active")->default(false);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('rewards');
+        Schema::dropIfExists("rewards");
     }
 }

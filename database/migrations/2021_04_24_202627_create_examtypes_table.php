@@ -6,27 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateExamtypesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('examtypes', function (Blueprint $table) {
+        Schema::create("examtypes", function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string("name");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('examtypes');
+        Schema::dropIfExists("examtypes");
     }
 }

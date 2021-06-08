@@ -12,16 +12,18 @@ class Room extends Model
 {
     use HasFactory;
 
-    protected $with = ['users'];
+    protected $with = ["users"];
 
     public function messages()
     {
-        return $this->morphMany('App\Models\Message', 'messageable');
+        return $this->morphMany("App\Models\Message", "messageable");
     }
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\User')->withPivot('is_administrator');
+        return $this->belongsToMany("App\Models\User")->withPivot(
+            "is_administrator"
+        );
     }
 
     public function roomable(): MorphTo
@@ -31,6 +33,6 @@ class Room extends Model
 
     public function quizresults(): HasMany
     {
-        return $this->hasMany('App\Models\Quizresult');
+        return $this->hasMany("App\Models\Quizresult");
     }
 }

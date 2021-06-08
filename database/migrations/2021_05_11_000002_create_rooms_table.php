@@ -6,31 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateRoomsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('rooms', function (Blueprint $table) {
+        Schema::create("rooms", function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->boolean('is_enabled')->default(true);
-            $table->unsignedBigInteger('roomable_id')->nullable();
-            $table->string('roomable_type')->nullable();
-            $table->string('identifier');
+            $table->string("name");
+            $table->boolean("is_enabled")->default(true);
+            $table->unsignedBigInteger("roomable_id")->nullable();
+            $table->string("roomable_type")->nullable();
+            $table->string("identifier");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('rooms');
+        Schema::dropIfExists("rooms");
     }
 }

@@ -12,6 +12,6 @@ class Reward extends Model
 
     public function quizrewards(): HasMany
     {
-        return $this->hasMany('App\Models\QuizReward');
+        return $this->hasMany("App\Models\QuizReward");
     }
 }

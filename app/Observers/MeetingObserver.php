@@ -24,16 +24,23 @@ class MeetingObserver
             $student->notify(new NewMeeting($meeting));
         }
 
-        $studentUserIds = $meeting->classroom->students->pluck('id');
+        $studentUserIds = $meeting->classroom->students->pluck("id");
 
         $room = new Room();
-        $room->name = 'Diskusi Kelas';
-        $room->identifier = 'meeting.general.' . $meeting->id;
+        $room->name = "Diskusi Kelas";
+        $room->identifier = "meeting.general." . $meeting->id;
         $meeting->rooms()->save($room);
 
-        $room->users()->attach(array_merge([$meeting->teacher->id], $studentUserIds->toArray()));
+        $room
+            ->users()
+            ->attach(
+                array_merge([$meeting->teacher->id], $studentUserIds->toArray())
+            );
 
-        $absents = $meeting->teacher->studentabsents()->whereDate('finish_at', '>', now())->get();
+        $absents = $meeting->teacher
+            ->studentabsents()
+            ->whereDate("finish_at", ">", now())
+            ->get();
 
         $absentsMap = [];
 
@@ -44,21 +51,17 @@ class MeetingObserver
         foreach ($studentUserIds as $id) {
             if (array_key_exists($id, $absentsMap)) {
                 Attendance::firstOrCreate([
-                    'subject_id' => $meeting->subject_id,
-                    'classroom_id' => $meeting->classroom_id,
-                    'user_id' => $id,
-                    'attendable_id' => $meeting->id,
-                    'attendable_type' => Meeting::class,
-                    'attended' => false,
-                    'reason' => $absentsMap[$id]->reason,
+                    "user_id" => $id,
+                    "attendable_id" => $meeting->id,
+                    "attendable_type" => Meeting::class,
+                    "attended" => false,
+                    "reason" => $absentsMap[$id]->reason,
                 ]);
             } else {
                 Attendance::firstOrCreate([
-                    'subject_id' => $meeting->subject_id,
-                    'classroom_id' => $meeting->classroom_id,
-                    'user_id' => $id,
-                    'attendable_id' => $meeting->id,
-                    'attendable_type' => Meeting::class
+                    "user_id" => $id,
+                    "attendable_id" => $meeting->id,
+                    "attendable_type" => Meeting::class,
                 ]);
             }
         }

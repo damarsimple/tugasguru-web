@@ -6,26 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Quizresult extends Model
+class Agenda extends Model
 {
     use HasFactory;
-
-    protected $with = ["user"];
-
-    protected $fillable = ["user_id", "quiz_id", "room_id"];
-
-    public function room(): BelongsTo
-    {
-        return $this->belongsTo("App\Models\Room");
-    }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");
     }
 
-    public function quiz(): BelongsTo
+    public function attendances()
     {
-        return $this->belongsTo("App\Models\Quiz");
+        return $this->morphMany("App\Models\Attendance", "attendable");
     }
 }

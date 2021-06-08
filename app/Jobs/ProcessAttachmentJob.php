@@ -3,17 +3,15 @@
 namespace App\Jobs;
 
 use App\Models\Attachment;
+use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
 use Symfony\Component\Process\Process;
 use WebPConvert\WebPConvert;
-use Exception;
 
 class ProcessAttachmentJob implements ShouldQueue
 {

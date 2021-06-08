@@ -6,33 +6,38 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateAttendancesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('attendances', function (Blueprint $table) {
+        Schema::create("attendances", function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('classroom_id')->nullable()->index()->constrained()->onDelete('cascade');
-            $table->foreignId('subject_id')->nullable()->index()->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('attendable_id')->nullable();
-            $table->string('attendable_type')->nullable();
-            $table->boolean('attended')->default(false);
-            $table->string('reason')->nullable();
+            $table->uuid("uuid")->nullable();
+            $table
+                ->foreignId("user_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("classroom_id")
+                ->nullable()
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("subject_id")
+                ->nullable()
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table->unsignedBigInteger("attendable_id")->nullable();
+            $table->string("attendable_type")->nullable();
+            $table->boolean("attended")->default(false);
+            $table->string("reason")->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('attendances');
+        Schema::dropIfExists("attendances");
     }
 }

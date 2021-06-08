@@ -18,7 +18,6 @@ class MessageObserver
      */
     public function created(Message $message)
     {
-       
         if ($message->messageable_type == "App\Models\PrivateRoom") {
             broadcast(new NewPrivateMessageEvent($message));
         }

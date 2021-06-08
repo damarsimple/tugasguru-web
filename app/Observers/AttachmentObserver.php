@@ -40,7 +40,7 @@ class AttachmentObserver
     public function deleted(Attachment $attachment)
     {
         try {
-            unlink(public_path('attachments') . "\\" . $attachment->name);
+            unlink(public_path("attachments") . "\\" . $attachment->name);
         } catch (\Throwable $th) {
         }
     }
@@ -54,7 +54,7 @@ class AttachmentObserver
     public function forceDeleted(Attachment $attachment)
     {
         try {
-            unlink(public_path('attachments') . "\\" . $attachment->name);
+            unlink(public_path("attachments") . "\\" . $attachment->name);
         } catch (\Throwable $th) {
         }
     }

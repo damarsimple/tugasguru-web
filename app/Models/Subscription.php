@@ -9,9 +9,9 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    protected $casts = ['ability' => 'array'];
+    protected $casts = ["ability" => "array"];
 
-    protected $appends = ['ability_alt'];
+    protected $appends = ["ability_alt"];
 
     public function getAbilityAltAttribute()
     {

@@ -13,16 +13,16 @@ class City extends Model
 
     public function province(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Province');
+        return $this->belongsTo("App\Models\Province");
     }
 
     public function schools(): HasMany
     {
-        return $this->hasMany('App\Models\School');
+        return $this->hasMany("App\Models\School");
     }
 
     public function districts(): HasMany
     {
-        return $this->hasMany('App\Models\District');
+        return $this->hasMany("App\Models\District");
     }
 }

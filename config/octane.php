@@ -9,8 +9,6 @@ use Laravel\Octane\Events\TickReceived;
 use Laravel\Octane\Events\WorkerErrorOccurred;
 use Laravel\Octane\Events\WorkerStarting;
 use Laravel\Octane\Events\WorkerStopping;
-use Laravel\Octane\Listeners\CollectGarbage;
-use Laravel\Octane\Listeners\DisconnectFromDatabases;
 use Laravel\Octane\Listeners\EnsureUploadedFilesAreValid;
 use Laravel\Octane\Listeners\FlushTemporaryContainerInstances;
 use Laravel\Octane\Listeners\ReportException;
@@ -18,7 +16,6 @@ use Laravel\Octane\Listeners\StopWorkerIfNecessary;
 use Laravel\Octane\Octane;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Octane Server
@@ -32,7 +29,7 @@ return [
     |
     */
 
-    'server' => env('OCTANE_SERVER', 'roadrunner'),
+    "server" => env("OCTANE_SERVER", "roadrunner"),
 
     /*
     |--------------------------------------------------------------------------
@@ -45,7 +42,7 @@ return [
     |
     */
 
-    'https' => env('OCTANE_HTTPS', false),
+    "https" => env("OCTANE_HTTPS", false),
 
     /*
     |--------------------------------------------------------------------------
@@ -58,10 +55,8 @@ return [
     |
     */
 
-    'listeners' => [
-        WorkerStarting::class => [
-            EnsureUploadedFilesAreValid::class,
-        ],
+    "listeners" => [
+        WorkerStarting::class => [EnsureUploadedFilesAreValid::class],
 
         RequestReceived::class => [
             ...Octane::prepareApplicationForNextOperation(),
@@ -114,11 +109,9 @@ return [
     |
     */
 
-    'warm' => [
-        ...Octane::defaultServicesToWarm(),
-    ],
+    "warm" => [...Octane::defaultServicesToWarm()],
 
-    'flush' => [
+    "flush" => [
         //
     ],
 
@@ -133,9 +126,9 @@ return [
     |
     */
 
-    'cache' => [
-        'rows' => 1000,
-        'bytes' => 10000,
+    "cache" => [
+        "rows" => 1000,
+        "bytes" => 10000,
     ],
 
     /*
@@ -149,10 +142,10 @@ return [
     |
     */
 
-    'tables' => [
-        'example:1000' => [
-            'name' => 'string:1000',
-            'votes' => 'int',
+    "tables" => [
+        "example:1000" => [
+            "name" => "string:1000",
+            "votes" => "int",
         ],
     ],
 
@@ -167,16 +160,16 @@ return [
     |
     */
 
-    'watch' => [
-        'app',
-        'bootstrap',
-        'config',
-        'database',
+    "watch" => [
+        "app",
+        "bootstrap",
+        "config",
+        "database",
         // 'public',
-        'resources',
-        'routes',
-        'composer.lock',
-        '.env',
+        "resources",
+        "routes",
+        "composer.lock",
+        ".env",
     ],
 
     /*
@@ -190,7 +183,7 @@ return [
     |
     */
 
-    'garbage' => 50,
+    "garbage" => 50,
 
     /*
     |--------------------------------------------------------------------------
@@ -203,6 +196,5 @@ return [
     |
     */
 
-    'max_execution_time' => 30,
-
+    "max_execution_time" => 30,
 ];

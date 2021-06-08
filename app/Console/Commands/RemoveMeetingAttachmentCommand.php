@@ -12,14 +12,14 @@ class RemoveMeetingAttachmentCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'meeting:rmattachment';
+    protected $signature = "meeting:rmattachment";
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'remove all attachment from meeting';
+    protected $description = "remove all attachment from meeting";
 
     /**
      * Create a new command instance.
@@ -38,11 +38,14 @@ class RemoveMeetingAttachmentCommand extends Command
      */
     public function handle()
     {
-        Attachment::where('attachable_type', Meeting::class)->chunk(100, function ($attachments) {
-            foreach ($attachments as $attachment) {
-                $attachment->delete();
+        Attachment::where("attachable_type", Meeting::class)->chunk(
+            100,
+            function ($attachments) {
+                foreach ($attachments as $attachment) {
+                    $attachment->delete();
+                }
             }
-        });
+        );
 
         return 0;
     }

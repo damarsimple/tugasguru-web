@@ -6,28 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateDistrictsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('districts', function (Blueprint $table) {
+        Schema::create("districts", function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('city_id')->index()->constrained()->onDelete('cascade');
+            $table->string("name");
+            $table
+                ->foreignId("city_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('districts');
+        Schema::dropIfExists("districts");
     }
 }

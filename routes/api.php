@@ -12,6 +12,7 @@ use App\Http\Middleware\EnsureTeacher;
 use App\Http\Middleware\EnsureXendit;
 use App\Jobs\FormApproveTest;
 use App\Models\Absent;
+use App\Models\Agenda;
 use App\Models\Answer;
 use App\Models\Article;
 use App\Models\Assigment;
@@ -40,7 +41,6 @@ use App\Models\Quizresult;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\School;
-use App\Models\Schooltype;
 use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
@@ -49,12 +49,13 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Payment\Xendit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
-use Laravel\Octane\Facades\Octane;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Laravel\Octane\Facades\Octane;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -103,6 +104,18 @@ Route::post("/register", [ApiAuthController::class, "register"]);
 Route::middleware('auth:sanctum')->get("/user", [ApiAuthController::class, 'profile']);
 Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'refresh']);
 
+Route::get('attendances/{uuid}', function ($uuid) {
+
+    $attendance = Attendance::where('uuid', $uuid)->firstOrFail();
+
+    $attendance->attended = true;
+
+    $attendance->save();
+
+    return 'ok';
+});
+
+
 Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], function () {
     Route::post('/invoices/paid', function (Request $request) {
 
@@ -132,7 +145,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
     Route::post('/', function (Request $request) {
         $quiz = new Quiz();
         $quiz->subject_id = $request->subject;
-        $quiz->classtype_id = $request->classtype;
 
         $quiz->name = $request->name;
         $quiz->description = $request->description;
@@ -378,14 +390,11 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
             }])->findOrFail($id);
 
             $attendance = Attendance::firstOrCreate([
-                'subject_id' => $meeting->subject_id,
-                'classroom_id' => $meeting->classroom_id,
                 'user_id' => $user->id,
                 'attendable_id' => $meeting->id,
                 'attendable_type' => Meeting::class
             ]);
 
-            $attendance->updated_at = now();
             $attendance->attended = true;
             $attendance->save();
 
@@ -1031,8 +1040,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
 
             $attendance = Attendance::firstOrCreate([
-                'subject_id' => $exam->subject_id,
-                'classroom_id' => $exam->classroom_id,
                 'user_id' => $user->id,
                 'attendable_id' => $exam->id,
                 'attendable_type' => Exam::class
@@ -1873,6 +1880,48 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $user = $request->user();
             return $user->headmasterschools()->get();
         });
+
+        Route::group(['prefix' => 'agendas'], function () {
+            Route::post('/', function (Request $request) {
+                $user = $request->user();
+
+                $agenda = new Agenda();
+                $agenda->name = $request->name;
+                $agenda->description = $request->description;
+                $agenda->finish_at = $request->finish_at;
+
+                $user->agendas()->save($agenda);
+
+                $absents = $user->studentabsents()->whereDate('finish_at', '>', now())->get();
+
+                $absentsMap = [];
+
+                foreach ($absents as $value) {
+                    $absentsMap[$value->user_id] = $value;
+                }
+
+
+                foreach ($request->users as $user) {
+                    if (array_key_exists($user, $absentsMap)) {
+                        Attendance::firstOrCreate([
+                            'user_id' => $user->id,
+                            'attendable_id' => $agenda->id,
+                            'attendable_type' => Agenda::class,
+                            'reason' => $absentsMap[$user]->reason,
+                        ]);
+                    } else {
+                        Attendance::firstOrCreate([
+                            'user_id' => $user->id,
+                            'attendable_id' => $agenda->id,
+                            'attendable_type' => Agenda::class
+                        ]);
+                    }
+                }
+
+                return 'ok';
+            });
+        });
+
         Route::get('/reports', function (Request $request) {
             $user = $request->user();
             return $user->myreports()->paginate(10);

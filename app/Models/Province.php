@@ -10,8 +10,8 @@ class Province extends Model
 {
     use HasFactory;
 
-    public function cities() : HasMany
+    public function cities(): HasMany
     {
-        return $this->hasMany('App\Models\City');
+        return $this->hasMany("App\Models\City");
     }
 }

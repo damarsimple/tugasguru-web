@@ -30,13 +30,19 @@ class QuizObserver
      */
     public function updated(Quiz $quiz)
     {
-        $reward = Reward::where('is_active', true)->first();
+        if ($quiz->is_rewarded) {
+            return;
+        }
 
-        if (!$reward) return;
+        $reward = Reward::where("is_active", true)->first();
+
+        if (!$reward) {
+            return;
+        }
 
         $user = $quiz->user;
 
-        if (!$quiz->is_rewarded && $quiz->played_count >= $reward->minimum_play_count) {
+        if ($quiz->played_count >= $reward->minimum_play_count) {
             $quiz->is_rewarded = true;
             $quiz->saveQuietly();
 
@@ -52,13 +58,17 @@ class QuizObserver
             $transaction->amount = $quizreward->reward;
             $transaction->from = $user->balance;
             $transaction->to = $user->balance + $quizreward->reward;
-            $transaction->description = 'Hadiah dari ' . $quiz->name . ' sebesar ' . $transaction->amount;
+            $transaction->description =
+                "Hadiah dari " .
+                $quiz->name .
+                " sebesar " .
+                $transaction->amount;
             $transaction->is_paid = true;
             $transaction->user_id = $user->id;
             $transaction->status = Transaction::SUCCESS;
             $quizreward->transaction()->save($transaction);
 
-            $user->balance  += $quizreward->reward;
+            $user->balance += $quizreward->reward;
             $user->save();
 
             $user->notify(new TransactionSuccess($transaction));

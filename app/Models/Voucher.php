@@ -10,10 +10,10 @@ class Voucher extends Model
 {
     use HasFactory;
 
-    protected $casts = ['expired_at' => 'datetime'];
+    protected $casts = ["expired_at" => "datetime"];
 
     public function transactions(): HasMany
     {
-        return $this->hasMany('App\Models\Voucher');
+        return $this->hasMany("App\Models\Voucher");
     }
 }

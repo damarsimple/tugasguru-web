@@ -6,28 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateSchooltypesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('schooltypes', function (Blueprint $table) {
+        Schema::create("schooltypes", function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->integer('level');
+            $table->string("name");
+            $table->integer("level");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('schooltypes');
+        Schema::dropIfExists("schooltypes");
     }
 }

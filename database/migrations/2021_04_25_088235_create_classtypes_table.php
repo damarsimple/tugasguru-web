@@ -6,28 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateClasstypesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('classtypes', function (Blueprint $table) {
+        Schema::create("classtypes", function (Blueprint $table) {
             $table->id();
-            $table->integer('level');
-            $table->foreignId('schooltype_id')->index()->constrained()->onDelete('cascade');
+            $table->integer("level");
+            $table
+                ->foreignId("schooltype_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('classtypes');
+        Schema::dropIfExists("classtypes");
     }
 }

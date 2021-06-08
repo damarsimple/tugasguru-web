@@ -17,12 +17,11 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+Broadcast::channel("App.Models.User.{id}", function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('private.{id}', function ($user, $id) {
-
+Broadcast::channel("private.{id}", function ($user, $id) {
     if ($user->id == $id) {
         return $user;
     }
@@ -30,8 +29,7 @@ Broadcast::channel('private.{id}', function ($user, $id) {
     return false;
 });
 
-Broadcast::channel('transaction.{id}', function ($user, $id) {
-
+Broadcast::channel("transaction.{id}", function ($user, $id) {
     $transaction = Transaction::findOrFail($id);
 
     if ($user->id == $transaction->user_id) {
@@ -41,53 +39,49 @@ Broadcast::channel('transaction.{id}', function ($user, $id) {
     return false;
 });
 
-Broadcast::channel('private_message.{id}', function ($user, $id) {
-
+Broadcast::channel("private_message.{id}", function ($user, $id) {
     $privateroom = PrivateRoom::findOrFail($id);
-    if (in_array($user->id, [$privateroom->first_id, $privateroom->second_id])) {
+    if (
+        in_array($user->id, [$privateroom->first_id, $privateroom->second_id])
+    ) {
         return $user;
     }
 
     return false;
 });
 
-
-Broadcast::channel('meeting.{id}', function ($user, $id) {
-
+Broadcast::channel("meeting.{id}", function ($user, $id) {
     $meeting = Meeting::findOrFail($id);
 
-    if (in_array(
-        $user->id,
-        array_merge(
-            [
-                $meeting->teacher_id
-            ],
-            $meeting->classroom->students->pluck('id')->toArray()
+    if (
+        in_array(
+            $user->id,
+            array_merge(
+                [$meeting->teacher_id],
+                $meeting->classroom->students->pluck("id")->toArray()
+            )
         )
-    )) {
+    ) {
         return $user;
     }
 
     return false;
 });
 
-
-Broadcast::channel('room.{id}', function ($user, $id) {
-
+Broadcast::channel("room.{id}", function ($user, $id) {
     $room = Room::findOrFail($id);
 
-    if (in_array($user->id, $room->users->pluck('id')->toArray())) {
+    if (in_array($user->id, $room->users->pluck("id")->toArray())) {
         return $user;
     }
 
     return false;
 });
 
-Broadcast::channel('quiz.rooms.{id}', function ($user, $id) {
-
+Broadcast::channel("quiz.rooms.{id}", function ($user, $id) {
     $room = Room::findOrFail($id);
 
-    if (in_array($user->id, $room->users->pluck('id')->toArray())) {
+    if (in_array($user->id, $room->users->pluck("id")->toArray())) {
         return $user;
     }
 

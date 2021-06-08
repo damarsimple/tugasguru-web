@@ -6,31 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateVouchersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('vouchers', function (Blueprint $table) {
+        Schema::create("vouchers", function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('code');
-            $table->float('percentage');
-            $table->longText('description')->nullable();
-            $table->timestamp('expired_at');
+            $table->string("name");
+            $table->string("code");
+            $table->float("percentage");
+            $table->longText("description")->nullable();
+            $table->timestamp("expired_at");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('vouchers');
+        Schema::dropIfExists("vouchers");
     }
 }

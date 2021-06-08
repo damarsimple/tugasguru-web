@@ -14,48 +14,45 @@ class Quiz extends Model
 {
     use HasFactory;
 
-    public const THUMBNAIL = 'THUMBNAIL';
+    public const THUMBNAIL = "THUMBNAIL";
 
-    protected $with = ['thumbnail', 'firstquestion', 'subject', 'classtype', 'user'];
-
+    protected $with = ["thumbnail", "firstquestion", "subject", "user"];
 
     public function quizreward(): HasOne
     {
-        return $this->hasOne('App\Models\QuizReward');
+        return $this->hasOne("App\Models\QuizReward");
     }
 
     public function questions(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Question');
+        return $this->belongsToMany("App\Models\Question");
     }
 
     public function firstquestion()
     {
-        return $this->belongsToMany('App\Models\Question')->take(1);
+        return $this->belongsToMany("App\Models\Question")->take(1);
     }
 
     public function subject(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Subject');
+        return $this->belongsTo("App\Models\Subject");
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
-    }
-
-    public function classtype(): BelongsTo
-    {
-        return $this->belongsTo('App\Models\Classtype');
+        return $this->belongsTo("App\Models\User");
     }
 
     public function thumbnail(): MorphOne
     {
-        return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::THUMBNAIL);
+        return $this->morphOne("App\Models\Attachment", "attachable")->where(
+            "role",
+            self::THUMBNAIL
+        );
     }
 
     public function rooms(): MorphMany
     {
-        return $this->morphMany('App\Models\Room', 'roomable');
+        return $this->morphMany("App\Models\Room", "roomable");
     }
 }

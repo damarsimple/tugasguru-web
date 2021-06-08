@@ -10,8 +10,8 @@ class District extends Model
 {
     use HasFactory;
 
-    public function city() : BelongsTo
+    public function city(): BelongsTo
     {
-        return $this->belongsTo('App\Models\City');
+        return $this->belongsTo("App\Models\City");
     }
 }

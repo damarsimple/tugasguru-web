@@ -11,22 +11,22 @@ class StudentAssigment extends Model
 {
     use HasFactory;
 
-    protected $with = ['attachments', 'user'];
+    protected $with = ["attachments", "user"];
 
-    protected $fillable = ['assigment_id', 'user_id'];
+    protected $fillable = ["assigment_id", "user_id"];
 
     public function assigment(): BelongsTo
     {
-        return $this->belongsTo('App\Models\Assigment');
+        return $this->belongsTo("App\Models\Assigment");
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo("App\Models\User");
     }
 
     public function attachments(): MorphMany
     {
-        return $this->morphMany('App\Models\Attachment', 'attachable');
+        return $this->morphMany("App\Models\Attachment", "attachable");
     }
 }

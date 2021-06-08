@@ -6,26 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateWithdrawsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('withdraws', function (Blueprint $table) {
+        Schema::create("withdraws", function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('withdraws');
+        Schema::dropIfExists("withdraws");
     }
 }
