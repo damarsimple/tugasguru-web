@@ -165,8 +165,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
 
                 $question->visibility = $request['visibility'];
 
-                $question->classtype_id = $request['classtype'];
-
                 $question->type = $questionData['type'];
 
                 $question->subject_id = $request['subject'];
