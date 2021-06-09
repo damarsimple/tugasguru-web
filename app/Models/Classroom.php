@@ -23,7 +23,7 @@ class Classroom extends Model
 
     public function teacher(): BelongsTo
     {
-        return $this->belongsTo("App\Models\User", "teacher_id");
+        return $this->belongsTo("App\Models\User", "user_id");
     }
 
     public function exams(): HasMany

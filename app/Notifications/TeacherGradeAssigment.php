@@ -67,7 +67,7 @@ class TeacherGradeAssigment extends Notification
         return new BroadcastMessage([
             'type' => 'TEACHER_GRADE_ASSIGMENT',
             'data' => $this->studentAssigment,
-            'user' => $this->studentAssigment->assigment->teacher
+            'user' => $this->studentAssigment->assigment->user
         ]);
     }
 
@@ -82,7 +82,7 @@ class TeacherGradeAssigment extends Notification
         return [
             'type' => 'TEACHER_GRADE_ASSIGMENT',
             'data' => $this->studentAssigment,
-            'user' => $this->studentAssigment->assigment->teacher
+            'user' => $this->studentAssigment->assigment->user
         ];
     }
 }

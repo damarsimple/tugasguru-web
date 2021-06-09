@@ -542,7 +542,7 @@ class SeedData extends Command
 
             $firstclassroom = new Classroom();
             $firstclassroom->name = "Test Pertama ";
-            $firstclassroom->teacher_id = 1;
+            $firstclassroom->user_id = 1;
             $firstclassroom->classtype_id = 1;
             $school->classrooms()->save($firstclassroom);
 
@@ -550,7 +550,7 @@ class SeedData extends Command
 
             $classroom = new Classroom();
             $classroom->name = "Test Kedua ";
-            $classroom->teacher_id = 1;
+            $classroom->user_id = 1;
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
@@ -558,7 +558,7 @@ class SeedData extends Command
 
             $absent = new Absent();
 
-            $absent->teacher_id = $teacher->id;
+            $absent->receiver_id = $teacher->id;
             $absent->type = "IZIN";
             $absent->reason = "test";
             $absent->start_at = now();
@@ -572,7 +572,7 @@ class SeedData extends Command
 
             $meeting->name = "Pertemuan oleh kian santang";
 
-            $meeting->teacher_id = $teacher->id;
+            $meeting->user_id = $teacher->id;
 
             $meeting->start_at = now();
 
@@ -734,7 +734,7 @@ class SeedData extends Command
                     $exam = new Exam();
 
                     $exam->name = "Test Exam $i";
-                    $exam->teacher_id = $teacher->id;
+                    $exam->user_id = $teacher->id;
                     $exam->description = " test ";
                     $exam->hint = "11";
                     $exam->subject_id = 1;
@@ -834,13 +834,11 @@ class SeedData extends Command
             $agenda->school_id = 1;
             $agenda->finish_at = now()->addHour(2);
             $teacher->agendas()->save($agenda);
-
             foreach (School::first()->teachers->pluck("id") as $id) {
                 Attendance::firstOrCreate([
                     "user_id" => $id,
                     "school_id" => 1,
-                    "attendable_id" => $agenda->id,
-                    "attendable_type" => Agenda::class,
+                    "agenda_id" => $agenda->id,
                 ]);
             }
         }

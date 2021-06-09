@@ -11,7 +11,7 @@ class CreateClassRoomsTable extends Migration
         Schema::create("classrooms", function (Blueprint $table) {
             $table->id();
             $table
-                ->foreignId("teacher_id")
+                ->foreignId("user_id")
                 ->constrained("users")
                 ->onDelete("cascade");
             $table

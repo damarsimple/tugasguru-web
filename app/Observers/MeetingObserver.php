@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Events\MeetingChangeEvent;
+use App\Models\Agenda;
 use App\Models\Attendance;
 use App\Models\Meeting;
 use App\Models\Room;
@@ -34,10 +35,10 @@ class MeetingObserver
         $room
             ->users()
             ->attach(
-                array_merge([$meeting->teacher->id], $studentUserIds->toArray())
+                array_merge([$meeting->user->id], $studentUserIds->toArray())
             );
 
-        $absents = $meeting->teacher
+        $absents = $meeting->user
             ->studentabsents()
             ->whereDate("finish_at", ">", now())
             ->get();
@@ -48,22 +49,29 @@ class MeetingObserver
             $absentsMap[$value->user_id] = $value;
         }
 
+        $agenda = new Agenda();
+
+        $agenda->agendaable_id = $meeting->id;
+        $agenda->agendaable_type = Meeting::class;
+        $agenda->user_id = $meeting->user_id;
+        $agenda->name = "Absensi " . $meeting->name;
+        $agenda->school_id = $meeting->classroom->school_id;
+        $agenda->save();
+
         foreach ($studentUserIds as $id) {
             if (array_key_exists($id, $absentsMap)) {
                 Attendance::firstOrCreate([
                     "school_id" => $meeting->classroom->school_id,
                     "user_id" => $id,
-                    "attendable_id" => $meeting->id,
-                    "attendable_type" => Meeting::class,
                     "attended" => false,
                     "reason" => $absentsMap[$id]->reason,
+                    "agenda_id" => $agenda->id,
                 ]);
             } else {
                 Attendance::firstOrCreate([
                     "school_id" => $meeting->classroom->school_id,
                     "user_id" => $id,
-                    "attendable_id" => $meeting->id,
-                    "attendable_type" => Meeting::class,
+                    "agenda_id" => $agenda->id,
                 ]);
             }
         }

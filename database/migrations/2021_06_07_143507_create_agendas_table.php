@@ -10,6 +10,7 @@ class CreateAgendasTable extends Migration
     {
         Schema::create("agendas", function (Blueprint $table) {
             $table->id();
+            $table->uuid("uuid")->nullable();
             $table
                 ->foreignId("user_id")
                 ->index()
@@ -21,6 +22,8 @@ class CreateAgendasTable extends Migration
                 ->constrained()
                 ->onDelete("cascade");
             $table->string("name");
+            $table->unsignedBigInteger("agendaable_id")->nullable();
+            $table->string("agendaable_type")->nullable();
             $table->longText("description")->nullable();
             $table->timestamp("finish_at")->nullable();
             $table->timestamps();

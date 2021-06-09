@@ -20,7 +20,7 @@ class CreateAssigmentsTable extends Migration
                 ->constrained()
                 ->onDelete("cascade");
             $table
-                ->foreignId("teacher_id")
+                ->foreignId("user_id")
                 ->index()
                 ->constrained("users")
                 ->onDelete("cascade");

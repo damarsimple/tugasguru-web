@@ -22,8 +22,12 @@ class CreateAttendancesTable extends Migration
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");
-            $table->unsignedBigInteger("attendable_id")->nullable();
-            $table->string("attendable_type")->nullable();
+            $table
+                ->foreignId("agenda_id")
+                ->nullable()
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
             $table->boolean("attended")->default(false);
             $table->string("reason")->nullable();
             $table->timestamps();

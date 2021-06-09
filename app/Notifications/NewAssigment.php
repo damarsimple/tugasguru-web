@@ -52,7 +52,7 @@ class NewAssigment extends Notification
         return new BroadcastMessage([
             'type' => 'NEW_ASSIGMENT',
             'data' => $this->assigment,
-            'user' => $this->assigment->teacher
+            'user' => $this->assigment->user
         ]);
     }
 
@@ -67,7 +67,7 @@ class NewAssigment extends Notification
         return [
             'type' => 'NEW_ASSIGMENT',
             'data' => $this->assigment,
-            'user' => $this->assigment->teacher
+            'user' => $this->assigment->user
         ];
     }
 }

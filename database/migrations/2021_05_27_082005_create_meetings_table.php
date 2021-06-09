@@ -26,7 +26,7 @@ class CreateMeetingsTable extends Migration
                 ->constrained()
                 ->onDelete("cascade");
             $table
-                ->foreignId("teacher_id")
+                ->foreignId("user_id")
                 ->constrained("users")
                 ->onDelete("cascade");
             $table

@@ -57,7 +57,7 @@ Broadcast::channel("meeting.{id}", function ($user, $id) {
         in_array(
             $user->id,
             array_merge(
-                [$meeting->teacher_id],
+                [$meeting->user_id],
                 $meeting->classroom->students->pluck("id")->toArray()
             )
         )

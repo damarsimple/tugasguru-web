@@ -11,13 +11,13 @@ class CreateConsultationsTable extends Migration
         Schema::create("consultations", function (Blueprint $table) {
             $table->id();
             $table
-                ->foreignId("teacher_id")
+                ->foreignId("user_id")
                 ->index()
                 ->constrained("users");
             $table
-                ->foreignId("user_id")
+                ->foreignId("consultant_id")
                 ->index()
-                ->constrained()
+                ->constrained('users')
                 ->onDelete("cascade");
             $table->string("name");
             $table->string("problem");

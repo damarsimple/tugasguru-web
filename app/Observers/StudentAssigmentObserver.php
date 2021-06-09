@@ -16,7 +16,7 @@ class StudentAssigmentObserver
      */
     public function created(StudentAssigment $studentAssigment)
     {
-        $studentAssigment->assigment->teacher->notify(
+        $studentAssigment->assigment->user->notify(
             new StudentTurningAssigment($studentAssigment)
         );
     }

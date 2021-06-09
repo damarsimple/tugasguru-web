@@ -11,14 +11,14 @@ class CreateAbsentsTable extends Migration
         Schema::create("absents", function (Blueprint $table) {
             $table->id();
             $table
-                ->foreignId("teacher_id")
+                ->foreignId("user_id")
                 ->nullable()
                 ->index()
                 ->constrained("users");
             $table
-                ->foreignId("user_id")
+                ->foreignId("receiver_id")
                 ->index()
-                ->constrained()
+                ->constrained('users')
                 ->onDelete("cascade");
             $table->string("type");
             $table->longText("reason");

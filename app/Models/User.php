@@ -204,23 +204,23 @@ class User extends Authenticatable
 
     public function exams(): HasMany
     {
-        return $this->hasMany('App\Models\Exam', 'teacher_id');
+        return $this->hasMany('App\Models\Exam', 'user_id');
     }
 
     public function classrooms(): HasMany
     {
-        return $this->hasMany('App\Models\Classroom', 'teacher_id');
+        return $this->hasMany('App\Models\Classroom', 'user_id');
     }
 
     public function assigments(): HasMany
     {
-        return $this->hasMany('App\Models\Assigment', 'teacher_id');
+        return $this->hasMany('App\Models\Assigment', 'user_id');
     }
 
 
     public function meetings(): HasMany
     {
-        return $this->hasMany('App\Models\Meeting', 'teacher_id');
+        return $this->hasMany('App\Models\Meeting', 'user_id');
     }
 
     public function packagequestions(): HasMany
@@ -250,7 +250,7 @@ class User extends Authenticatable
 
     public function studentabsents(): HasMany
     {
-        return $this->hasMany('App\Models\Absent', foreignKey: 'teacher_id');
+        return $this->hasMany('App\Models\Absent', foreignKey: 'receiver_id');
     }
 
     public function studentanswers()
@@ -268,7 +268,7 @@ class User extends Authenticatable
 
     public function studentconsultations(): HasMany
     {
-        return $this->hasMany('App\Models\Consultation', foreignKey: 'teacher_id');
+        return $this->hasMany('App\Models\Consultation', foreignKey: 'consultant_id');
     }
 
     public function forms(): HasMany
@@ -283,7 +283,7 @@ class User extends Authenticatable
 
     public function studentattendances(): HasManyThrough
     {
-        return $this->hasManyThrough('App\Models\Attendance', 'App\Models\Classroom', firstKey: 'teacher_id');
+        return $this->hasManyThrough('App\Models\Attendance', 'App\Models\Classroom', firstKey: 'user_id');
     }
 
     public function subscriptions(): BelongsToMany

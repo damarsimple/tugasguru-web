@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Meeting extends Model
 {
@@ -16,7 +17,7 @@ class Meeting extends Model
         "rooms",
         "classroom.students",
         "subject",
-        "teacher",
+        "user",
         "article",
     ];
 
@@ -41,11 +42,11 @@ class Meeting extends Model
 
     public function getAbsentsAttribute()
     {
-        $builder = $this->teacher
+        $builder = $this->user
             ->studentabsents()
             ->whereHas(
                 "user.myclassrooms",
-                fn($e) => $e->where("classroom_id", $this->classroom_id)
+                fn ($e) => $e->where("classroom_id", $this->classroom_id)
             )
             ->whereDate("start_at", Carbon::today());
 
@@ -56,9 +57,9 @@ class Meeting extends Model
         return $builder->get();
     }
 
-    public function teacher(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo("App\Models\User", "teacher_id");
+        return $this->belongsTo("App\Models\User", "user_id");
     }
 
     public function rooms(): MorphMany
@@ -71,8 +72,8 @@ class Meeting extends Model
         return $this->morphMany("App\Models\Attachment", "attachable");
     }
 
-    public function attendances()
+    public function agenda(): MorphOne
     {
-        return $this->morphMany("App\Models\Attachment", "attendable");
+        return $this->morphOne("App\Models\Agenda", "agendaable");
     }
 }

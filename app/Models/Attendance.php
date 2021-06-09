@@ -14,8 +14,7 @@ class Attendance extends Model
     protected $fillable = [
         "user_id",
         "school_id",
-        "attendable_id",
-        "attendable_type",
+        "agenda_id"
     ];
 
     protected $with = ["user", "attendable"];
@@ -31,8 +30,8 @@ class Attendance extends Model
         return $this->belongsTo("App\Models\School");
     }
 
-    public function attendable(): MorphTo
+    public function agenda(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo('App\Models\Agenda');
     }
 }

@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Exam extends Model
 {
     use HasFactory;
 
-    public $with = ["teacher", "subject", "examtype", "classroom"];
+    public $with = ["user", "subject", "examtype", "classroom"];
 
     public function examsessions(): HasMany
     {
@@ -57,13 +58,13 @@ class Exam extends Model
         return $this->belongsTo("App\Models\Examtype");
     }
 
-    public function teacher(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo("App\Models\User", "teacher_id");
+        return $this->belongsTo("App\Models\User");
     }
 
-    public function attendances(): MorphMany
+    public function agenda(): MorphOne
     {
-        return $this->morphMany("App\Models\Attachment", "attendable");
+        return $this->morphOne("App\Models\Agenda", "agendaable");
     }
 }

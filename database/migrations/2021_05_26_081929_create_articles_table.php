@@ -11,19 +11,13 @@ class CreateArticlesTable extends Migration
         Schema::create("articles", function (Blueprint $table) {
             $table->id();
             $table
-                ->foreignId("user_id")
-                ->nullable()
-                ->index()
-                ->constrained()
-                ->onDelete("cascade");
-            $table
                 ->foreignId("school_id")
                 ->nullable()
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");
             $table
-                ->foreignId("teacher_id")
+                ->foreignId("user_id")
                 ->nullable()
                 ->index()
                 ->constrained()

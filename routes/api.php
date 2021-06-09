@@ -170,7 +170,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
                 $question->subject_id = $request['subject'];
 
                 $user->questions()->save($question);
-                
+
                 $questionIds[] = $question->id;
                 $answers = [];
                 foreach ($questionData['answers'] as $i => $answerData) {
@@ -388,11 +388,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
                 return $e->whereHas('users', fn ($e) => $e->where('user_id', $user->id));
             }])->findOrFail($id);
 
+
+
             $attendance = Attendance::firstOrCreate([
                 'school_id' => $meeting->classroom->school_id,
+                'agenda_id' => $meeting->agenda->id,
                 'user_id' => $user->id,
-                'attendable_id' => $meeting->id,
-                'attendable_type' => Meeting::class
             ]);
 
             $attendance->attended = true;
@@ -444,7 +445,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
     });
     Route::group(['prefix' => 'attendances'], function () {
         Route::get('{id}', function (Request $request, $id) {
-            return  $request->user()->attendances()->with('attendable')->findOrFail($id);
+            return  $request->user()->attendances()->with('agenda')->findOrFail($id);
         });
     });
     Route::group(['prefix' => 'followers'], function () {
@@ -838,7 +839,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $finishAt->second = $startAt->second;
 
             $absent = new Absent();
-            $absent->teacher_id = $request->teacher;
+            $absent->receiver_id = $request->teacher;
             $absent->type = $request->type;
             $absent->reason = $request->reason;
             $absent->start_at = $startAt;
@@ -855,7 +856,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $user = $request->user();
 
             $constult = new Consultation();
-            $constult->teacher_id = User::findOrFail($request->teacher)->id;
+            $constult->consultant_id = User::findOrFail($request->teacher)->id;
             $constult->name = $request->name;
             $constult->problem = $request->problem;
             $user->consultations()->save($constult);
@@ -1047,8 +1048,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $attendance = Attendance::firstOrCreate([
                 'school_id' => $exam->classroom->school_id,
                 'user_id' => $user->id,
-                'attendable_id' => $exam->id,
-                'attendable_type' => Exam::class
+                'agenda_id' => $exam->agenda->id,
             ]);
 
             $attendance->updated_at = now();
@@ -1393,7 +1393,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $user = $request->user();
 
             return $user->studentconsultations()->with(['user.myclassrooms' => function ($e) use ($user) {
-                return $e->where('teacher_id', $user->id);
+                return $e->where('user_id', $user->id);
             }])->findOrFail($id);
         });
 
@@ -1585,7 +1585,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $meeting->subject_id = $request->subject;
             $meeting->data = $request->data;
             $meeting->article_id = $request->article ?? null;
-            $meeting->teacher_id = $user->id;
+            $meeting->user_id = $user->id;
 
             $meeting->start_at = now();
 
@@ -1924,16 +1924,14 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                         Attendance::firstOrCreate([
                             'school_id' => $agenda->school_id,
                             'user_id' => $user,
-                            'attendable_id' => $agenda->id,
-                            'attendable_type' => Agenda::class,
+                            'agenda_id' => $agenda->id,
                             'reason' => $absentsMap[$user]->reason,
                         ]);
                     } else {
                         Attendance::firstOrCreate([
                             'school_id' => $agenda->school_id,
                             'user_id' => $user,
-                            'attendable_id' => $agenda->id,
-                            'attendable_type' => Agenda::class
+                            'agenda_id' => $agenda->id,
                         ]);
                     }
                 }
@@ -2111,13 +2109,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $school = School::findOrFail($request->school);
 
 
-            if (Classroom::where(['teacher_id' => $user->id, 'name' => $request->name, 'classtype_id' => $request->classtype_id])->exists()) {
+            if (Classroom::where(['user_id' => $user->id, 'name' => $request->name, 'classtype_id' => $request->classtype_id])->exists()) {
                 return ['message' => 'exists'];
             }
 
             $classroom = new Classroom();
             $classroom->name = $request->name;
-            $classroom->teacher_id = $user->id;
+            $classroom->user_id = $user->id;
             $classroom->classtype_id = $request->classtype_id;
             $school->classrooms()->save($classroom);
         });

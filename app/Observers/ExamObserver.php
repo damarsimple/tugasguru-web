@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\Agenda;
 use App\Models\Attendance;
 use App\Models\Exam;
 
@@ -17,7 +18,7 @@ class ExamObserver
     {
         $studentUserIds = $exam->classroom->students->pluck("id");
 
-        $absents = $exam->teacher
+        $absents = $exam->user
             ->studentabsents()
             ->whereDate("finish_at", ">", now())
             ->get();
@@ -28,22 +29,29 @@ class ExamObserver
             $absentsMap[$value->user_id] = $value;
         }
 
+
+        $agenda = new Agenda();
+
+        $agenda->agendaable_id = $exam->id;
+        $agenda->agendaable_type = Exam::class;
+        $agenda->user_id = $exam->user_id;
+        $agenda->name = "Absensi " . $exam->name;
+        $agenda->school_id = $exam->classroom->school_id;
+        $agenda->save();
         foreach ($studentUserIds as $id) {
             if (array_key_exists($id, $absentsMap)) {
                 Attendance::firstOrCreate([
                     "school_id" => $exam->classroom->school_id,
                     "user_id" => $id,
-                    "attendable_id" => $exam->id,
-                    "attendable_type" => Exam::class,
                     "attended" => false,
                     "reason" => $absentsMap[$id]->reason,
+                    "agenda_id" => $agenda->id
                 ]);
             } else {
                 Attendance::firstOrCreate([
                     "school_id" => $exam->classroom->school_id,
                     "user_id" => $id,
-                    "attendable_id" => $exam->id,
-                    "attendable_type" => Exam::class,
+                    "agenda_id" => $agenda->id
                 ]);
             }
         }

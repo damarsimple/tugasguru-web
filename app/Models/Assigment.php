@@ -14,7 +14,7 @@ class Assigment extends Model
 
     // protected $with = ['teacher', 'classroom', 'subject'];
 
-    public function teacher(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");
     }
