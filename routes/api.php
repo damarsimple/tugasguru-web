@@ -115,7 +115,7 @@ Route::middleware('auth:sanctum')->get('attendances/{uuid}', function ($uuid) {
     return 'ok';
 });
 
-Route::middleware('auth:sanctum')->get("/agenda/{uuid}", function(Request $request, $uuid){
+Route::middleware('auth:sanctum')->get("/agenda/{uuid}", function (Request $request, $uuid) {
     $agenda = Agenda::where('uuid', $uuid)->firstOrFail();
 
     $attendance = $agenda->attendances()->where('user_id', $request->user()->id)->firstOrFail();
@@ -125,7 +125,6 @@ Route::middleware('auth:sanctum')->get("/agenda/{uuid}", function(Request $reque
     $attendance->save();
 
     return 'ok';
-
 });
 
 
@@ -356,10 +355,10 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
             case 'XENDIT':
 
                 $invoice = Xendit::makePayment(
-                    $transaction->amount,
-                    $transaction->uuid,
-                    $transaction->description,
-                    $user->email
+                    amount: $transaction->amount,
+                    uuid: $transaction->uuid,
+                    description: $transaction->description,
+                    email: $user->email
                 );
                 $transaction->invoice_request = json_encode($invoice);
 
@@ -798,7 +797,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
         Route::get('{id}', function (Request $request, $id) {
             $user = $request->user();
 
-            $assigment = Assigment::with('myanswer', 'classroom', 'subject', 'teacher')->findOrFail($id);
+            $assigment = Assigment::with('myanswer', 'classroom', 'subject', 'user')->findOrFail($id);
 
             if (!$user->myclassrooms->pluck('id')->contains($assigment->classroom->id)) {
                 return ['message' => 'unathorized'];
@@ -906,7 +905,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
             return $user->myclassrooms()->with(
                 'students',
-                'teacher',
+                'user',
             )->get();
         });
 
@@ -986,7 +985,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                                 'name' => $e->exam->name,
                                 'subject' => $e->exam->subject,
                                 'classroom' => $e->exam->classroom,
-                                'teacher' => $e->exam->teacher,
+                                'user' => $e->exam->user,
                                 'id' => $e->id,
                                 'close_at' => $e->close_at,
                                 'open_at' => $e->open_at,
@@ -1005,7 +1004,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                                 'name' => $e->name,
                                 'subject' => $classroom->subject,
                                 'classroom' => $classroom,
-                                'teacher' => $classroom->teacher,
+                                'user' => $classroom->user,
                                 'id' => $e->id,
                                 'close_at' => $e->finish_at,
                                 'open_at' => $e->start_at,
@@ -1017,14 +1016,14 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                         return $data;
                     },
                     function () use ($classroom) {
-                        $data = $classroom->assigments()->where('close_at', '>', now())->with('teacher', 'classroom', 'subject')->get();
+                        $data = $classroom->assigments()->where('close_at', '>', now())->with('user', 'classroom', 'subject')->get();
 
                         $data = $data->map(function ($e) use ($classroom) {
                             return [
                                 'name' => $e->name,
                                 'subject' => $classroom->subject,
                                 'classroom' => $classroom,
-                                'teacher' => $classroom->teacher,
+                                'user' => $classroom->user,
                                 'id' => $e->id,
                                 'close_at' => $e->close_at,
                                 'open_at' => $e->created_at,
@@ -1197,7 +1196,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                     'questions',
                     'subject',
                     'supervisors',
-                    'teacher',
+                    'user',
                     'examtype',
                     'examsessions'
                 )
@@ -1322,9 +1321,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             return $attendances->latest()->paginate(10);
         });
-        Route::get('/', function (Request $request) {
-            return $request->user()->studentattendances()->paginate(10);
-        });
+        // Route::get('/', function (Request $request) {
+        //     return $request->user()->studentattendances()->paginate(10);
+        // });
     });
 
     Route::group(['prefix' => 'forms'], function () {
@@ -1449,7 +1448,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/User $teacher  */
             $user = $request->user();
 
-            return $user->assigments()->with('studentassigments', 'classroom', 'subject', 'teacher')->findOrFail($id);
+            return $user->assigments()->with('studentassigments', 'classroom', 'subject', 'user')->findOrFail($id);
         });
 
         Route::put('{assigmentId}/answers/{studentAssigmentId}', function (Request $request, $assigmentId, $studentAssigmentId) {
@@ -1675,7 +1674,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                                 'name' => $e->exam->name,
                                 'subject' => $e->exam->subject,
                                 'classroom' => $e->exam->classroom,
-                                'teacher' => $e->exam->teacher,
+                                'user' => $e->exam->user,
                                 'id' => $e->id,
                                 'close_at' => $e->close_at,
                                 'open_at' => $e->open_at,
@@ -1694,7 +1693,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                                 'name' => $e->name,
                                 'subject' => $classroom->subject,
                                 'classroom' => $classroom,
-                                'teacher' => $classroom->teacher,
+                                'user' => $classroom->user,
                                 'id' => $e->id,
                                 'close_at' => $e->finish_at,
                                 'open_at' => $e->start_at,
@@ -1706,14 +1705,14 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                         return $data;
                     },
                     function () use ($user, $classroom) {
-                        $data = $user->assigments()->where('close_at', '>', now())->with('teacher', 'classroom', 'subject')->get();
+                        $data = $user->assigments()->where('close_at', '>', now())->with('user', 'classroom', 'subject')->get();
 
                         $data = $data->map(function ($e) use ($classroom) {
                             return [
                                 'name' => $e->name,
                                 'subject' => $classroom->subject,
                                 'classroom' => $classroom,
-                                'teacher' => $classroom->teacher,
+                                'user' => $classroom->user,
                                 'id' => $e->id,
                                 'close_at' => $e->close_at,
                                 'open_at' => $e->created_at,
@@ -2093,7 +2092,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $classrooms =  $user->classrooms();
             if ($request->withExtra) {
                 $classrooms = $classrooms->with(
-                    'teacher',
+                    'user',
                     'students',
                 );
             }
@@ -2108,7 +2107,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             if ($request->withExtra) {
                 return $classrooms->with(
-                    'teacher',
+                    'user',
                     'students',
                 )->get();
             } else {

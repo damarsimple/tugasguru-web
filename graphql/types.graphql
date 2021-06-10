@@ -1,10 +1,9 @@
-"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+"A date String with format `Y-m-d`, e.g. `2011-05-23`."
 scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
 
-"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+"A datetime String with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
 scalar DateTime
     @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
-
 
 type Province {
     id: ID!
@@ -42,11 +41,11 @@ type School {
     province: Province @belongsTo
     district: District @belongsTo
     schooltype: Schooltype @belongsTo
-    address: string
-    description: string
-    latitude: string
-    longtitude: string
-    npsn: string
+    address: String
+    description: String
+    latitude: String
+    longtitude: String
+    npsn: String
 
     teachers: [User!]! @hasMany
     students: [User!]! @hasMany
@@ -56,22 +55,42 @@ type School {
     classrooms: [Classroom!]! @hasMany
 }
 
-type Absent{
+type Absent {
     id: ID!
     name: String
     created_at: DateTime!
     updated_at: DateTime!
-    teacher: User
     user: User
+    receiver: User
 }
 
 type Answer {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    is_correct: Boolean!
     question: Question
     attachment: Attachment @morphOne
 }
 
+enum VisibilityEnum {
+    PUBLIK
+    PRIVAT
+    SELECTPEOPLE
+}
+
 type Article {
-    user: User
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User!
+    slug: String!
+    content: String!
+    is_paid: Boolean!
+    role: String!
+    visibility: VisibilityEnum
+    school: School
     price: Price
     thumbnail: Attachment @morphOne
     subjects: [Subject!]! @belongsToMany
@@ -80,114 +99,199 @@ type Article {
 }
 
 type Assigment {
-    user: User
-    subject: Subject
-    classroom: Classroom
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User!
+    content: String!
+    close_at: String
+    is_odd_semester: Boolean!
+    subject: Subject!
+    classroom: Classroom!
     studentassigments: [StudentAssigment!]! @hasMany
     myanswer: StudentAssigment
 }
 
-
 union Attachable = User
 
 type Attachment {
-    path: String
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    path: String!
+    mime: String!
+    is_processed: Boolean!
+    original_size: String
+    compressed_size: String
+    role: String!
     attachable: Attachable @morphTo
-
 }
 
-union Attendable = Meeting | Exam | Agenda
+union Agendaable = Meeting | Exam
 
-type Agenda { 
+type Agenda {
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
     user: User @belongsTo
     school: School @belongsTo
-    name: String
     description: String
+    attendances: [Attendance!]! @hasMany
     finish_at: DateTime
 }
-
 type Attendance {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
     user: User @belongsTo
     classroom: Classroom @belongsTo
+    school: School @belongsTo
     subject: Subject @belongsTo
-    attendable: Attendable @morphTo
+    agenda: Agenda! @belongsTo
+    attended: Boolean!
+    reason: String
 }
 
 type Classroom {
-    students: [Student!]! @belongsToMany
-    user: User @belongsTo
-    subject: Subject @belongsTo
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    students: [User!]! @belongsToMany
+    user: User! @belongsTo
+    subject: Subject! @belongsTo
     exams: [Exam!]! @hasMany
-    classtype: Classtype @belongsTo
+    classtype: Classtype! @belongsTo
+    meetings: [Meeting!]! @hasMany
     name_formatted: String
     meeting: [Meeting!]! @hasMany
-    assigments: [Assigment!] @hasMany
+    assigments: [Assigment!]! @hasMany
+    absents: [Absent!]! @hasMany
 }
 
 type Classtype {
-    schooltype: Schooltype @belongsTo
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    level: Int!
+    schooltype: Schooltype! @belongsTo
     name: String
 }
 
 type Consultation {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    problem: String!
+    notes: String!
+    advice: String!
     user: User @belongsTo
-    teacher: User @belongsTo
+    consultant: User @belongsTo
 }
 
 type Exam {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
     examsessions: [Examsession!]! @hasMany
     examresults: [Examresult!]! @hasMany
-    questions: [Question!]! @hasMany
-    subject: Subject @belongsTo
-    classroom: Classroom @belongsTo 
-    supervisors: User @belongsToMany
-    examtype: Examtype @belongsTo
-    teacher: User
-    attendances: [Attendance!]! @morphMany
+    questions: [Question!]! @belongsToMany
+    subject: Subject! @belongsTo
+    classroom: Classroom! @belongsTo
+    supervisors: [User!]! @belongsToMany
+    examtype: Examtype! @belongsTo
+    user: User! @belongsTo
+    agenda: Agenda @morphOne
 }
 
 type Examresult {
-    exam: Exam @belongsTo
-    user: User @belongsTo
-    examsession: Examsession @belongsTo
-    studentanswers: StudentAnswer @hasMany
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    exam: Exam! @belongsTo
+    user: User! @belongsTo
+    examsession: Examsession! @belongsTo
+    studentanswers: [StudentAnswer!]! @hasMany
 }
 
 type Examsession {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
     exam: Exam @belongsTo
+    open_at: String
+    close_at: String
+    token: String
 }
 
 type Examtracker {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
     examsession: Examsession @belongsTo
-    exam: Exam @belongsTo
-    user: User @belongsTo
+    exam: Exam! @belongsTo
+    user: User! @belongsTo
+    examsession: Examsession! @belongsTo
+    last_activity: String!
+    minute_passed: Int!
 }
 
 type Examtype {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
     exams: [Exam!]! @hasMany
 }
 
 type Meeting {
-    classroom: Classroom @belongsTo
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    start_at: String!
+    finish_at: String!
+    content: String
+    description: String
+    classroom: Classroom! @belongsTo
     article: Article @belongsTo
-    user: User @belongsTo
+    subject: Subject! @belongsTo
+    user: User! @belongsTo
     rooms: [Room!]! @morphMany
     attachments: [Attachment!]! @morphMany
-    attendances: [Attendance!]! @morphMany
+    attendances: Agenda @morphOne
 }
 
 union Messageable = Room | PrivateRoom
 
 type Message {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
     user: User @belongsTo
+    content: String!
     messageable: Messageable @morphTo
 }
 
 type Packagequestion {
+    idd: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
     questions: [Question!]! @belongsToMany
-    user: User @belongsTo
-    subject: Subject @belongsTo
-    classtype: Classtype @belongsTo
+    user: User! @belongsTo
+    subject: Subject! @belongsTo
+    classtype: Classtype! @belongsTo
+    editable: Boolean!
+    visibility: VisibilityEnum
 }
 
 union Priceable = Article
@@ -197,64 +301,147 @@ type Price {
 }
 
 type PrivateRoom {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
     messages: [Message!]! @morphMany
     firstmessage: Message @morphOne
-    first: User @belongsTo
-    second: User @belongsTo
+    first: User! @belongsTo
+    second: User! @belongsTo
 }
-
+enum QuestiontTypeEnum {
+    MULTI_CHOICE
+    ESSAY
+    FILLER
+    SURVEY
+    SLIDE
+    MANY_ANSWERS
+}
 type Question {
-    teacher: User @belongsTo
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User @belongsTo
+    subject: Subject! @belongsTo
+    classtype: Classtype! @belongsTo
+    editable: Boolean!
     answers: [Answer!]! @hasMany
     correctanswer: Answer @hasOne
     attachments: [Attachment!]! @morphMany
-    subject: Subject @belongsTo
+    subject: Subject! @belongsTo
     classtype: Classtype @belongsTo
+    type: QuestiontTypeEnum!
+    content: String!
+    visibility: VisibilityEnum
 }
 
-union Roomable = Meeting
+union Roomable = Meeting | Quiz
 
 type Room {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
     messages: [Message!]! @morphMany
     users: [User!]! @belongsToMany
     roomable: Roomable @morphTo
+    quizresults: [Quizresult!]! @hasMany
 }
 
 type Schooltype {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    level: Int!
     classtypes: [Classtype!]! @hasMany
     schools: [School!]! @hasMany
 }
 
 type StudentAnswer {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
     answer: Answer @belongsTo
-    question: Question @belongsTo
-    examsession: Examsession @belongsTo
-    user: User @belongsTo
-    exam: Exam @belongsTo
-    examresult: Examresult @belongsTo
+    question: Question! @belongsTo
+    examsession: Examsession! @belongsTo
+    user: User! @belongsTo
+    exam: Exam! @belongsTo
+    examresult: Examresult! @belongsTo
+    content: String!
+    is_correct: Boolean!
+    is_processed: Boolean!
+    grade: Float!
 }
 
 type StudentAssigment {
-    assigment: Assigment @belongsTo
-    user: User @belongsTo
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    assigment: Assigment! @belongsTo
+    user: User! @belongsTo
     attachments: [Attachment!]! @morphMany
+    content: String
+    external_url: String
+    grade: Float!
+    is_graded: Boolean!
+    comment: String
+    edited_times: Int!
+    turned_at: String
+}
+
+enum SubjectTypeEnum {
+    VOCATIONAL
+    LOCAL_CONTENT
+    SPECIAL_DEVELOPMENT
 }
 
 type Subject {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
     schools: [School!]! @belongsToMany
     meetings: [Meeting!]! @hasMany
+    abbreviation: String
+    description: String
+    type: SubjectTypeEnum
 }
 
-type Topup {
+union Transactionable = Subscription | Quizreward
 
+enum TransactionStatusEnum {
+    STAGING
+    PENDING
+    SUCCESS
+    FAILED
 }
 
 type Transaction {
-    
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User! @belongsTo
+    from: Float!
+    to: Float!
+    amount: Float!
+    voucher: Voucher
+    uuid: String!
+    payment_method: String
+    status: TransactionStatusEnum
+    is_paid: Boolean!
+    staging_url: String
+    invoice_request: String
+    invoice_response: String
+    transactionable: Transactionable @morphTo
+    description: String
 }
 
 type User {
-    
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
     province: Province @belongsTo
     city: City @belongsTo
     district: District @belongsTo
@@ -265,19 +452,20 @@ type User {
 
     followers: [User!]! @belongsToMany
     requestfollowers: [User!]! @belongsToMany
-    following: [User!]! @belongsToMany
+    followings: [User!]! @belongsToMany
     rooms: [Room!]! @belongsToMany
     school: School @belongsTo
-
+    attendances: [Attendance!]! @hasMany
     "Student"
-
     myclassrooms: [Classroom!]! @belongsToMany
     guardian: User @belongsTo
     consultations: [Consultation!]! @hasMany
+    "Teacher"
+    homeroomschools: [School!]! @belongsToMany
+    headmasterschools: [School!]! @belongsToMany
+
     absents: [Absent!]! @hasMany
     schools: [School!]! @belongsToMany
-
-    "Teacher"
     subjects: [Subject!]! @belongsToMany
     questions: [Question!]! @hasMany
     exams: [Exam!]! @hasMany
@@ -285,10 +473,141 @@ type User {
     assigments: [Assigment!]! @hasMany
     packagequestions: [Packagequestion!]! @hasMany
     meetings: [Meeting!]! @hasMany
+    questions: [Question!]! @hasMany
+    examresults: [Examresult!]! @hasMany
+    studentassigments: [StudentAssigment!]! @hasMany
 
+    studentabsents: [Absent!]! @hasMany
+    studentanswers: [StudentAnswer!]! @hasMany
+    studentconsultations: [Consultation!]! @hasMany
+    forms: [Form!]! @hasMany
+    reports: [Report!]! @hasMany
+
+    main_school: School
+    subscriptions: [Subscription!]! @belongsToMany
+    rawsubscriptions: [Subscription!]! @belongsToMany
+    transactions: [Transaction!]! @hasMany
+    myreports: [Report!]! @belongsToMany
+    quizzez: [Quiz!]! @hasMany
+    agendas: [Agenda!]! @hasMany
 }
 
+enum FormStatusEnum {
+    PENDING
+    PROCESSED
+    FINISHED
+    REJECTED
+}
 
-type Withdraw {
-    
+enum FormTypeEnum {
+    REQUEST_TUTOR
+    REQUEST_COUNSELOR
+    REQUEST_HEADMASTER
+    REQUEST_PPDB
+    REQUEST_HOMEROOM
+}
+
+type Form {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User! @belongsTo
+    data: String!
+    type: FormTypeEnum
+    comment: String
+    status: FormStatusEnum
+}
+
+enum ReportTypeEnum {
+    GRADE
+}
+
+type Report {
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    data: String!
+    data_alt: String!
+    user: User! @belongsTo
+    users: [User!]! @belongsToMany
+    type: ReportTypeEnum
+}
+
+type Subscription {
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    price: Float!
+    duration: Int!
+    ability: [String]!
+}
+
+enum QuizDifficultyEnum {
+    EASY
+    MEDIUM
+    HARD
+}
+
+type Quiz {
+    id: ID!
+    name: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    quizreward: Quizreward @hasOne
+    questions: [Question!]! @belongsToMany
+    firstquestion: [Question!]! @belongsToMany
+    subject: Subject! @belongsTo
+    user: User! @belongsTo
+    rooms: [Room!]! @morphMany
+    thumbnail: Attachment @morphOne
+    description: String!
+    played_count: Int!
+    is_rewarded: Boolean!
+    difficulty: QuizDifficultyEnum
+    visibility: VisibilityEnum
+}
+
+type Quizreward {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    transaction: Transaction! @morphOne
+    quiz: Quiz! @belongsTo
+    reward: Reward! @belongsTo
+}
+
+type Quizresult {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    quiz: Quiz! @belongsTo
+    user: User! @belongsTo
+    grade: Float!
+    start_at: String!
+    finish_at: String
+}
+
+type Reward {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    description: String!
+    prize_pool: Float!
+    reward: Float!
+    minimum_play_count: Int!
+    is_active: Boolean
+}
+
+type Voucher {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    code: String!
+    percentage: Float!
+    description: String
+    expired_at: String!
 }
