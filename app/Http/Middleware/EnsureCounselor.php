@@ -22,9 +22,7 @@ class EnsureCounselor
         if (
             !in_array(
                 Ability::COUNSELING,
-                is_array($user->access)
-                    ? $user->access
-                    : json_decode($user->access)
+                $user->access
             )
         ) {
             return response(["message" => "Unauthorized"], 401);

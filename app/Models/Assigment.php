@@ -12,8 +12,6 @@ class Assigment extends Model
 {
     use HasFactory;
 
-    // protected $with = ['teacher', 'classroom', 'subject'];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");

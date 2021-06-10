@@ -30,6 +30,7 @@ class NewMessageEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
+        $this->message->user = $this->message->user;
         return new PresenceChannel(
             "room" . "." . $this->message->messageable_id
         );

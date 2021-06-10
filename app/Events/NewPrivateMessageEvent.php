@@ -31,6 +31,7 @@ class NewPrivateMessageEvent  implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
+        $this->message->user = $this->message->user;
         return new PresenceChannel(
             "private_message" . "." . $this->message->messageable_id
         );

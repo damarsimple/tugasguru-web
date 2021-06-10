@@ -9,12 +9,12 @@ class Access extends Model
 {
     use HasFactory;
 
-    protected $casts = ["ability" => "array"];
-
-    protected $appends = ["ability_alt"];
-
-    public function getAbilityAltAttribute()
-    {
-        return json_decode($this->ability);
-    }
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'ability' => 'array',
+    ];
 }

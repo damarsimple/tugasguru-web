@@ -19,7 +19,6 @@ class Report extends Model
         "data" => "object",
     ];
 
-    protected $appends = ["data_alt"];
 
     public function user(): BelongsTo
     {
@@ -29,10 +28,5 @@ class Report extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany("App\Models\User");
-    }
-
-    public function getDataAltAttribute()
-    {
-        return json_decode($this->data);
     }
 }

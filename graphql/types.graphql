@@ -47,9 +47,12 @@ type School {
     longtitude: String
     npsn: String
 
+    homeroomteachers: [User!]! @belongsToMany
+    headmasters: [User!]! @belongsToMany
+    ppdbadmins: [User!]! @belongsToMany
+    counselors: [User!]! @belongsToMany
     teachers: [User!]! @hasMany
     students: [User!]! @hasMany
-    partteacher: [User!]! @belongsToMany
     schooltype: Schooltype @belongsTo
     subjects: [Subject!]! @belongsToMany
     classrooms: [Classroom!]! @hasMany
@@ -62,6 +65,10 @@ type Absent {
     updated_at: DateTime!
     user: User
     receiver: User
+    type: String!
+    reason: String!
+    finish_at: DateTime
+    start_at: DateTime
 }
 
 type Answer {
@@ -69,11 +76,12 @@ type Answer {
     created_at: DateTime!
     updated_at: DateTime!
     is_correct: Boolean!
+    content: String
     question: Question
     attachment: Attachment @morphOne
 }
 
-enum VisibilityEnum {
+enum Visibility {
     PUBLIK
     PRIVAT
     SELECTPEOPLE
@@ -89,7 +97,7 @@ type Article {
     content: String!
     is_paid: Boolean!
     role: String!
-    visibility: VisibilityEnum
+    visibility: Visibility
     school: School
     price: Price
     thumbnail: Attachment @morphOne
@@ -136,17 +144,20 @@ type Agenda {
     name: String
     created_at: DateTime!
     updated_at: DateTime!
+    uuid: String!
     user: User @belongsTo
     school: School @belongsTo
     description: String
     attendances: [Attendance!]! @hasMany
     finish_at: DateTime
+    agendaable_type: String
 }
 type Attendance {
     id: ID!
     created_at: DateTime!
     updated_at: DateTime!
     user: User @belongsTo
+    uuid: String!
     classroom: Classroom @belongsTo
     school: School @belongsTo
     subject: Subject @belongsTo
@@ -197,6 +208,14 @@ type Consultation {
 type Exam {
     id: ID!
     name: String!
+    time_limit: Int!
+    allow_show_result: Boolean!
+    shuffle: Boolean!
+    education_year_start: Int!
+    is_odd_semester: Boolean!
+    education_year_end: Int!
+    hint: String
+    description: String
     created_at: DateTime!
     updated_at: DateTime!
     examsessions: [Examsession!]! @hasMany
@@ -219,6 +238,7 @@ type Examresult {
     user: User! @belongsTo
     examsession: Examsession! @belongsTo
     studentanswers: [StudentAnswer!]! @hasMany
+    grade: Float!
 }
 
 type Examsession {
@@ -252,6 +272,30 @@ type Examtype {
     exams: [Exam!]! @hasMany
 }
 
+enum MeetingContentType {
+    Article
+    DRAW
+}
+type MeetingContent {
+    type: MeetingContentType
+    content: String
+}
+
+interface MeetingData {
+    url: String
+    type: MeetingMedia
+    content: String
+    attachment: Attachment
+}
+enum MeetingMedia {
+    YOUTUBE
+    IMAGE
+    AUDIO
+    VIDEO
+    DOCUMENT
+    ARTICLE_NOW
+}
+
 type Meeting {
     id: ID!
     name: String!
@@ -259,7 +303,8 @@ type Meeting {
     updated_at: DateTime!
     start_at: String!
     finish_at: String!
-    content: String
+    content: MeetingContent
+    data: MeetingData
     description: String
     classroom: Classroom! @belongsTo
     article: Article @belongsTo
@@ -282,7 +327,7 @@ type Message {
 }
 
 type Packagequestion {
-    idd: ID!
+    id: ID!
     name: String!
     created_at: DateTime!
     updated_at: DateTime!
@@ -291,7 +336,7 @@ type Packagequestion {
     subject: Subject! @belongsTo
     classtype: Classtype! @belongsTo
     editable: Boolean!
-    visibility: VisibilityEnum
+    visibility: Visibility
 }
 
 union Priceable = Article
@@ -309,7 +354,7 @@ type PrivateRoom {
     first: User! @belongsTo
     second: User! @belongsTo
 }
-enum QuestiontTypeEnum {
+enum QuestionType {
     MULTI_CHOICE
     ESSAY
     FILLER
@@ -330,9 +375,9 @@ type Question {
     attachments: [Attachment!]! @morphMany
     subject: Subject! @belongsTo
     classtype: Classtype @belongsTo
-    type: QuestiontTypeEnum!
+    type: QuestionType!
     content: String!
-    visibility: VisibilityEnum
+    visibility: Visibility
 }
 
 union Roomable = Meeting | Quiz
@@ -346,6 +391,8 @@ type Room {
     users: [User!]! @belongsToMany
     roomable: Roomable @morphTo
     quizresults: [Quizresult!]! @hasMany
+    identifier: String!
+    is_enabled: Boolean!
 }
 
 type Schooltype {
@@ -362,6 +409,7 @@ type StudentAnswer {
     id: ID!
     created_at: DateTime!
     updated_at: DateTime!
+    answer_id: ID
     answer: Answer @belongsTo
     question: Question! @belongsTo
     examsession: Examsession! @belongsTo
@@ -390,7 +438,7 @@ type StudentAssigment {
     turned_at: String
 }
 
-enum SubjectTypeEnum {
+enum SubjectType {
     VOCATIONAL
     LOCAL_CONTENT
     SPECIAL_DEVELOPMENT
@@ -405,12 +453,12 @@ type Subject {
     meetings: [Meeting!]! @hasMany
     abbreviation: String
     description: String
-    type: SubjectTypeEnum
+    type: SubjectType
 }
 
 union Transactionable = Access | Quizreward
 
-enum TransactionStatusEnum {
+enum TransactionStatus {
     STAGING
     PENDING
     SUCCESS
@@ -428,7 +476,7 @@ type Transaction {
     voucher: Voucher
     uuid: String!
     payment_method: String
-    status: TransactionStatusEnum
+    status: TransactionStatus
     is_paid: Boolean!
     staging_url: String
     invoice_request: String
@@ -437,9 +485,20 @@ type Transaction {
     description: String
 }
 
+enum Gender {
+    Male
+    Female
+}
+enum Roles {
+    TEACHER
+    STUDENT
+    BIMBEL
+    PARENT
+}
 type User {
     id: ID!
     name: String!
+    email: String!
     created_at: DateTime!
     updated_at: DateTime!
     province: Province @belongsTo
@@ -449,21 +508,35 @@ type User {
     attachments: [Attachment!]! @hasMany
     articles: [Article!]! @hasMany
     frontarticles: [Article!]! @hasMany
-
+    profilepicture: Attachment @morphOne
     followers: [User!]! @belongsToMany
     requestfollowers: [User!]! @belongsToMany
     followings: [User!]! @belongsToMany
     rooms: [Room!]! @belongsToMany
     school: School @belongsTo
     attendances: [Attendance!]! @hasMany
+    roles: Roles
+    mainschool: School
+    balance: Float!
+    phone: String!
+    dob: DateTime
+    address: String
+    gender: Gender
     "Student"
     myclassrooms: [Classroom!]! @belongsToMany
     guardian: User @belongsTo
     consultations: [Consultation!]! @hasMany
+    nisn: String
+    school: School
+    classtype: Classtype
+    parent: User
     "Teacher"
+    is_bimbel: Boolean!
     homeroomschools: [School!]! @belongsToMany
     headmasterschools: [School!]! @belongsToMany
-
+    academic_degree: String
+    specialty: String
+    hidden_attribute: [String]
     absents(where: _ @whereConditions(columns: ["name"])): [Absent!]! @hasMany
     schools: [School!]! @belongsToMany
     subjects(where: _ @whereConditions(columns: ["name"])): [Subject!]!
@@ -493,7 +566,7 @@ type User {
     studentconsultations: [Consultation!]! @hasMany
     forms: [Form!]! @hasMany
     reports: [Report!]! @hasMany
-
+    access: [String]
     main_school: School
     accesses: [Access!]! @belongsToMany
     rawaccesses: [Access!]! @belongsToMany
@@ -505,14 +578,14 @@ type User {
     agendas: [Agenda!]! @hasMany
 }
 
-enum FormStatusEnum {
+enum FormStatus {
     PENDING
     PROCESSED
     FINISHED
     REJECTED
 }
 
-enum FormTypeEnum {
+enum FormType {
     REQUEST_TUTOR
     REQUEST_COUNSELOR
     REQUEST_HEADMASTER
@@ -526,12 +599,12 @@ type Form {
     updated_at: DateTime!
     user: User! @belongsTo
     data: String!
-    type: FormTypeEnum
+    type: FormType
     comment: String
-    status: FormStatusEnum
+    status: FormStatus
 }
 
-enum ReportTypeEnum {
+enum ReportType {
     GRADE
 }
 
@@ -541,10 +614,9 @@ type Report {
     created_at: DateTime!
     updated_at: DateTime!
     data: String!
-    data_alt: String!
     user: User! @belongsTo
     users: [User!]! @belongsToMany
-    type: ReportTypeEnum
+    type: ReportType
 }
 
 type Access {
@@ -554,10 +626,10 @@ type Access {
     updated_at: DateTime!
     price: Float!
     duration: Int!
-    ability: [String]!
+    ability: [String]
 }
 
-enum QuizDifficultyEnum {
+enum QuizDifficulty {
     EASY
     MEDIUM
     HARD
@@ -578,8 +650,8 @@ type Quiz {
     description: String!
     played_count: Int!
     is_rewarded: Boolean!
-    difficulty: QuizDifficultyEnum
-    visibility: VisibilityEnum
+    difficulty: QuizDifficulty
+    visibility: Visibility
 }
 
 type Quizreward {
@@ -598,6 +670,7 @@ type Quizresult {
     quiz: Quiz! @belongsTo
     user: User! @belongsTo
     grade: Float!
+    room: Room
     start_at: String!
     finish_at: String
 }

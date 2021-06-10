@@ -61,7 +61,8 @@
         ],
         "remigrate": [
             "@php artisan migrate:fresh",
-            "@php artisan seed:data --test"
+            "@php artisan seed:data --test",
+            "composer dump-autoload"
         ]
     },
     "extra": {

@@ -66,7 +66,7 @@ class TeacherRespondConsultation extends Notification
         return new BroadcastMessage([
             'type' => 'TEACHER_RESPOND_CONSULTATION',
             'data' => $this->consultation,
-            'user' => $this->consultation->teacher
+            'user' => $this->consultation->consultant
         ]);
     }
 
@@ -81,7 +81,7 @@ class TeacherRespondConsultation extends Notification
         return [
             'type' => 'TEACHER_RESPOND_CONSULTATION',
             'data' => $this->consultation,
-            'user' => $this->consultation->teacher
+            'user' => $this->consultation->consultant
         ];
     }
 }

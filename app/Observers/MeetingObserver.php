@@ -19,6 +19,8 @@ class MeetingObserver
      */
     public function created(Meeting $meeting)
     {
+        $meeting->user = $meeting->user;
+
         broadcast(new MeetingChangeEvent($meeting));
 
         foreach ($meeting->classroom->students as $student) {
@@ -85,6 +87,7 @@ class MeetingObserver
      */
     public function updated(Meeting $meeting)
     {
+        $meeting->user = $meeting->user;
         broadcast(new MeetingChangeEvent($meeting));
     }
 

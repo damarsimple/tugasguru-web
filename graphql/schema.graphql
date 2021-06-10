@@ -7,4 +7,5 @@ type Query {
     provinces: [Province!]! @all
     cities: [City!]! @all
     me: User @auth
+    accesses: [Access!]! @all
 }

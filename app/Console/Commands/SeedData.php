@@ -582,10 +582,10 @@ class SeedData extends Command
             $access->name = "Guru Plus 1 Tahun";
             $access->duration = 12 * 30;
             $access->price = 50000;
-            $access->ability = json_encode([
+            $access->ability = [
                 Ability::ABSENT_CONSULT,
                 Ability::GRADE_REPORT,
-            ]);
+            ];
 
             $access->save();
 
@@ -593,7 +593,7 @@ class SeedData extends Command
             $access->name = "Wali Kelas 1 Tahun";
             $access->duration = 12 * 30;
             $access->price = 50000;
-            $access->ability = json_encode([Ability::HOMEROOM]);
+            $access->ability = [Ability::HOMEROOM];
 
             $access->save();
 
@@ -601,7 +601,7 @@ class SeedData extends Command
             $access->name = "Guru BK 1 Tahun";
             $access->duration = 12 * 30;
             $access->price = 50000;
-            $access->ability = json_encode([Ability::COUNSELING]);
+            $access->ability = [Ability::COUNSELING];
 
             $access->save();
 
@@ -609,7 +609,7 @@ class SeedData extends Command
             $access->name = "Kepala Sekolah 1 Tahun";
             $access->duration = 12 * 30;
             $access->price = 50000;
-            $access->ability = json_encode([Ability::HEADMASTER]);
+            $access->ability = [Ability::HEADMASTER];
 
             $access->save();
 

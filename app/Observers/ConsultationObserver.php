@@ -16,7 +16,7 @@ class ConsultationObserver
      */
     public function created(Consultation $consultation)
     {
-        $consultation->teacher->notify(
+        $consultation->consultant->notify(
             new StudentCreateConsultation($consultation)
         );
     }

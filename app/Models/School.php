@@ -55,10 +55,6 @@ class School extends Model
         return $this->hasMany("App\Models\User")->where("roles", User::STUDENT);
     }
 
-    public function partteacher(): BelongsToMany
-    {
-        return $this->belongsToMany("App\Models\User");
-    }
     public function province(): BelongsTo
     {
         return $this->belongsTo("App\Models\Province");

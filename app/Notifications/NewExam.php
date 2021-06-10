@@ -52,7 +52,7 @@ class NewExam extends Notification
         return new BroadcastMessage([
             'type' => 'NEW_EXAM',
             'data' => $this->exam,
-            'user' => $this->exam->teacher
+            'user' => $this->exam->user
         ]);
     }
 
@@ -67,7 +67,7 @@ class NewExam extends Notification
         return [
             'type' => 'NEW_EXAM',
             'data' => $this->exam,
-            'user' => $this->exam->teacher
+            'user' => $this->exam->user
         ];
     }
 }

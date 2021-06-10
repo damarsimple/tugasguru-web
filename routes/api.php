@@ -137,12 +137,12 @@ Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], func
 
             $transaction->is_paid = true;
             $transaction->status = Transaction::SUCCESS;
-            $transaction->invoice_response = json_encode($request->toArray());
+            $transaction->invoice_response = $request->toArray();
 
             $transaction->save();
         } else {
             $transaction->status = Transaction::FAILED;
-            $transaction->invoice_response = json_encode($request->toArray());
+            $transaction->invoice_response = $request->toArray();
 
             $transaction->save();
         }
@@ -360,7 +360,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
                     description: $transaction->description,
                     email: $user->email
                 );
-                $transaction->invoice_request = json_encode($invoice);
+                $transaction->invoice_request = $invoice;
 
                 $transaction->staging_url = $invoice['invoice_url'];
 
@@ -513,27 +513,19 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             $candidate = User::findOrFail($request->user);
 
 
-            if ($user->roles == User::TEACHER) {
+            if ($user->roles == User::TEACHER && $candidate->roles !== "TEACHER") {
 
-                if ($candidate->roles !== "TEACHER" || !$candidate->teacher) {
-                    return ['message' => 'invalid follow target'];
-                }
-
-                $candidate->teacher->requestfollowers()->syncWithoutDetaching([$user?->id]);
+                return ['message' => 'invalid follow target'];
+            } else  if (
+                $candidate->roles == "TEACHER" &&
+                !$user->school->teachers->pluck('id')->contains($request->user)
+            ) {
+                return ['message' => 'Guru tidak ada di sekolah'];
             } else {
-                if (
-                    $candidate->roles == "TEACHER" &&
-                    !$user->school->teachers->pluck('id')->contains($request->user)
-                ) {
-                    return ['message' => 'Guru tidak ada di sekolah'];
-                }
-
-                if ($candidate->roles == "TEACHER") {
-                    $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
-                } else {
-                    $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
-                }
+                $candidate->requestfollowers()->syncWithoutDetaching([$user->id]);
             }
+
+
 
 
             return ['message' => 'ok'];
@@ -553,7 +545,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
     });
 
 
-    Route::group(['prefix' => 'access'], function () {
+    Route::group(['prefix' => 'accesses'], function () {
         Route::get('/', function () {
             return Access::all();
         });
@@ -591,7 +583,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
         $user->academic_degree = $request->academic_degree;
 
         if ($request->hidden_attribute) {
-            $user->hidden_attribute = json_encode($request->hidden_attribute);
+            $user->hidden_attribute = $request->hidden_attribute;
         }
 
         $user->save();
@@ -691,11 +683,16 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
                 sort($participants);
 
                 [$first, $second] = $participants;
-
-                return PrivateRoom::firstOrCreate([
+                $room = PrivateRoom::firstOrCreate([
                     'first_id' => $first,
+            
                     'second_id' => $second
                 ]);
+
+                $room->first = User::find($first);
+                $room->second = User::find($second);
+
+                return  $room;
             });
         });
     });
@@ -817,7 +814,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
         $user->gender = $request->gender;
 
         if ($request->hidden_attribute) {
-            $user->hidden_attribute = json_encode($request->hidden_attribute);
+            $user->hidden_attribute = $request->hidden_attribute;
         }
 
         if ($request->profilepicture) {
@@ -1229,7 +1226,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             return Examresult::where('user_id', $student->id)
                 ->where('exam_id', $id)
                 ->with(
-                    'exam.teacher',
+                    'exam.user',
                     'exam.subject',
                     'exam.examtype',
                     'exam.supervisors',
@@ -1349,7 +1346,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $form->type = $request->type;
 
-            $form->data = json_encode($request->data);
+            $form->data = $request->data;
 
             $user = $request->user();
 
@@ -1992,7 +1989,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $report = new Report();
             $report->name = $request->name;
-            $report->data = json_encode($request->data);
+            $report->data = $request->data;
             $report->type = $request->type;
 
             if ($request->receiver) {
@@ -2009,7 +2006,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $report = $request->user()->reports()->findOrFail($id);
             $report->name = $request->name;
-            $report->data = json_encode($request->data);
+            $report->data = $request->data;
             $report->type = $request->type;
 
             if ($request->receiver) {

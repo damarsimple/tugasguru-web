@@ -56,9 +56,7 @@ class TransactionObserver
     {
         $user = $transaction->user;
 
-        $abilities = is_array($user->access)
-            ? $user->access
-            : json_decode($user->access) ?? [];
+        $abilities = $user->access ?? [];
 
         switch ($transaction->transactionable_type) {
             case "App\Models\Access":
@@ -70,7 +68,7 @@ class TransactionObserver
                         "expired_at" => now()->addDay($subscription->duration),
                     ]);
 
-                foreach ($subscription->ability_alt as $ability) {
+                foreach ($subscription->ability as $ability) {
                     $abilities[] = $ability;
                 }
 

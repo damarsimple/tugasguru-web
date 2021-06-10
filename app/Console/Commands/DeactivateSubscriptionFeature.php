@@ -51,7 +51,7 @@ class DeactivateSubscriptionFeature extends Command
             $abilities = [];
 
             foreach ($user->subscriptions as $subscription) {
-                foreach ($subscription->ability_alt as $ability) {
+                foreach ($subscription->ability as $ability) {
                     $abilities[] = $ability;
                 }
             }
