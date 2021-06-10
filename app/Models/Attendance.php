@@ -17,7 +17,7 @@ class Attendance extends Model
         "agenda_id"
     ];
 
-    protected $with = ["user", "attendable"];
+    protected $with = ["user","agenda"];
 
     public function user(): BelongsTo
     {

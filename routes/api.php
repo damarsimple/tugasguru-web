@@ -104,7 +104,7 @@ Route::post("/register", [ApiAuthController::class, "register"]);
 Route::middleware('auth:sanctum')->get("/user", [ApiAuthController::class, 'profile']);
 Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'refresh']);
 
-Route::get('attendances/{uuid}', function ($uuid) {
+Route::middleware('auth:sanctum')->get('attendances/{uuid}', function ($uuid) {
 
     $attendance = Attendance::where('uuid', $uuid)->firstOrFail();
 
@@ -113,6 +113,19 @@ Route::get('attendances/{uuid}', function ($uuid) {
     $attendance->save();
 
     return 'ok';
+});
+
+Route::middleware('auth:sanctum')->get("/agenda/{uuid}", function(Request $request, $uuid){
+    $agenda = Agenda::where('uuid', $uuid)->firstOrFail();
+
+    $attendance = $agenda->attendances()->where('user_id', $request->user()->id)->firstOrFail();
+
+    $attendance->attended = true;
+
+    $attendance->save();
+
+    return 'ok';
+
 });
 
 
