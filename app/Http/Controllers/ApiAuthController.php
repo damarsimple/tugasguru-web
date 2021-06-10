@@ -18,30 +18,18 @@ class ApiAuthController extends Controller
         ]);
         $credentials = $request->only("email", "password");
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return response()->json(["user" => Auth::user()]);
-        }
-        throw ValidationException::withMessages([
-            "email" => ["The provided credentials are incorrect."],
-        ]);
-    }
-    public function token(Request $request)
-    {
-        $request->validate([
-            "email" => "required|email",
-            "password" => "required",
-        ]);
-        $user = User::where("email", $request->email)->first();
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                "email" => ["The provided credentials are incorrect."],
+            $user = User::where('email', $request->email)->firstOrFail();
+            return response()->json([
+                "user" => $user,
+                "token" => $user->createToken($user->name)->plainTextToken,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'The provided credentials do not match our records.',
             ]);
         }
-        return response()->json([
-            "user" => $user,
-            "token" => $user->createToken($user->name)->plainTextToken,
-        ]);
     }
+
     public function register(Request $request)
     {
         $request->validate([
