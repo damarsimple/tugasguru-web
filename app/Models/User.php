@@ -286,14 +286,14 @@ class User extends Authenticatable
     //     return $this->hasManyThrough('App\Models\Attendance', 'App\Models\Classroom', firstKey: 'user_id');
     // }
 
-    public function subscriptions(): BelongsToMany
+    public function accesses(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Subscription')->wherePivot('expired_at', '>', now())->withPivot('expired_at');
+        return $this->belongsToMany('App\Models\Access')->wherePivot('expired_at', '>', now())->withPivot('expired_at');
     }
 
-    public function rawsubscriptions(): BelongsToMany
+    public function rawaccesses(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Subscription')->withPivot('expired_at');
+        return $this->belongsToMany('App\Models\Access')->withPivot('expired_at');
     }
 
     public function transactions(): HasMany

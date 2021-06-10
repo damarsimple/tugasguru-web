@@ -408,7 +408,7 @@ type Subject {
     type: SubjectTypeEnum
 }
 
-union Transactionable = Subscription | Quizreward
+union Transactionable = Access | Quizreward
 
 enum TransactionStatusEnum {
     STAGING
@@ -464,17 +464,28 @@ type User {
     homeroomschools: [School!]! @belongsToMany
     headmasterschools: [School!]! @belongsToMany
 
-    absents: [Absent!]! @hasMany
+    absents(where: _ @whereConditions(columns: ["name"])): [Absent!]! @hasMany
     schools: [School!]! @belongsToMany
-    subjects: [Subject!]! @belongsToMany
-    questions: [Question!]! @hasMany
-    exams: [Exam!]! @hasMany
-    classrooms: [Classroom!]! @hasMany
-    assigments: [Assigment!]! @hasMany
-    packagequestions: [Packagequestion!]! @hasMany
-    meetings: [Meeting!]! @hasMany
-    questions: [Question!]! @hasMany
-    examresults: [Examresult!]! @hasMany
+    subjects(where: _ @whereConditions(columns: ["name"])): [Subject!]!
+        @belongsToMany
+    questions(where: _ @whereConditions(columns: ["subject_id"])): [Question!]!
+        @hasMany
+    exams(where: _ @whereConditions(columns: ["name", "subject_id"])): [Exam!]!
+        @hasMany
+    classrooms(
+        where: _ @whereConditions(columns: ["name", "subject_id"])
+    ): [Classroom!]! @hasMany
+    assigments(
+        where: _ @whereConditions(columns: ["name", "subject_id"])
+    ): [Assigment!]! @hasMany
+    packagequestions(
+        where: _ @whereConditions(columns: ["name", "subject_id"])
+    ): [Packagequestion!]! @hasMany
+    meetings(
+        where: _ @whereConditions(columns: ["name", "subject_id"])
+    ): [Meeting!]! @hasMany
+    examresults(where: _ @whereConditions(columns: ["name"])): [Examresult!]!
+        @hasMany
     studentassigments: [StudentAssigment!]! @hasMany
 
     studentabsents: [Absent!]! @hasMany
@@ -484,11 +495,13 @@ type User {
     reports: [Report!]! @hasMany
 
     main_school: School
-    subscriptions: [Subscription!]! @belongsToMany
-    rawsubscriptions: [Subscription!]! @belongsToMany
+    accesses: [Access!]! @belongsToMany
+    rawaccesses: [Access!]! @belongsToMany
     transactions: [Transaction!]! @hasMany
     myreports: [Report!]! @belongsToMany
-    quizzez: [Quiz!]! @hasMany
+    quizzez(
+        where: _ @whereConditions(columns: ["name", "subject_id"])
+    ): [Quiz!]! @hasMany
     agendas: [Agenda!]! @hasMany
 }
 
@@ -534,7 +547,7 @@ type Report {
     type: ReportTypeEnum
 }
 
-type Subscription {
+type Access {
     id: ID!
     name: String
     created_at: DateTime!

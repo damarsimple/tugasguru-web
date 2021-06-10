@@ -12,6 +12,7 @@ use App\Http\Middleware\EnsureTeacher;
 use App\Http\Middleware\EnsureXendit;
 use App\Jobs\FormApproveTest;
 use App\Models\Absent;
+use App\Models\Access;
 use App\Models\Agenda;
 use App\Models\Answer;
 use App\Models\Article;
@@ -44,7 +45,6 @@ use App\Models\School;
 use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
-use App\Models\Subscription;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
@@ -316,10 +316,10 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
 
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], function () {
-    Route::post('/subscriptions', function (Request $request) {
+    Route::post('/accesses', function (Request $request) {
         $user = $request->user();
 
-        $subscription = Subscription::findOrFail($request->subscription);
+        $subscription = Access::findOrFail($request->subscription);
 
         $transaction = new Transaction();
 
@@ -553,13 +553,13 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
     });
 
 
-    Route::group(['prefix' => 'subscriptions'], function () {
+    Route::group(['prefix' => 'access'], function () {
         Route::get('/', function () {
-            return Subscription::all();
+            return Access::all();
         });
 
         Route::get('/my', function (Request $request) {
-            return $request->user()->subscriptions;
+            return $request->user()->accesses;
         });
     });
 

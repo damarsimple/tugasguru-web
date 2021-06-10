@@ -235,10 +235,10 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create("subscription_user", function (Blueprint $table) {
+        Schema::create("access_user", function (Blueprint $table) {
             $table->id();
             $table
-                ->foreignId("subscription_id")
+                ->foreignId("access_id")
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");

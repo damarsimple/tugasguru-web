@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Enum\Ability;
 use App\Events\TransactionEvent;
-use App\Models\Subscription;
 use App\Models\Transaction;
 use App\Notifications\TransactionFailed;
 use App\Notifications\TransactionPending;
@@ -62,11 +61,11 @@ class TransactionObserver
             : json_decode($user->access) ?? [];
 
         switch ($transaction->transactionable_type) {
-            case "App\Models\Subscription":
+            case "App\Models\Access":
                 $subscription = $transaction->transactionable;
 
                 $user
-                    ->subscriptions()
+                    ->accesses()
                     ->attach($subscription, [
                         "expired_at" => now()->addDay($subscription->duration),
                     ]);

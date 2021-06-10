@@ -28,7 +28,7 @@ use App\Models\Schooltype;
 use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
-use App\Models\Subscription;
+use App\Models\Access;
 use App\Models\User;
 use App\Models\Voucher;
 use Illuminate\Console\Command;
@@ -578,40 +578,40 @@ class SeedData extends Command
 
             $firstclassroom->meetings()->save($meeting);
 
-            $subscription = new Subscription();
-            $subscription->name = "Guru Plus 1 Tahun";
-            $subscription->duration = 12 * 30;
-            $subscription->price = 50000;
-            $subscription->ability = json_encode([
+            $access = new Access();
+            $access->name = "Guru Plus 1 Tahun";
+            $access->duration = 12 * 30;
+            $access->price = 50000;
+            $access->ability = json_encode([
                 Ability::ABSENT_CONSULT,
                 Ability::GRADE_REPORT,
             ]);
 
-            $subscription->save();
+            $access->save();
 
-            $subscription = new Subscription();
-            $subscription->name = "Wali Kelas 1 Tahun";
-            $subscription->duration = 12 * 30;
-            $subscription->price = 50000;
-            $subscription->ability = json_encode([Ability::HOMEROOM]);
+            $access = new Access();
+            $access->name = "Wali Kelas 1 Tahun";
+            $access->duration = 12 * 30;
+            $access->price = 50000;
+            $access->ability = json_encode([Ability::HOMEROOM]);
 
-            $subscription->save();
+            $access->save();
 
-            $subscription = new Subscription();
-            $subscription->name = "Guru BK 1 Tahun";
-            $subscription->duration = 12 * 30;
-            $subscription->price = 50000;
-            $subscription->ability = json_encode([Ability::COUNSELING]);
+            $access = new Access();
+            $access->name = "Guru BK 1 Tahun";
+            $access->duration = 12 * 30;
+            $access->price = 50000;
+            $access->ability = json_encode([Ability::COUNSELING]);
 
-            $subscription->save();
+            $access->save();
 
-            $subscription = new Subscription();
-            $subscription->name = "Kepala Sekolah 1 Tahun";
-            $subscription->duration = 12 * 30;
-            $subscription->price = 50000;
-            $subscription->ability = json_encode([Ability::HEADMASTER]);
+            $access = new Access();
+            $access->name = "Kepala Sekolah 1 Tahun";
+            $access->duration = 12 * 30;
+            $access->price = 50000;
+            $access->ability = json_encode([Ability::HEADMASTER]);
 
-            $subscription->save();
+            $access->save();
 
             // $transaction = new Transaction();
 
