@@ -12,7 +12,7 @@ class Room extends Model
 {
     use HasFactory;
 
-    protected $with = ["users"];
+    protected $with = ["users", "quizresults"];
 
     public function messages()
     {

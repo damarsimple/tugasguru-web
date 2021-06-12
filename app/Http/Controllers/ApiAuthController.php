@@ -69,7 +69,7 @@ class ApiAuthController extends Controller
             "city_id" => ["required", "numeric"],
             "district_id" => ["required", "numeric"],
             "gender" => ["required", "numeric"],
-            "phone" => ["required", "numeric"],
+            "phone" => ["required", "numeric",  Rule::unique(User::class)],
             "roles" => [
                 "required",
                 "in:TEACHER,STUDENT,TEACHER_BIMBEL,GUARDIAN,GENERAL",

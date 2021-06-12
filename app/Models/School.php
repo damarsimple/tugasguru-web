@@ -73,11 +73,6 @@ class School extends Model
         return $this->belongsToMany("App\Models\Subject");
     }
 
-    public function classtypes(): BelongsToMany
-    {
-        return $this->belongsToMany("App\Models\Classtype");
-    }
-
     public function classrooms(): HasMany
     {
         return $this->hasMany("App\Models\Classroom");

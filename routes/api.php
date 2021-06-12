@@ -48,6 +48,7 @@ use App\Models\Subject;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
+use App\Notifications\QuizInvite;
 use App\Payment\Xendit;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -290,6 +291,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
                 'room' => Room::with('users')->find($room->id),
                 'quiz' => Quiz::with('questions.answers')->findOrFail($room->roomable_id)
             ];
+        });
+        Route::post('/invite', function (Request $request) {
+            $room = Room::where('identifier', $request->identifier)->firstOrFail();
+            $user = User::where('id', $request->user)->firstOrFail();
+            $user->notify(new QuizInvite($room));
+            return 'ok';
         });
         Route::put('{id}', function (Request $request, $id) {
             $room = Room::find($id);
@@ -649,12 +656,23 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
                 $user = $request->user();
 
                 if ($user->roles == User::TEACHER) {
-                    $y = $user->schools()->first();
-                } else {
+                    $y = $user->schools()->get();
+                    $users = [];
+                    foreach ($y as $school) {
+                        foreach ($school->teachers as $teacher) {
+                            $users[] = $teacher;
+                        }
+                        foreach ($school->students as $student) {
+                            $users[] = $student;
+                        }
+                    }
+                    return array_merge($users, $user->followers->toArray());
+                } else if ($user->roles == User::STUDENT) {
                     $y = $user->school;
+                    return array_merge($y->teachers->toArray(), $y->students->toArray(), $user->followers->toArray());
+                } else {
+                    return $user->followers;
                 }
-
-                return array_merge($y->teachers->toArray(), $y->students->toArray());
             });
             Route::get('rooms', function (Request $request) {
 

@@ -38,7 +38,7 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create("classtype_school", function (Blueprint $table) {
+        Schema::create("classtype_schooltype", function (Blueprint $table) {
             $table->id();
             $table
                 ->foreignId("classtype_id")
@@ -46,7 +46,7 @@ class CreatePivotsTable extends Migration
                 ->constrained()
                 ->onDelete("cascade");
             $table
-                ->foreignId("school_id")
+                ->foreignId("schooltype_id")
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");

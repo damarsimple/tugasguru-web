@@ -436,8 +436,6 @@ class SeedData extends Command
                             }
                         }
 
-                        $schoolModel->classtypes()->attach($classtypesIds);
-
                         // $classrooms = [];
                         // foreach ($schoolModel->classtypes as $classtype) {
                         //     for ($i = 0; $i < 3; $i++) {
