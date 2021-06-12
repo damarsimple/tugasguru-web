@@ -360,6 +360,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
                     description: $transaction->description,
                     email: $user->email
                 );
+
                 $transaction->invoice_request = $invoice;
 
                 $transaction->staging_url = $invoice['invoice_url'];
@@ -685,7 +686,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
                 [$first, $second] = $participants;
                 $room = PrivateRoom::firstOrCreate([
                     'first_id' => $first,
-            
+
                     'second_id' => $second
                 ]);
 

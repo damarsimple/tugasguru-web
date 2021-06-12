@@ -20,7 +20,14 @@ class ApiAuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->email)->firstOrFail();
             return response()->json([
-                "user" => $user,
+                "user" => $user->load(
+                    "classrooms",
+                    "myclassrooms",
+                    "school",
+                    "followings",
+                    "requestfollowers",
+                    "city"
+                ),
                 "token" => $user->createToken($user->name)->plainTextToken,
             ]);
         } else {
@@ -56,7 +63,7 @@ class ApiAuthController extends Controller
                 "myclassrooms",
                 "school",
                 "followings",
-                "requestfollowings",
+                "requestfollowers",
                 "city"
             );
 

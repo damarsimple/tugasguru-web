@@ -16,8 +16,6 @@ class Quiz extends Model
 
     public const THUMBNAIL = "THUMBNAIL";
 
-    protected $with = ["thumbnail", "firstquestion", "subject", "user"];
-
     public function quizreward(): HasOne
     {
         return $this->hasOne("App\Models\QuizReward");

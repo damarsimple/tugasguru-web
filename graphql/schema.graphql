@@ -7,5 +7,30 @@ type Query {
     provinces: [Province!]! @all
     cities: [City!]! @all
     me: User @auth
+    user(id: ID! @eq): User @find
+    school(id: ID! @eq): School @find
+    report(id: ID! @eq): Report @find
+    attendance(id: ID! @eq): Attendance @find
+    transaction(id: ID! @eq): Transaction @find
     accesses: [Access!]! @all
+    examtypes: [Examtype!]! @all
+    subjects: [Subject!]! @all
+    classtypes: [Classtype!]! @all
+    schooltypes: [Schooltype!]! @all
+    article(slug: String! @eq): Article @find
+    quizzez(
+        where: _ @whereConditions(columns: ["subject_id", "classtype_id"])
+    ): [Quiz]!
+        @paginate(type: CONNECTION)
+        @orderBy(column: "created_at", direction: DESC)
+    questions(
+        where: _ @whereConditions(columns: ["subject_id", "classtype_id"])
+    ): [Question]!
+        @paginate(type: CONNECTION)
+        @orderBy(column: "created_at", direction: DESC)
+    packagequestions(
+        where: _ @whereConditions(columns: ["subject_id", "classtype_id"])
+    ): [Packagequestion]!
+        @paginate(type: CONNECTION)
+        @orderBy(column: "created_at", direction: DESC)
 }

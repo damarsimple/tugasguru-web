@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Article;
+use App\Models\Assigment;
 use App\Models\Attachment;
 use App\Models\Attendance;
 use App\Models\Consultation;
@@ -14,6 +15,7 @@ use App\Models\Quiz;
 use App\Models\StudentAssigment;
 use App\Models\Transaction;
 use App\Observers\ArticleObserver;
+use App\Observers\AssigmentObserver;
 use App\Observers\AttachmentObserver;
 use App\Observers\AttendanceObserver;
 use App\Observers\ConsultationObserver;
@@ -57,6 +59,7 @@ class EventServiceProvider extends ServiceProvider
         Exam::observe(ExamObserver::class);
         Transaction::observe(TransactionObserver::class);
         Quiz::observe(QuizObserver::class);
+        Assigment::observe(AssigmentObserver::class);
         Attendance::observe(AttendanceObserver::class);
     }
 }

@@ -13,8 +13,6 @@ class Report extends Model
 
     const GRADE = "GRADE";
 
-    protected $with = ["user", "users"];
-
     protected $casts = [
         "data" => "object",
     ];

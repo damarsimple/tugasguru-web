@@ -20,6 +20,8 @@ class Transaction extends Model
     public const SUCCESS = "SUCCESS";
     public const FAILED = "FAILED";
 
+    protected $casts = ['invoice_request' => 'object', 'invoice_response' => 'object'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");

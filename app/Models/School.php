@@ -13,8 +13,6 @@ class School extends Model
 {
     use HasFactory;
 
-    public $with = ["subjects", "schooltype"];
-
     public function teachers(): BelongsToMany
     {
         return $this->belongsToMany("App\Models\User")->where(

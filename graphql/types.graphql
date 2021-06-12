@@ -56,6 +56,10 @@ type School {
     schooltype: Schooltype @belongsTo
     subjects: [Subject!]! @belongsToMany
     classrooms: [Classroom!]! @hasMany
+    attendances(
+        where: _ @whereConditions(columns: ["id"])
+        hasUser: _ @whereHasConditions(columns: ["roles"])
+    ): [Attendance!]! @paginate(type: CONNECTION)
 }
 
 type Absent {
@@ -495,6 +499,7 @@ enum Roles {
     BIMBEL
     PARENT
 }
+
 type User {
     id: ID!
     name: String!
@@ -521,19 +526,24 @@ type User {
     phone: String!
     dob: DateTime
     address: String
-    gender: Gender
+    gender: Int
     "Student"
     myclassrooms: [Classroom!]! @belongsToMany
     guardian: User @belongsTo
-    consultations: [Consultation!]! @hasMany
+    consultations(where: _ @whereConditions(columns: ["id"])): [Consultation!]!
+        @hasMany
     nisn: String
     school: School
     classtype: Classtype
     parent: User
     "Teacher"
     is_bimbel: Boolean!
-    homeroomschools: [School!]! @belongsToMany
-    headmasterschools: [School!]! @belongsToMany
+    homeroomschools(
+        where: _ @whereConditions(columns: ["school_id"])
+    ): [School!]! @belongsToMany
+    headmasterschools(
+        where: _ @whereConditions(columns: ["school_id"])
+    ): [School!]! @belongsToMany
     academic_degree: String
     specialty: String
     hidden_attribute: [String]
@@ -549,7 +559,7 @@ type User {
         where: _ @whereConditions(columns: ["name", "subject_id"])
     ): [Classroom!]! @hasMany
     assigments(
-        where: _ @whereConditions(columns: ["name", "subject_id"])
+        where: _ @whereConditions(columns: ["id", "name", "subject_id"])
     ): [Assigment!]! @hasMany
     packagequestions(
         where: _ @whereConditions(columns: ["name", "subject_id"])
@@ -563,7 +573,9 @@ type User {
 
     studentabsents: [Absent!]! @hasMany
     studentanswers: [StudentAnswer!]! @hasMany
-    studentconsultations: [Consultation!]! @hasMany
+    studentconsultations(
+        where: _ @whereConditions(columns: ["id"])
+    ): [Consultation!]! @hasMany
     forms: [Form!]! @hasMany
     reports: [Report!]! @hasMany
     access: [String]
@@ -613,7 +625,7 @@ type Report {
     name: String
     created_at: DateTime!
     updated_at: DateTime!
-    data: String!
+    data: Mixed
     user: User! @belongsTo
     users: [User!]! @belongsToMany
     type: ReportType

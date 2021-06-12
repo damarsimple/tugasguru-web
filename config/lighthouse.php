@@ -28,6 +28,7 @@ return [
          * make sure to return spec-compliant responses in case an error is thrown.
          */
         "middleware" => [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
 
             // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
@@ -56,7 +57,7 @@ return [
     |
     */
 
-    "guard" => "api",
+    'guard' => 'sanctum',
 
     /*
     |--------------------------------------------------------------------------
@@ -140,10 +141,10 @@ return [
 
     "security" => [
         "max_query_complexity" =>
-            \GraphQL\Validator\Rules\QueryComplexity::DISABLED,
+        \GraphQL\Validator\Rules\QueryComplexity::DISABLED,
         "max_query_depth" => \GraphQL\Validator\Rules\QueryDepth::DISABLED,
         "disable_introspection" =>
-            \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
+        \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
     /*
@@ -356,7 +357,7 @@ return [
             "pusher" => [
                 "driver" => "pusher",
                 "routes" =>
-                    \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class .
+                \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class .
                     "@pusher",
                 "connection" => "pusher",
             ],
@@ -367,7 +368,7 @@ return [
                     "default"
                 ),
                 "routes" =>
-                    \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class .
+                \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class .
                     "@echoRoutes",
             ],
         ],

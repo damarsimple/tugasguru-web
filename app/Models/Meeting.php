@@ -13,14 +13,6 @@ class Meeting extends Model
 {
     use HasFactory;
 
-    protected $with = [
-        "rooms",
-        "classroom.students",
-        "subject",
-        "user",
-        "article",
-    ];
-
     public $appends = ["absents"];
 
     protected $casts = ["data" => "object", "content" => "object"];

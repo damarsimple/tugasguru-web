@@ -14,7 +14,7 @@ class Question extends Model
 
     protected $fillable = ["editable"];
 
-    public $with = ["attachments", "answers", "subject"];
+    public $with = ["attachments", "answers"];
 
     const MULTI_CHOICE = "MULTI_CHOICE";
     const FILLER = "FILLER";

@@ -10,8 +10,6 @@ class Quizresult extends Model
 {
     use HasFactory;
 
-    protected $with = ["user"];
-
     protected $fillable = ["user_id", "quiz_id", "room_id"];
 
     public function room(): BelongsTo

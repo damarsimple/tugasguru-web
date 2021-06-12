@@ -13,7 +13,7 @@ class Examresult extends Model
 
     protected $fillable = ["examsession_id", "user_id", "exam_id"];
 
-    protected $with = ["user"];
+    protected $with = ['user'];
 
     public function exam(): BelongsTo
     {

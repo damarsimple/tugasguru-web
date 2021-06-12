@@ -10,8 +10,6 @@ class Consultation extends Model
 {
     use HasFactory;
 
-    public $with = ["consultant", "user"];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");

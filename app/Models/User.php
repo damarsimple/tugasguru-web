@@ -58,7 +58,7 @@ class User extends Authenticatable
     public const TEACHER = 'TEACHER';
     protected $appends = ['mainschool'];
 
-    protected $with = ['profilepicture', 'province'];
+    protected $with = ['profilepicture'];
 
     public function province(): BelongsTo
     {
@@ -200,8 +200,6 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
     }
 
-
-
     public function exams(): HasMany
     {
         return $this->hasMany('App\Models\Exam', 'user_id');
@@ -214,7 +212,7 @@ class User extends Authenticatable
 
     public function assigments(): HasMany
     {
-        return $this->hasMany('App\Models\Assigment', 'user_id');
+        return $this->hasMany('App\Models\Assigment');
     }
 
 
@@ -303,7 +301,7 @@ class User extends Authenticatable
 
     public function myreports(): BelongsToMany
     {
-    return $this->belongsToMany('App\Models\Report');
+        return $this->belongsToMany('App\Models\Report');
     }
 
     public function quizzes(): HasMany

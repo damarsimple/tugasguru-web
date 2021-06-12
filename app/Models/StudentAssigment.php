@@ -11,9 +11,9 @@ class StudentAssigment extends Model
 {
     use HasFactory;
 
-    protected $with = ["attachments", "user"];
-
     protected $fillable = ["assigment_id", "user_id"];
+
+    protected $with = ['user'];
 
     public function assigment(): BelongsTo
     {

@@ -12,8 +12,6 @@ class Examsession extends Model
 
     protected $hidden = ["token"];
 
-    public $with = ["exam.user"];
-
     protected $casts = [
         "open_at" => "datetime",
         "close_at" => "datetime",
