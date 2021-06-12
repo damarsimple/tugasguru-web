@@ -312,6 +312,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
                 }
             }
             $room->save();
+            
             broadcast(new QuizRoomChangeEvent($room));
         });
         Route::post('/answer', function (Request $request) {
@@ -341,6 +342,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
             $quizresult->save();
 
             $quizanswer->save();
+
             broadcast(new QuizRoomChangeEvent(Room::findOrFail($request->room)));
             return 'ok';
         });
