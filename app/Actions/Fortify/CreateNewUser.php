@@ -2,11 +2,14 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Attachment;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Illuminate\Support\Str;
+use GuzzleHttp\Client;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -87,6 +90,28 @@ class CreateNewUser implements CreatesNewUsers
         }
 
         $user->save();
+
+
+        if (array_key_exists('avatar', $input)) {
+            try {
+                $attachment = new Attachment();
+
+                $attachment->name = Str::uuid() . "." . ".jpg";
+
+                $attachment->mime =  "image/jpeg";
+                $attachment->is_proccessed = false;
+                $attachment->original_size = 0;
+                $attachment->compressed_size = 0;
+                $attachment->role = User::PROFILEPICTURE;
+                $user->attachments()->save($attachment);
+
+                // $file->move('attachments', $attachment->name);
+                $client = new Client();
+                $client->request('GET', $input['avatar'], ['sink' => public_path() . '/attachments/' . $attachment->name]);
+            } catch (\Throwable $th) {
+                return $user;
+            }
+        }
 
         return $user;
     }

@@ -55,6 +55,7 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Laravel\Octane\Facades\Octane;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,31 @@ Broadcast::routes(['middleware' => ['api', 'auth:sanctum']]);
 
 Route::get('me', fn (Request $request) => $request->user());
 
+Route::middleware('web')->get('auth/google/callback', function () {
+
+    $data =  Socialite::driver('google')?->stateless()?->user();
+
+    $user = User::where('email', $data?->email)->first();
+
+    if (!$user) {
+        return redirect(
+            env('FRONT_END_REGISTER_URL') .
+                '/?email=' . $data?->email
+                . '&name=' . $data?->name
+                . '&avatar=' . $data?->avatar_original
+        );
+    } else {
+        $token = $user->createToken('google-' . $user->name)->plainTextToken;
+        return redirect(
+            env('FRONT_END_CALLBACK') .
+                '/?token=' . $token
+                . '&socialToken=' . $data?->token . '&social=google'
+        );
+    }
+});
+Route::middleware('web')->get('social', function () {
+    return Socialite::driver('google')->redirect();
+});
 Route::get('examtypes', fn () => Examtype::all());
 Route::get('/provinces', fn () => Province::all());
 Route::get('/subjects', fn () => Subject::all());
