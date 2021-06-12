@@ -20,7 +20,7 @@ class QuizRoomChangeEvent implements ShouldBroadcastNow
      */
     public function __construct(public Room $room)
     {
-        $this->room->quizresults = Room::find($room->id);
+        $this->room = Room::find($room->id);
     }
 
     /**
