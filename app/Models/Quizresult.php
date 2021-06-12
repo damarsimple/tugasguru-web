@@ -12,6 +12,8 @@ class Quizresult extends Model
 
     protected $fillable = ["user_id", "quiz_id", "room_id"];
 
+    protected $with = ['user'];
+
     public function room(): BelongsTo
     {
         return $this->belongsTo("App\Models\Room");
