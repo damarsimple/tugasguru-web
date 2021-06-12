@@ -72,7 +72,7 @@ class ApiAuthController extends Controller
             "phone" => ["required", "numeric"],
             "roles" => [
                 "required",
-                "in:TEACHER,STUDENT,TEACHER_BIMBEL,GUARDIAN",
+                "in:TEACHER,STUDENT,TEACHER_BIMBEL,GUARDIAN,GENERAL",
             ],
         ];
 

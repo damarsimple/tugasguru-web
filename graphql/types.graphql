@@ -494,10 +494,11 @@ enum Gender {
     Female
 }
 enum Roles {
+    GENERAL
     TEACHER
     STUDENT
     BIMBEL
-    PARENT
+    GUARDIAN
 }
 
 type User {

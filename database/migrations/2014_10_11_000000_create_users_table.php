@@ -33,7 +33,7 @@ class CreateUsersTable extends Migration
             $table->string("phone")->unique();
             $table->integer("gender")->nullable();
             $table->string("password");
-            $table->string("roles");
+            $table->string("roles")->default('GENERAL');
             $table->string("specialty")->nullable();
             $table->string("academic_degree")->nullable();
             $table->json("hidden_attribute")->nullable();
