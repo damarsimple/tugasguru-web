@@ -54,6 +54,8 @@ class User extends Authenticatable
     ];
 
     public const PROFILEPICTURE = 'PROFILEPICTURE';
+    public const DOCUMENTS  = 'DOCUMENTS';
+
     public const STUDENT = 'STUDENT';
     public const TEACHER = 'TEACHER';
     protected $appends = ['mainschool'];

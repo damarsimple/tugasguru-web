@@ -306,7 +306,7 @@ type Meeting {
     created_at: DateTime!
     updated_at: DateTime!
     start_at: String!
-    finish_at: String!
+    finish_at: String
     content: MeetingContent
     data: MeetingData
     description: String

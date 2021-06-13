@@ -46,6 +46,7 @@ class CreateUsersTable extends Migration
             $table->double("balance")->default(0);
 
             $table->json("access")->nullable();
+            $table->json("identity")->nullable();
             // students
             $table
                 ->foreignId("parent_id")
