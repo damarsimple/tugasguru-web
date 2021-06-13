@@ -20,6 +20,7 @@ class QuizRoomChangeEvent implements ShouldBroadcastNow
      */
     public function __construct(public Room $room)
     {
+        $this->room = Room::find($room->id);
     }
 
     /**
@@ -29,7 +30,6 @@ class QuizRoomChangeEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        $this->room->quizresults = $this->room->quizresults;
         return new PresenceChannel(
             "quiz.rooms."  . $this->room->id
         );
