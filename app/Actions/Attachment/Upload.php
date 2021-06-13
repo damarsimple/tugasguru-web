@@ -13,6 +13,7 @@ class Upload
         bool $isProcessed = false,
         int $originalSize = 0,
         int $compressedSize = 0,
+        bool $withAuth = true,
     ) {
         $attachment = new Attachment();
 
@@ -27,7 +28,11 @@ class Upload
         $attachment->original_size = $originalSize;
         $attachment->compressed_size = $compressedSize;
 
-        request()->user()->attachments()->save($attachment);
+        if ($withAuth) {
+            request()->user()->attachments()->save($attachment);
+        } else {
+            $attachment->save();
+        }
 
         $file->move('attachments', $attachment->name);
 

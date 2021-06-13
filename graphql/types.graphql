@@ -494,6 +494,7 @@ enum Gender {
     Female
 }
 enum Roles {
+    ADMIN
     GENERAL
     TEACHER
     STUDENT

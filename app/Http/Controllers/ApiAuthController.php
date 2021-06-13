@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attachment;
+use App\Models\Form;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -72,12 +73,14 @@ class ApiAuthController extends Controller
             "phone" => ["required", "numeric",  Rule::unique(User::class)],
             "roles" => [
                 "required",
-                "in:TEACHER,STUDENT,TEACHER_BIMBEL,GUARDIAN,GENERAL",
+                "in:TEACHER,STUDENT,BIMBEL,GUARDIAN,GENERAL",
             ],
         ];
 
         switch ($input["roles"]) {
-            case "TEACHER_BIMBEL":
+            case "BIMBEL":
+                $validationArray["scanktp"] = ["required", "numeric"];
+                $validationArray["noktp"] = ["required", "numeric"];
                 break;
             case "TEACHER":
                 $validationArray["school_id"] = ["required", "numeric"];
@@ -106,12 +109,34 @@ class ApiAuthController extends Controller
             "roles" => $input["roles"],
         ]);
 
+        $user->save();
+
         switch ($input["roles"]) {
             case "TEACHER":
                 $user->schools()->attach($input["school_id"]);
             case "TEACHER_BIMBEL":
-                $user->is_bimbel =
-                    $input["roles"] == "TEACHER_BIMBEL" ? true : false;
+                // $user->is_bimbel =
+                //     $input["roles"] == "TEACHER_BIMBEL" ? true : false;
+
+                $form = new Form();
+
+                $form->type = Form::REQUEST_TUTOR;
+
+                $form->data = ['message' => 'REQUEST FROM REGISTER'];
+
+                $user->forms()->save($form);
+
+                $ktp = Attachment::find($input['scanktp']);
+
+                $ktp->user_id = $user->id;
+                $ktp->role = User::DOCUMENTS;
+                $ktp->description = 'KTP';
+                $ktp->attachable_id = $form->id;
+                $ktp->attachable_type = Form::class;
+                $ktp->save();
+
+                $user->identity = ['ktp' => $input['noktp']];
+
                 break;
             case "STUDENT":
                 $user->nisn = $input["nisn"];
@@ -122,7 +147,6 @@ class ApiAuthController extends Controller
         }
 
         $user->save();
-
 
         if (array_key_exists('avatar', $input)) {
             try {

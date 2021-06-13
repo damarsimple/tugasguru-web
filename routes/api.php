@@ -77,6 +77,20 @@ Broadcast::routes(['middleware' => ['api', 'auth:sanctum']]);
 
 Route::get('me', fn (Request $request) => $request->user());
 
+Route::group(['prefix' => 'attachments'], function () {
+
+    Route::post('/temp', function (Request $request) {
+
+        $files = $request->file('file');
+        $isProcessed = (bool) $request->get('is_proccessed') ?? false;
+        $originalSize = (int) $request->get('original_size') ?? false;
+        $compressedSize = (int) $request->get('compressed_size') ?? false;
+        $attachment =  Upload::handle($files, $isProcessed, $originalSize, $compressedSize, false);
+
+        return $attachment;
+    });
+});
+
 Route::middleware('web')->get('auth/google/callback', function () {
 
     $data =  Socialite::driver('google')?->stateless()?->user();
@@ -632,21 +646,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
         return ['message' => 'ok'];
     });
-
-    Route::group(['prefix' => 'attachments'], function () {
-
-        Route::post('/temp', function (Request $request) {
-
-            $files = $request->file('file');
-            $isProcessed = (bool) $request->get('is_proccessed') ?? false;
-            $originalSize = (int) $request->get('original_size') ?? false;
-            $compressedSize = (int) $request->get('compressed_size') ?? false;
-            $attachment =  Upload::handle($files, $isProcessed, $originalSize, $compressedSize);
-
-            return $attachment;
-        });
-    });
-
 
     Route::group(['prefix' => 'messages'], function () {
 
