@@ -22,6 +22,7 @@ class CreateAttachmentsTable extends Migration
             $table->string("original_size")->nullable();
             $table->string("compressed_size")->nullable();
             $table->string("role")->nullable();
+            $table->string("description")->nullable();
             $table->timestamps();
         });
     }
