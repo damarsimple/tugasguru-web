@@ -502,6 +502,11 @@ enum Roles {
     GUARDIAN
 }
 
+type Identity {
+    type: String!
+    identifier: String!
+}
+
 type User {
     id: ID!
     name: String!
@@ -590,13 +595,15 @@ type User {
         where: _ @whereConditions(columns: ["name", "subject_id"])
     ): [Quiz!]! @hasMany
     agendas: [Agenda!]! @hasMany
+    identity: [Identity]
 }
 
+
 enum FormStatus {
-    PENDING
-    PROCESSED
-    FINISHED
-    REJECTED
+    PENDING @enum(value: 0)
+    PROCESSED @enum(value: 1)
+    FINISHED @enum(value: 2)
+    REJECTED @enum(value: 3)
 }
 
 enum FormType {

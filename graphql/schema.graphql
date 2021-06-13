@@ -4,9 +4,10 @@
 #import user/*.graphql
 
 type Query {
-    attachments: [Attachment!]!
-        @can(ability: "viewAny")
-        @paginate(type: CONNECTION)
+    attachments(
+        where: _ @whereConditions(columns: ["id", "status"])
+    ): [Attachment!]! @can(ability: "viewAny") @paginate(type: CONNECTION)
+    forms: [Form!]! @can(ability: "viewAny") @paginate(type: CONNECTION)
     provinces: [Province!]! @all
     cities: [City!]! @all
     me: User @auth

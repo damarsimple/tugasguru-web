@@ -114,7 +114,7 @@ class ApiAuthController extends Controller
         switch ($input["roles"]) {
             case "TEACHER":
                 $user->schools()->attach($input["school_id"]);
-            case "TEACHER_BIMBEL":
+            case "BIMBEL":
                 // $user->is_bimbel =
                 //     $input["roles"] == "TEACHER_BIMBEL" ? true : false;
 
@@ -135,7 +135,7 @@ class ApiAuthController extends Controller
                 $ktp->attachable_type = Form::class;
                 $ktp->save();
 
-                $user->identity = ['ktp' => $input['noktp']];
+                $user->identity = [['type' => 'ktp', 'identifier' => $input['noktp']]];
 
                 break;
             case "STUDENT":

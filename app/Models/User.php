@@ -51,7 +51,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'hidden_attribute' => 'array',
-        'access' => 'array'
+        'access' => 'array',
+        'identity' => 'array'
     ];
 
     public const PROFILEPICTURE = 'PROFILEPICTURE';
