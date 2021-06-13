@@ -26,7 +26,7 @@ type Query {
     classtypes: [Classtype!]! @all
     schooltypes: [Schooltype!]! @all
     article(slug: String! @eq): Article @find
-    quizzez(
+    quizzes(
         where: _ @whereConditions(columns: ["subject_id", "classtype_id"])
     ): [Quiz]!
         @paginate(type: CONNECTION)
