@@ -591,7 +591,7 @@ type User {
     rawaccesses: [Access!]! @belongsToMany
     transactions: [Transaction!]! @hasMany
     myreports: [Report!]! @belongsToMany
-    quizzez(
+    quizzes(
         where: _ @whereConditions(columns: ["name", "subject_id"])
     ): [Quiz!]! @hasMany
     agendas: [Agenda!]! @hasMany
