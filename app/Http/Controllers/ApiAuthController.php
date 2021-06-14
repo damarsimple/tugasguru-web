@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attachment;
 use App\Models\Form;
+use App\Models\School;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -84,6 +85,7 @@ class ApiAuthController extends Controller
                 break;
             case "TEACHER":
                 $validationArray["school_id"] = ["required", "numeric"];
+                $validationArray["npsn"] = ["required", "numeric", "in:" . School::find($input['school_id'])->npsn];
                 break;
             case "STUDENT":
                 $validationArray["school_id"] = ["required", "numeric"];
