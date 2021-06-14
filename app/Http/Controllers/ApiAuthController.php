@@ -113,9 +113,10 @@ class ApiAuthController extends Controller
 
         $user->save();
 
-        switch ($input["roles"]) {
+        switch ($user->roles) {
             case "TEACHER":
                 $user->schools()->attach($input["school_id"]);
+                break;
             case "BIMBEL":
                 // $user->is_bimbel =
                 //     $input["roles"] == "TEACHER_BIMBEL" ? true : false;
