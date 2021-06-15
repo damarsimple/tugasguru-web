@@ -420,7 +420,7 @@ type StudentAnswer {
     user: User! @belongsTo
     exam: Exam! @belongsTo
     examresult: Examresult! @belongsTo
-    content: String!
+    content: String
     is_correct: Boolean!
     is_processed: Boolean!
     grade: Float!

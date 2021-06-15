@@ -695,7 +695,7 @@ class SeedData extends Command
 
                 $packagequestion->questions()->save($question);
 
-                for ($j = 0; $j < 4; $j++) {
+                for ($j = 0; $j < 5; $j++) {
                     $answer = new Answer();
                     $answer->content = "Yes Answer " . $j + 1;
                     $answer->is_correct = $j == 0;
@@ -721,6 +721,7 @@ class SeedData extends Command
                 $answer->content = "Yes Answer " . $i + 1;
                 $answer->is_correct = true;
                 $question->answers()->save($answer);
+
 
                 print "question $i\n";
             }
@@ -765,13 +766,22 @@ class SeedData extends Command
 
                         foreach ($questions as $v => $y) {
                             $studentanswer = new StudentAnswer();
-                            $studentanswer->answer_id =
-                                $v % 2 == 0
-                                ? $y->correctanswer->id
-                                : $y
-                                ->answers()
-                                ->pluck("id")
-                                ->random();
+                            if ($y->type == Question::MULTI_CHOICE) {
+                                $studentanswer->answer_id =
+                                    $v % 2 == 0
+                                    ? $y->correctanswer->id
+                                    : $y
+                                    ->answers()
+                                    ->pluck("id")
+                                    ->random();
+                                $studentanswer->is_correct = $studentanswer->answer_id == $y->correctanswer->id;
+                                $studentanswer->grade = $studentanswer->is_correct ? 100 : 0;
+                            } else {
+                                $studentanswer->content = $y->correctanswer->content;
+                                similar_text(strtolower($studentanswer->content), strtolower(strip_tags($y->correctanswer->content)), $percentage);
+                                $answer->is_correct = $percentage > 75;
+                                $studentanswer->grade = $percentage;
+                            }
                             $studentanswer->examsession_id = $examsession->id;
                             $studentanswer->exam_id = $exam->id;
                             $studentanswer->question_id = $y->id;

@@ -1390,7 +1390,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             return ['grade' => $map, 'studentMap' => $studentMap];
         });
-        Route::get('/', function (Request $request) {
+        Route::get('/{id}/student', function (Request $request) {
             // no efficent por favor
             $classroom = Classroom::findOrFail($request->classroom);
             $map = [];
@@ -1974,7 +1974,26 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
     Route::group(['prefix' => 'exams'], function () {
+        Route::group(['prefix' => 'examresults'], function () {
+            Route::put('{id}', function (Request $request, $id) {
+                $examresult = Examresult::findOrFail($id);
+                $examresult->grade = $request->grade;
+                $examresult->save();
+                return 'ok';
+            });
+            Route::put('{id}/answers/{answerId}', function (Request $request, $id, $answerId) {
+                $examresult = Examresult::with('exam')->findOrFail($id);
 
+                $studentanswer = StudentAnswer::findOrFail($answerId);
+                $studentanswer->grade = $request->grade;
+                $studentanswer->is_correct = $request->is_correct;
+                $studentanswer->save();
+
+                $examresult->grade = $examresult->studentanswers()->sum('grade') / $examresult->exam->questions()->count();
+                $examresult->save();
+                return ['message' => 'ok', 'grade' => $examresult->grade];
+            });
+        });
         Route::get('/', function (Request $request) {
             return $request->user()->exams()?->paginate(10);
         });
