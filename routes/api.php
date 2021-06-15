@@ -1356,7 +1356,70 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     });
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
+    Route::group(['prefix' => 'grades'], function () {
+        Route::get('/', function (Request $request) {
+            // no efficent por favor
+            $classroom = Classroom::findOrFail($request->classroom);
+            $map = [];
+            $studentMap = [];
+            foreach ($classroom->students as $student) {
+                $studentMap[$student->name] = $student->id;
+                $examresultSubjects = Examresult::where([
+                    'user_id' =>  $student->id,
+                ])->whereHas('exam', fn ($q) => $q->where('classroom_id', $classroom->id))
+                    ->get()
+                    ->groupBy('exam.subject.name');
 
+                $studentassigments =  StudentAssigment::where([
+                    'user_id' =>  $student->id,
+                ])->whereHas('assigment', fn ($q) => $q->where('classroom_id', $classroom->id))
+                    ->get()
+                    ->groupBy('assigment.subject.name');
+
+
+                foreach ($examresultSubjects as $subject => $examresult) {
+                    $types = $examresult->groupBy('exam.examtype.name');
+                    foreach ($types as $type => $value) {
+                        $map[$student->name][$subject][$type] = $value;
+                    }
+                }
+                foreach ($studentassigments as $subject => $value) {
+                    $map[$student->name][$subject]["Tugas"] = $value;
+                }
+            }
+
+            return ['grade' => $map, 'studentMap' => $studentMap];
+        });
+        Route::get('/', function (Request $request) {
+            // no efficent por favor
+            $classroom = Classroom::findOrFail($request->classroom);
+            $map = [];
+            $examresultSubjects = Examresult::where([
+                'user_id' =>  $request->student,
+            ])->whereHas('exam', fn ($q) => $q->where('classroom_id', $classroom->id))
+                ->get()
+                ->groupBy('exam.subject.name');
+
+            $studentassigments =  StudentAssigment::where([
+                'user_id' =>  $request->student,
+            ])->whereHas('assigment', fn ($q) => $q->where('classroom_id', $classroom->id))
+                ->get()
+                ->groupBy('assigment.subject.name');
+
+
+            foreach ($examresultSubjects as $subject => $examresult) {
+                $types = $examresult->groupBy('exam.examtype.name');
+                foreach ($types as $type => $value) {
+                    $map[$subject][$type] = $value;
+                }
+            }
+            foreach ($studentassigments as $subject => $value) {
+                $map[$subject]["Tugas"] = $value;
+            }
+
+            return ['grade' => $map];
+        });
+    });
     Route::group(['prefix' => 'attendances'], function () {
         Route::get('/school/{id}', function (Request $request, $id) {
             if ($id == 'undefined') return ['data' => []];
