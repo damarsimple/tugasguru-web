@@ -326,7 +326,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
                 }
             }
             $room->save();
-            
+
             broadcast(new QuizRoomChangeEvent($room));
         });
         Route::post('/answer', function (Request $request) {
@@ -500,6 +500,16 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
+    Route::group(['prefix' => 'attachments'], function () {
+        Route::post('/temp', function (Request $request) {
+            $files = $request->file('file');
+            $isProcessed = (bool) $request->get('is_proccessed') ?? false;
+            $originalSize = (int) $request->get('original_size') ?? false;
+            $compressedSize = (int) $request->get('compressed_size') ?? false;
+            $attachment =  Upload::handle($files, $isProcessed, $originalSize, $compressedSize, true);
+            return $attachment;
+        });
+    });
     Route::group(['prefix' => 'transactions'], function () {
         Route::get('/', function (Request $request) {
             return  $request->user()->transactions()->paginate(10);
@@ -1398,9 +1408,18 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $user->forms()->save($form);
 
-            if (config('app.env') == 'local' || config('app.debug') == true) {
-                dispatch(new FormApproveTest($form));
+            if ($request->attahment) {
+                $attachment = Attachment::findOrFail($request->attachment);
+                $attachment->description = $request->description;
+                $attachment->role = $request->role;
+                $attachment->attachable_id = $form->id;
+                $attachment->attachable_type = Form::class;
+                $attachment->save();
             }
+
+            // if (config('app.env') == 'local' || config('app.debug') == true) {
+            //     dispatch(new FormApproveTest($form));
+            // }
 
             return ['message' => 'ok'];
         });
