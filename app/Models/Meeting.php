@@ -17,6 +17,8 @@ class Meeting extends Model
 
     protected $casts = ["data" => "object", "content" => "object"];
 
+    public $with = ['rooms'];
+
     public function classroom(): BelongsTo
     {
         return $this->belongsTo("App\Models\Classroom");
