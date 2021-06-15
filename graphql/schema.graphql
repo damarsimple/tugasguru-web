@@ -11,6 +11,11 @@ type Query {
     provinces: [Province!]! @all
     cities: [City!]! @all
     me: User @auth
+    users(
+        city_id: ID @where(operator: "=")
+        roles: Roles @where(operator: "=")
+        is_bimbel: Boolean @where(operator: "=")
+    ): User @paginate(type: CONNECTION)
     user(id: ID! @eq): User @find
     school(id: ID! @eq): School @find
     report(id: ID! @eq): Report @find
