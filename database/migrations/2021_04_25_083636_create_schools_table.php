@@ -32,6 +32,12 @@ class CreateSchoolsTable extends Migration
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");
+            $table
+                ->foreignId("form_template_id")
+                ->nullable()
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
             $table->string("address");
             $table->longText("description")->nullable();
             $table->string("latitude")->nullable();

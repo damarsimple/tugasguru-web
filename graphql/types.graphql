@@ -60,6 +60,8 @@ type School {
         where: _ @whereConditions(columns: ["id"])
         hasUser: _ @whereHasConditions(columns: ["roles"])
     ): [Attendance!]! @paginate(type: CONNECTION)
+
+    ppdbform: FormTemplate
 }
 
 type Absent {
@@ -598,7 +600,6 @@ type User {
     identity: [Identity]
 }
 
-
 enum FormStatus {
     PENDING @enum(value: 0)
     PROCESSED @enum(value: 1)
@@ -717,4 +718,18 @@ type Voucher {
     percentage: Float!
     description: String
     expired_at: String!
+}
+
+enum FormTemplateStatus {
+    ACTIVE @enum(value: "ACTIVE")
+    DISABLED @enum(value: "DISABLED")
+}
+
+type FormTemplate {
+    id: ID!
+    data: Mixed
+    comment: String
+    status: FormTemplateStatus!
+    created_at: DateTime!
+    updated_at: DateTime!
 }

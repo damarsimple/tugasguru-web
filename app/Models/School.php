@@ -48,6 +48,11 @@ class School extends Model
             ->wherePivot("is_counselor", true);
     }
 
+    public function ppdbform(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\FormTemplate', 'form_template_id');
+    }
+
     public function students(): HasMany
     {
         return $this->hasMany("App\Models\User")->where("roles", User::STUDENT);
