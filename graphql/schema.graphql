@@ -18,6 +18,14 @@ type Query {
     ): User @paginate(type: CONNECTION)
     user(id: ID! @eq): User @find
     school(id: ID! @eq): School @find
+
+    schools(
+        where: _
+            @whereConditions(
+                columns: ["province_id", "district_id", "city_id", "city_id"]
+            )
+    ): School @paginate(type: CONNECTION)
+
     report(id: ID! @eq): Report @find
     consultation(id: ID! @eq): Consultation
         @find
@@ -51,4 +59,5 @@ type Query {
     ): [Packagequestion]!
         @paginate(type: CONNECTION)
         @orderBy(column: "created_at", direction: DESC)
+    subjectsAdmin: [Subject!]! @paginate(type: CONNECTION)
 }

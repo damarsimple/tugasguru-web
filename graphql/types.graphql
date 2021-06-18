@@ -445,9 +445,10 @@ type StudentAssigment {
 }
 
 enum SubjectType {
-    VOCATIONAL
-    LOCAL_CONTENT
-    SPECIAL_DEVELOPMENT
+    GENERAL @enum(value: "GENERAL")
+    VOCATIONAL @enum(value: "VOCATIONAL")
+    LOCAL_CONTENT @enum(value: "LOCAL_CONTENT")
+    SPECIAL_DEVELOPMENT @enum(value: "SPECIAL_DEVELOPMENT")
 }
 
 type Subject {
