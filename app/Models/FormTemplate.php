@@ -9,6 +9,10 @@ class FormTemplate extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'data' => 'array',
+    ];
+
     public const ACTIVE = 'ACTIVE';
     public const DISABLED = 'DISABLED';
 }

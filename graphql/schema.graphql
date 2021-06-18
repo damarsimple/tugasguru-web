@@ -24,7 +24,12 @@ type Query {
         @can(ability: "view", find: "id")
     attendance(id: ID! @eq): Attendance @find
     assigment(id: ID! @eq): Assigment @find
-    transaction(id: ID! @eq): Transaction @find
+    transaction(id: ID! @eq): Transaction
+        @find
+        @can(ability: "view", find: "id")
+    transactions: Transaction
+        @paginate(type: CONNECTION)
+        @can(ability: "viewAny")
     accesses: [Access!]! @all
     examtypes: [Examtype!]! @all
     subjects: [Subject!]! @all

@@ -60,7 +60,7 @@ class CreateUsersTable extends Migration
             // teachers
 
             $table->boolean("is_bimbel")->default(false);
-
+            $table->boolean("is_admin")->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

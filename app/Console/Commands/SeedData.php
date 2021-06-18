@@ -435,18 +435,6 @@ class SeedData extends Command
                                     break;
                             }
                         }
-
-                        // $classrooms = [];
-                        // foreach ($schoolModel->classtypes as $classtype) {
-                        //     for ($i = 0; $i < 3; $i++) {
-                        //         $classroom = new Classroom();
-                        //         $classroom->classtype_id = $classtype->id;
-                        //         $classroom->name = "Kelas " . $classtype->level . " " . chr($i + 65);
-                        //         $classrooms[] = $classroom;
-                        //     }
-                        // }
-
-                        // $schoolModel->classrooms()->saveMany($classrooms);
                         print $schoolModel->id . PHP_EOL;
                     } catch (\Throwable $th) {
                         print $th->getMessage() . PHP_EOL;
@@ -459,6 +447,7 @@ class SeedData extends Command
 
         if ($onTest) {
             $teacher = new User();
+            $teacher->is_admin = true;
             $teacher->name = "Damar Albaribin Guru 1";
             $teacher->email = "damaralbaribin@gmail.com";
             $teacher->password = Hash::make("we5n9t5ReNV8gNE");

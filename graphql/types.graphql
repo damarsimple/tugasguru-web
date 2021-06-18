@@ -536,6 +536,8 @@ type User {
     dob: DateTime
     address: String
     gender: Int
+    "Admin"
+    is_admin: Boolean!
     "Student"
     myclassrooms: [Classroom!]! @belongsToMany
     guardian: User @belongsTo
