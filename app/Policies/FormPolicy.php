@@ -18,7 +18,9 @@ class FormPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->roles == User::ADMIN;
+        if ($user->is_admin) return true;
+        
+        return false;
     }
 
     /**

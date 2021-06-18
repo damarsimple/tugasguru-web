@@ -9,7 +9,11 @@ type Query {
     ): [Attachment!]! @can(ability: "viewAny") @paginate(type: CONNECTION)
     forms: [Form!]! @can(ability: "viewAny") @paginate(type: CONNECTION)
     provinces: [Province!]! @all
+
     cities: [City!]! @all
+    provincesAdmin: [Province!]! @paginate(type: CONNECTION)
+    citiesAdmin: [City!]! @paginate(type: CONNECTION)
+    districtsAdmin: [District!]! @paginate(type: CONNECTION)
     me: User @auth
     users(
         city_id: ID @where(operator: "=")
