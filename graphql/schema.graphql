@@ -11,11 +11,13 @@ type Query {
     provinces: [Province!]! @all
 
     cities: [City!]! @all
+    districts(city_id: ID @where(operator: "=")): [District!]! @all
     provincesAdmin: [Province!]! @paginate(type: CONNECTION)
     citiesAdmin: [City!]! @paginate(type: CONNECTION)
     districtsAdmin: [District!]! @paginate(type: CONNECTION)
     me: User @auth
     users(
+        district_id: ID @where(operator: "=")
         city_id: ID @where(operator: "=")
         roles: Roles @where(operator: "=")
         is_bimbel: Boolean @where(operator: "=")
@@ -54,11 +56,15 @@ type Query {
         @paginate(type: CONNECTION)
         @orderBy(column: "created_at", direction: DESC)
     questions(
+        subject_id: ID @where(operator: "=")
+        classtype_id: ID @where(operator: "=")
         where: _ @whereConditions(columns: ["subject_id", "classtype_id"])
     ): [Question]!
         @paginate(type: CONNECTION)
         @orderBy(column: "created_at", direction: DESC)
     packagequestions(
+        subject_id: ID @where(operator: "=")
+        classtype_id: ID @where(operator: "=")
         where: _ @whereConditions(columns: ["subject_id", "classtype_id"])
     ): [Packagequestion]!
         @paginate(type: CONNECTION)

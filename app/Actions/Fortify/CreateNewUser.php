@@ -78,6 +78,7 @@ class CreateNewUser implements CreatesNewUsers
             case "TEACHER":
                 $user->schools()->attach($input["school_id"]);
             case "TEACHER_BIMBEL":
+                $user->nisn = User::TEACHER;
                 $user->is_bimbel =
                     $input["roles"] == "TEACHER_BIMBEL" ? true : false;
                 break;
