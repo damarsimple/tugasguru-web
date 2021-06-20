@@ -60,7 +60,7 @@ class FormApproveTest implements ShouldQueue
                 $school->teachers()->updateExistingPivot($user, ['is_headmaster' => true]);
                 $user->save();
                 break;
-            case Form::REQUEST_PPDB:
+            case Form::REQUEST_ADMIN_SCHOOL:
                 $user = $form->user;
                 try {
                     $school = School::findOrFail($form->data->school);

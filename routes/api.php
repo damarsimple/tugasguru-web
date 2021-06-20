@@ -1451,7 +1451,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 Form::REQUEST_TUTOR,
                 Form::REQUEST_COUNSELOR,
                 Form::REQUEST_HEADMASTER,
-                Form::REQUEST_PPDB,
+                Form::REQUEST_ADMIN_SCHOOL,
                 Form::REQUEST_HOMEROOM
             ] as $v) {
                 $maps[$v] = Form::where('type', $v)->where('status', Form::PENDING)->exists();

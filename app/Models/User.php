@@ -206,6 +206,11 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\School')->wherePivot('is_headmaster', true);
     }
 
+    public function adminschools(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\School')->wherePivot('is_headmaster', true);
+    }
+
     public function subjects(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
@@ -274,7 +279,7 @@ class User extends Authenticatable
 
         return null;
     }
-    
+
     public function studentconsultations(): HasMany
     {
         return $this->hasMany('App\Models\Consultation', foreignKey: 'consultant_id');

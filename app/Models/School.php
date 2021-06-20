@@ -34,7 +34,7 @@ class School extends Model
             ->where("roles", User::TEACHER)
             ->wherePivot("is_headmaster", true);
     }
-    public function ppdbadmins(): BelongsToMany
+    public function admins(): BelongsToMany
     {
         return $this->belongsToMany("App\Models\User")
             ->where("roles", User::TEACHER)
