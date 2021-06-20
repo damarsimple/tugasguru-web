@@ -67,7 +67,7 @@ class FormApproveTest implements ShouldQueue
                 } catch (\Throwable $th) {
                     $school = School::findOrFail(json_decode($form->data)->school);
                 }
-                $school->teachers()->updateExistingPivot($user, ['is_ppdb' => true]);
+                $school->teachers()->updateExistingPivot($user, ['is_administrator' => true]);
                 break;
             case Form::REQUEST_TUTOR:
                 $user = $form->user;

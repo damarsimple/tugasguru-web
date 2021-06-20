@@ -208,7 +208,7 @@ class User extends Authenticatable
 
     public function adminschools(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\School')->wherePivot('is_headmaster', true);
+        return $this->belongsToMany('App\Models\School')->wherePivot('is_administrator', true);
     }
 
     public function subjects(): BelongsToMany

@@ -86,8 +86,7 @@ class TransactionObserver
             $school->teachers()->updateExistingPivot($user->id, [
                 "is_homeroom" => in_array(Ability::HOMEROOM, $user->access),
                 "is_headmaster" => in_array(Ability::HEADMASTER, $user->access),
-                "is_ppdb_master" => in_array(Ability::PPDB, $user->access),
-                "is_ppdb" => in_array(Ability::PPDB, $user->access),
+                "is_administrator" => in_array(Ability::ADMIN_SCHOOL, $user->access),
                 "is_counselor" => in_array(Ability::COUNSELING, $user->access),
             ]);
         }

@@ -13,6 +13,8 @@ class School extends Model
 {
     use HasFactory;
 
+    public const LOGO = 'LOGO';
+    public const COVER = 'COVER';
     public function teachers(): BelongsToMany
     {
         return $this->belongsToMany("App\Models\User")->where(
@@ -38,7 +40,7 @@ class School extends Model
     {
         return $this->belongsToMany("App\Models\User")
             ->where("roles", User::TEACHER)
-            ->wherePivot("is_ppdb", true);
+            ->wherePivot("is_administrator", true);
     }
 
     public function counselors(): BelongsToMany
@@ -46,6 +48,16 @@ class School extends Model
         return $this->belongsToMany("App\Models\User")
             ->where("roles", User::TEACHER)
             ->wherePivot("is_counselor", true);
+    }
+
+    public function logo()
+    {
+        return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::LOGO);
+    }
+
+    public function cover()
+    {
+        return $this->morphOne('App\Models\Attachment', 'attachable')->where('role', self::COVER);
     }
 
     public function ppdbform(): BelongsTo

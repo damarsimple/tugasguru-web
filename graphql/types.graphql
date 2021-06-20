@@ -47,6 +47,9 @@ type School {
     longtitude: String
     npsn: String
 
+    cover: Attachment @morphOne
+    logo: Attachment @morphOne
+
     homeroomteachers: [User!]! @belongsToMany
     headmasters: [User!]! @belongsToMany
     admins: [User!]! @belongsToMany

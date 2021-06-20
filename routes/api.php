@@ -2169,6 +2169,33 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'schools'], function () {
 
+        Route::post('/update/thumbnail', function (Request $request) {
+            $user = $request->user();
+
+            $school = School::findOrFail($request->school);
+
+            if (!$school->admins()->where('user_id', $user->id)->exists()) {
+                return ['message' => 'Unauthorized'];
+            }
+
+            if ($request->has('logo')) {
+                $school->logo()->delete();
+                $newPicture = Attachment::findOrFail($request->logo);
+                $newPicture->role = School::LOGO;
+                $newPicture->save();
+                $school->logo()->save($newPicture);
+            }
+            if ($request->has('cover')) {
+                $school->cover()->delete();
+                $newPicture = Attachment::findOrFail($request->cover);
+                $newPicture->role = School::COVER;
+                $newPicture->save();
+                $school->cover()->save($newPicture);
+            }
+
+            return ['message' => 'ok'];
+        });
+
         Route::get('/', function (Request $request) {
 
             return $request->user()->schools()->with(
@@ -2177,7 +2204,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 'teachers',
                 'students',
                 'headmasters',
-                'ppdbadmins'
+                'admins'
             )->get();
         });
 
@@ -2204,7 +2231,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 'teachers',
                 'students',
                 'headmasters',
-                'ppdbadmins'
+                'admins'
             )->findOrFail($id);
         });
     });

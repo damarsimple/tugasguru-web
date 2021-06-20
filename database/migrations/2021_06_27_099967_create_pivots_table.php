@@ -280,8 +280,7 @@ class CreatePivotsTable extends Migration
                 ->onDelete("cascade");
             $table->boolean("is_homeroom")->default(false);
             $table->boolean("is_headmaster")->default(false);
-            $table->boolean("is_ppdb_master")->default(false);
-            $table->boolean("is_ppdb")->default(false);
+            $table->boolean("is_administrator")->default(false);
             $table->boolean("is_counselor")->default(false);
             $table->timestamps();
         });

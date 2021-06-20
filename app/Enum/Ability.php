@@ -10,5 +10,5 @@ class Ability
     const COUNSELING = "COUNSELING";
     const HEADMASTER = "HEADMASTER";
     const ABSENT_CONSULT = "ABSENT_CONSULT";
-    const PPDB = "PPDB";
+    const ADMIN_SCHOOL = "ADMIN_SCHOOL";
 }
