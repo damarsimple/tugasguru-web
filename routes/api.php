@@ -4,6 +4,7 @@ use App\Actions\Attachment\Upload;
 use App\Events\MeetingChangeEvent;
 use App\Events\QuizRoomChangeEvent;
 use App\Http\Controllers\ApiAuthController;
+use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureGradeReport;
 use App\Http\Middleware\EnsureHeadmaster;
 use App\Http\Middleware\EnsureHomeroom;
@@ -166,6 +167,20 @@ Route::middleware('auth:sanctum')->get("/agenda/{uuid}", function (Request $requ
     $attendance->save();
 
     return 'ok';
+});
+
+
+Route::group(['middleware' => [EnsureAdmin::class], 'prefix' => 'admins'], function () {
+    Route::put('/forms/{id}', function (Request $request, $id) {
+
+        $form = Form::findOrFail($id);
+
+        $form->comment = $request->comment;
+
+        $form->status = $request->status;
+
+        $form->save();
+    });
 });
 
 
@@ -1467,11 +1482,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             $form->data = $request->data;
 
+            $form->school_id = $request->school;
+
             $user = $request->user();
 
             $user->forms()->save($form);
 
-            if ($request->attahment) {
+            if ($request->attachment) {
                 $attachment = Attachment::findOrFail($request->attachment);
                 $attachment->description = $request->description;
                 $attachment->role = $request->role;

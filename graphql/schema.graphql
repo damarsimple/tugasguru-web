@@ -8,6 +8,9 @@ type Query {
         where: _ @whereConditions(columns: ["id", "status"])
     ): [Attachment!]! @can(ability: "viewAny") @paginate(type: CONNECTION)
     forms: [Form!]! @can(ability: "viewAny") @paginate(type: CONNECTION)
+    schoolforms: [Form!]!
+        @paginate(type: CONNECTION, builder: "App\\Models\\Form@ppdbforms")
+    form(id: ID! @eq): Form! @find @can(ability: "view", find: "id")
     provinces: [Province!]! @all
 
     cities: [City!]! @all

@@ -454,14 +454,14 @@ class SeedData extends Command
             $teacher->city_id = 1;
             $teacher->province_id = 1;
             $teacher->district_id = 1;
-            $teacher->access = [Ability::GRADE_REPORT, Ability::HEADMASTER];
+            $teacher->access = [Ability::GRADE_REPORT, Ability::HEADMASTER, Ability::ADMIN_SCHOOL];
             $teacher->gender = 1;
             $teacher->phone = "08987181017";
             $teacher->roles = "TEACHER";
 
             $teacher->save();
 
-            $teacher->schools()->attach(1);
+            $teacher->schools()->attach(1, ['is_administrator' => true]);
 
             $teacher->is_bimbel = false;
 

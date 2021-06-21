@@ -107,26 +107,6 @@ class User extends Authenticatable
     }
 
 
-    // function followingteachers(): BelongsToMany
-    // {
-    //     return $this->belongsToMany('App\Models\User')->where('is_accepted', true);
-    // }
-
-    // function followingstudents(): belongsToMany
-    // {
-    //     return $this->belongsToMany('App\Models\Student')->where('is_accepted', true);
-    // }
-
-    // function requestfollowingteachers(): BelongsToMany
-    // {
-    //     return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
-    // }
-
-    // function requestfollowingstudents(): belongsToMany
-    // {
-    //     return $this->belongsToMany('App\Models\Student')->where('is_accepted', false);
-    // }
-
     public function followers(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\User', relatedPivotKey: 'follower_id', foreignPivotKey: 'user_id')->where('is_accepted', true);
@@ -295,11 +275,6 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Report');
     }
 
-    // public function studentattendances(): HasManyThrough
-    // {
-    //     return $this->hasManyThrough('App\Models\Attendance', 'App\Models\Classroom', firstKey: 'user_id');
-    // }
-
     public function accesses(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Access')->wherePivot('expired_at', '>', now())->withPivot('expired_at');
@@ -328,5 +303,10 @@ class User extends Authenticatable
     public function agendas(): HasMany
     {
         return $this->hasMany('App\Models\Agenda');
+    }
+    
+    public function getAdminSchoolIdAttribute(): string | null
+    {
+        return $this?->adminschools()?->first()?->id;
     }
 }

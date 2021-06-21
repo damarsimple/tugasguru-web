@@ -142,7 +142,7 @@ type Attachment {
     is_processed: Boolean!
     original_size: String
     compressed_size: String
-    role: String!
+    role: String
     attachable: Attachable @morphTo
 }
 
@@ -623,13 +623,18 @@ enum FormType {
     REQUEST_HOMEROOM
 }
 
+type FormData {
+    message: String
+}
+
 type Form {
     id: ID!
     created_at: DateTime!
     updated_at: DateTime!
     user: User! @belongsTo
-    data: String!
+    data: FormData
     type: FormType
+    attachments: [Attachment!]! @morphMany
     comment: String
     status: FormStatus
 }

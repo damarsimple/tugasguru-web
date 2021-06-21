@@ -33,48 +33,6 @@ class FormApproveTest implements ShouldQueue
     {
         sleep(7);
         $form = $this->form;
-        $form->status = Form::FINISHED;
-        switch ($form->type) {
-            case Form::REQUEST_COUNSELOR:
-                $user = $form->user;
-                $user->is_counselor = true;
-                $user->save();
-                break;
-            case Form::REQUEST_HOMEROOM:
-                $user = $form->user;
-                try {
-                    $school = School::findOrFail($form->data->school);
-                } catch (\Throwable $th) {
-                    $school = School::findOrFail(json_decode($form->data)->school);
-                }
-                $school->teachers()->updateExistingPivot($user, ['is_homeroom' => true]);
-                $user->save();
-                break;
-            case Form::REQUEST_HEADMASTER:
-                $user = $form->user;
-                try {
-                    $school = School::findOrFail($form->data->school);
-                } catch (\Throwable $th) {
-                    $school = School::findOrFail(json_decode($form->data)->school);
-                }
-                $school->teachers()->updateExistingPivot($user, ['is_headmaster' => true]);
-                $user->save();
-                break;
-            case Form::REQUEST_ADMIN_SCHOOL:
-                $user = $form->user;
-                try {
-                    $school = School::findOrFail($form->data->school);
-                } catch (\Throwable $th) {
-                    $school = School::findOrFail(json_decode($form->data)->school);
-                }
-                $school->teachers()->updateExistingPivot($user, ['is_administrator' => true]);
-                break;
-            case Form::REQUEST_TUTOR:
-                $user = $form->user;
-                $user->is_bimbel = true;
-                $user->save();
-                break;
-        }
-        $form->save();
+        
     }
 }
