@@ -68,6 +68,51 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create("major_school", function (Blueprint $table) {
+            $table->id();
+            $table
+                ->foreignId("subject_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("major_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table->timestamps();
+        });
+
+        Schema::create("extracurricular_student", function (Blueprint $table) {
+            $table->id();
+            $table
+                ->foreignId("extracurricular_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("student_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table->timestamps();
+        });
+
+        Schema::create("extracurricular_school", function (Blueprint $table) {
+            $table->id();
+            $table
+                ->foreignId("extracurricular_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("school_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table->timestamps();
+        });
+
         Schema::create("classroom_user", function (Blueprint $table) {
             $table->id();
             $table

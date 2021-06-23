@@ -13,10 +13,12 @@ class CreateFormsTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->index();
             $table->foreignId('school_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('wave_id')->nullable()->constrained()->onDelete('cascade');
             $table->json('data');
             $table->string('type')->nullable();
             $table->longText('comment')->nullable();
             $table->boolean('is_ppdb')->default(false);
+            $table->boolean('is_verified')->default(false);
             $table->smallInteger('status', unsigned: true)->default(Form::PENDING);
             $table->timestamps();
         });

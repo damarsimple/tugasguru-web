@@ -65,6 +65,10 @@ type School {
     ): [Attendance!]! @paginate(type: CONNECTION)
 
     ppdbform: FormTemplate
+
+    extracurriculars: [Extracurricular!]! @belongsToMany
+    majors: [Major!]! @belongsToMany
+    waves: [Wave!]! @hasMany
 }
 
 type Absent {
@@ -606,6 +610,9 @@ type User {
     ): [Quiz!]! @hasMany
     agendas: [Agenda!]! @hasMany
     identity: [Identity]
+
+    major: Major @belongsTo
+    extracurriculars: [Extracurricular!]! @belongsToMany
 }
 
 enum FormStatus {
@@ -632,11 +639,52 @@ type Form {
     created_at: DateTime!
     updated_at: DateTime!
     user: User! @belongsTo
+    school: School @belongsTo
     data: FormData
     type: FormType
+    is_ppdb: Boolean!
+    is_verified: Boolean!
     attachments: [Attachment!]! @morphMany
     comment: String
     status: FormStatus
+}
+
+type Wave {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    education_year_start: Int!
+    education_year_end: Int!
+    max_join: Int!
+    open_at: DateTime!
+    close_at: DateTime!
+
+    allow_extracurricular: Boolean!
+    allow_major: Boolean!
+
+    school: School! @belongsTo
+}
+
+type Major {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    abbreviation: String!
+    description: String!
+}
+
+type Extracurricular {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    abbreviation: String!
+    description: String!
 }
 
 enum ReportType {
@@ -740,9 +788,40 @@ enum FormTemplateStatus {
 
 type FormTemplate {
     id: ID!
-    data: Mixed
     comment: String
+    data: [FormTemplateData!]!
     status: FormTemplateStatus!
     created_at: DateTime!
     updated_at: DateTime!
+}
+
+type FormTemplateData{
+  hash: String!
+  name: String!
+  description: String
+  blocks: [Input!]!
+}
+
+enum InputType {
+  SELECT @enum(value: "SELECT")
+  TEXT @enum(value: "TEXT")
+  NUMBER @enum(value: "NUMBER")
+  RADIO @enum(value: "RADIO")
+  FILE @enum(value: "FILE")
+  DATE @enum(value: "DATE")
+  TIME @enum(value: "TIME")
+  TEXTAREA @enum(value: "TEXTAREA")
+}
+
+
+type Input {
+  hash: String!
+  name: String!
+  type: InputType!
+  description: String
+  defaultValue: String
+  placeholder: String
+  required: Boolean
+  regex: String
+  options: [String]
 }

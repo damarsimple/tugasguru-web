@@ -304,9 +304,19 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Agenda');
     }
-    
+
     public function getAdminSchoolIdAttribute(): string | null
     {
         return $this?->adminschools()?->first()?->id;
+    }
+
+    public function extracurriculars(): BelongsToMany
+    {
+        return $this->belongsToMany("App\Models\Extracurricular");
+    }
+
+    public function major(): BelongsTo
+    {
+        return $this->belongsTo("App\Models\Major");
     }
 }

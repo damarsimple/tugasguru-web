@@ -29,8 +29,12 @@ use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
 use App\Models\Access;
+use App\Models\Extracurricular;
+use App\Models\Major;
 use App\Models\User;
 use App\Models\Voucher;
+use App\Models\Wave;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
@@ -446,6 +450,82 @@ class SeedData extends Command
         }
 
         if ($onTest) {
+
+            $majors = [
+                'Jurusan Animasi Dan Multimedia',
+                'Farmasi', 'Pemasaran',
+                'Akuntansi',
+                'Pelayaran', 'Pariwisata',
+                'Tata Boga', 'Tata Busana',
+                'Tehnik Otomotif', 'Administrasi Perkantoran atau Otomatisasi dan Tata Kelola Perkantoran', 'IPA', 'IPS'
+            ];
+
+            foreach ($majors as $major) {
+                $majorModel = new Major();
+                $majorModel->name = $major;
+                $majorModel->save();
+            }
+
+            $extraculiculers = [
+                "Sepak Bola",
+                "Bola Basket",
+                "Bola Voli",
+                "Badminton",
+                "Tenis Meja",
+                "Futsal",
+                "Bulu Tangkis",
+                "Renang",
+                "Billyard",
+                "Fitnes",
+
+                "Paduan Suara",
+                "Marching Band",
+                "Angklung",
+                "Band",
+                "Nasyid",
+                "Qasidah",
+                "Orkestra",
+                "Karawitan",
+
+
+                "Gulat",
+                "Silat",
+                "Tae Kwon Do",
+                "Karate",
+                "Wushu",
+                "Merpati Putih",
+                "Tinju",
+                "Capoeira",
+
+                "Pramuka",
+                "Paskibra",
+                "Bahasa",
+                "Palang Merah Remaja",
+                "Karya Ilmiah Remaja"
+            ];
+
+
+            foreach ($extraculiculers as $extraculiculer) {
+                $extraculiculerModel = new Extracurricular();
+                $extraculiculerModel->name = $extraculiculer;
+                $extraculiculerModel->save();
+            }
+
+            for ($i = 0; $i < 3; $i++) {
+                $wave = new Wave();
+                $wave->name = "Gelombang " . $i + 1;
+                $wave->school_id = 1;
+                $wave->education_year_start = Carbon::now()->year;
+                $wave->education_year_end = Carbon::now()->year + 1;
+                $wave->max_join = 100;
+                $wave->allow_extracurricular = rand(1, 10) > 1;
+                $wave->allow_major = rand(1, 10) > 1;
+                $wave->open_at = Carbon::now();
+                $wave->close_at = Carbon::now()->addDay(10);
+                $wave->save();
+            }
+
+
             $teacher = new User();
             $teacher->is_admin = true;
             $teacher->name = "Damar Albaribin Guru 1";

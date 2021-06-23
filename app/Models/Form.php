@@ -42,6 +42,10 @@ class Form extends Model
         return $this->belongsTo("App\Models\School");
     }
 
+    public function wave(): BelongsTo
+    {
+        return $this->belongsTo("App\Models\Wave");
+    }
 
     public function attachments(): MorphMany
     {

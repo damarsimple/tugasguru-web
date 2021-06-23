@@ -90,6 +90,16 @@ class School extends Model
         return $this->belongsToMany("App\Models\Subject");
     }
 
+    public function majors(): BelongsToMany
+    {
+        return $this->belongsToMany("App\Models\Major");
+    }
+
+    public function extracurriculars(): BelongsToMany
+    {
+        return $this->belongsToMany("App\Models\Extracurricular");
+    }
+
     public function classrooms(): HasMany
     {
         return $this->hasMany("App\Models\Classroom");
@@ -105,5 +115,10 @@ class School extends Model
         return $this->hasMany(
             "App\Models\Attendance",
         );
+    }
+
+    public function waves(): HasMany
+    {
+        return $this->hasMany('App\Models\Wave');
     }
 }

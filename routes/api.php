@@ -11,6 +11,7 @@ use App\Http\Middleware\EnsureHomeroom;
 use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
 use App\Http\Middleware\EnsureXendit;
+use App\Http\Middleware\EnsureAdminSchool;
 use App\Jobs\FormApproveTest;
 use App\Models\Absent;
 use App\Models\Access;
@@ -30,6 +31,7 @@ use App\Models\Examsession;
 use App\Models\Examtracker;
 use App\Models\Examtype;
 use App\Models\Form;
+use App\Models\FormTemplate;
 use App\Models\Meeting;
 use App\Models\Message;
 use App\Models\Packagequestion;
@@ -49,6 +51,7 @@ use App\Models\Subject;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
+use App\Models\Wave;
 use App\Notifications\QuizInvite;
 use App\Payment\Xendit;
 use Carbon\Carbon;
@@ -1371,6 +1374,55 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     });
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
+    Route::group(['prefix' => 'ppdb', 'middleware' => [EnsureAdminSchool::class]], function () {
+        Route::group(['prefix' => 'forms'], function () {
+            Route::post('', function (Request $request) {
+                $school = $request->user()->adminschools()->first();
+
+                $formTemplate = new FormTemplate;
+                $formTemplate->data = $request->data;
+                $formTemplate->save();
+
+                $school->form_template_id = $formTemplate->id;
+
+                $school->save();
+
+                return ['message' => 'ok'];
+            });
+            Route::put('', function (Request $request) {
+                $school = $request->user()->adminschools()->first();
+
+                $formTemplate = $school->ppdbform;
+                $formTemplate->data = $request->data;
+                $formTemplate->save();
+
+                return ['message' => 'ok'];
+            });
+        });
+        Route::group(['prefix' => 'waves'], function () {
+            Route::put('{id}', function (Request $request, $id) {
+                $wave = Wave::findOrFail($id);
+
+                $wave->close_at = Carbon::parse($request->close_at);
+                $wave->open_at = Carbon::parse($request->open_at);
+
+                $wave->max_join = $request->max_join;
+                $wave->education_year_end = $request->education_year_end;
+                $wave->education_year_start = $request->education_year_start;
+
+                $wave->allow_extracurricular = $request->allow_extracurricular;
+                $wave->allow_major = $request->allow_major;
+
+                if (!in_array($wave->school_id, $request->user()->adminschools->pluck('id')->toArray())) {
+                    return response(["message" => "no"], 403);
+                }
+
+                $wave->save();
+
+                return ['message' => 'ok'];
+            });
+        });
+    });
     Route::group(['prefix' => 'grades'], function () {
         Route::get('/', function (Request $request) {
             // no efficent por favor

@@ -55,6 +55,8 @@ class CreateUsersTable extends Migration
                 ->on("users");
 
             $table->foreignId("classtype_id")->nullable();
+            $table->foreignId("major_id")->nullable();
+            
             $table->bigInteger("nisn")->nullable();
 
             // teachers
