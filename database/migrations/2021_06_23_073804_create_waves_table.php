@@ -24,8 +24,8 @@ class CreateWavesTable extends Migration
             $table->boolean('allow_extracurricular')->default(false);
             $table->boolean('allow_major')->default(false);
 
-            $table->timestamp('open_at');
-            $table->timestamp('close_at');
+            $table->timestamp('open_at')->nullable();
+            $table->timestamp('close_at')->nullable();
             $table->timestamps();
         });
     }
