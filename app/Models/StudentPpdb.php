@@ -41,6 +41,8 @@ class StudentPpdb extends Model
 
         if (!$this->wave_id) return false;
 
+        if(!$this->wave->is_paid) return true;
+
         return Transaction::where([
             'transactionable_id' => $this->wave_id,
             'transactionable_type' => Wave::class,
