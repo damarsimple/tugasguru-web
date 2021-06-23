@@ -66,6 +66,7 @@ class User extends Authenticatable
     public const BIMBEL = 'BIMBEL';
     public const GENERAL = 'GENERAL';
     public const ADMIN = 'ADMIN';
+    public const STUDENT_PPDB = 'STUDENT_PPDB';
 
     protected $appends = ['mainschool'];
 
@@ -318,5 +319,10 @@ class User extends Authenticatable
     public function major(): BelongsTo
     {
         return $this->belongsTo("App\Models\Major");
+    }
+
+    public function studentppdb(): HasOne
+    {
+        return $this->hasOne('App\Models\StudentPpdb');
     }
 }

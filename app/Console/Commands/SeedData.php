@@ -31,6 +31,7 @@ use App\Models\Subject;
 use App\Models\Access;
 use App\Models\Extracurricular;
 use App\Models\Major;
+use App\Models\StudentPpdb;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Models\Wave;
@@ -522,6 +523,12 @@ class SeedData extends Command
                 $wave->allow_major = rand(1, 10) > 1;
                 $wave->open_at = Carbon::now();
                 $wave->close_at = Carbon::now()->addDay(10);
+
+                if ($i == 0) {
+                    $wave->is_paid = true;
+                    $wave->price = 300000;
+                }
+
                 $wave->save();
             }
 
@@ -595,13 +602,18 @@ class SeedData extends Command
             $secondstudent->district_id = 1;
             $secondstudent->gender = 1;
             $secondstudent->phone = "08987181015";
-            $secondstudent->roles = "STUDENT";
+            $secondstudent->roles = "STUDENT_PPDB";
 
             $secondstudent->nisn = 1234568123;
             $secondstudent->school_id = 1;
             $secondstudent->classtype_id = 1;
 
             $secondstudent->save();
+
+            $studentPpdb = new StudentPpdb();
+            $studentPpdb->school_id = $secondstudent->school_id;
+
+            $secondstudent->studentppdb()->save($studentPpdb);
 
             $studentIds = [$student->id, $secondstudent->id];
 

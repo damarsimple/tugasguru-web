@@ -40,7 +40,7 @@ class CreateNewUser implements CreatesNewUsers
             "phone" => ["required", "numeric"],
             "roles" => [
                 "required",
-                "in:TEACHER,STUDENT,TEACHER_BIMBEL,GUARDIAN",
+                "in:TEACHER,STUDENT_PPDB,TEACHER_BIMBEL,GUARDIAN",
             ],
         ];
 
@@ -50,6 +50,7 @@ class CreateNewUser implements CreatesNewUsers
             case "TEACHER":
                 $validationArray["school_id"] = ["required", "numeric"];
                 break;
+            case "STUDENT_PPDB":
             case "STUDENT":
                 $validationArray["school_id"] = ["required", "numeric"];
                 $validationArray["nisn"] = ["required", "numeric"];
@@ -81,6 +82,10 @@ class CreateNewUser implements CreatesNewUsers
                 $user->nisn = User::TEACHER;
                 $user->is_bimbel =
                     $input["roles"] == "TEACHER_BIMBEL" ? true : false;
+                break;
+            case "STUDENT_PPDB":
+                $user->nisn = $input["nisn"];
+                $user->school_id = $input["school_id"];
                 break;
             case "STUDENT":
                 $user->nisn = $input["nisn"];

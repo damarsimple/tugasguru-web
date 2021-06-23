@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attachment;
 use App\Models\Form;
 use App\Models\School;
+use App\Models\StudentPpdb;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -74,7 +75,7 @@ class ApiAuthController extends Controller
             "phone" => ["required", "numeric",  Rule::unique(User::class)],
             "roles" => [
                 "required",
-                "in:TEACHER,STUDENT,BIMBEL,GUARDIAN,GENERAL",
+                "in:TEACHER,STUDENT,STUDENT_PPDB,BIMBEL,GUARDIAN,GENERAL",
             ],
         ];
 
@@ -86,6 +87,10 @@ class ApiAuthController extends Controller
             case "TEACHER":
                 $validationArray["school_id"] = ["required", "numeric"];
                 $validationArray["npsn"] = ["required", "numeric", "in:" . School::find($input['school_id'])->npsn];
+                break;
+            case "STUDENT_PPDB":
+                $validationArray["school_id"] = ["required", "numeric"];
+                $validationArray["nisn"] = ["required", "numeric"];
                 break;
             case "STUDENT":
                 $validationArray["school_id"] = ["required", "numeric"];
@@ -144,6 +149,16 @@ class ApiAuthController extends Controller
             case "STUDENT":
                 $user->nisn = $input["nisn"];
                 $user->school_id = $input["school_id"];
+                break;
+            case "STUDENT_PPDB":
+
+                $user->nisn = $input["nisn"];
+                $user->school_id = $input["school_id"];
+
+                $studentPpdb = new StudentPpdb();
+                $studentPpdb->school_id = $user->school_id;
+
+                $user->studentppdb()->save($studentPpdb);
                 break;
             default:
                 break;

@@ -121,4 +121,9 @@ class School extends Model
     {
         return $this->hasMany('App\Models\Wave');
     }
+
+    public function openWaves(): HasMany
+    {
+        return $this->hasMany('App\Models\Wave')->where('close_at', '>', now());
+    }
 }

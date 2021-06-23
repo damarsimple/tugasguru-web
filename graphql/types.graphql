@@ -69,6 +69,7 @@ type School {
     extracurriculars: [Extracurricular!]! @belongsToMany
     majors: [Major!]! @belongsToMany
     waves: [Wave!]! @hasMany
+    openWaves: [Wave!]! @hasMany
 }
 
 type Absent {
@@ -505,6 +506,7 @@ enum Gender {
 }
 enum Roles {
     ADMIN
+    STUDENT_PPDB
     GENERAL
     TEACHER
     STUDENT
@@ -555,6 +557,8 @@ type User {
     school: School
     classtype: Classtype
     parent: User
+
+    studentppdb: StudentPpdb
     "Teacher"
     is_bimbel: Boolean!
     adminschools(where: _ @whereConditions(columns: ["school_id"])): [School!]!
@@ -639,7 +643,6 @@ type Form {
     created_at: DateTime!
     updated_at: DateTime!
     user: User! @belongsTo
-    school: School @belongsTo
     data: FormData
     type: FormType
     is_ppdb: Boolean!
@@ -663,8 +666,13 @@ type Wave {
 
     allow_extracurricular: Boolean!
     allow_major: Boolean!
+    is_paid: Boolean!
+    price: Float!
 
     school: School! @belongsTo
+
+    studentppdbs: [StudentPpdb!]! @hasMany
+    studentppdbCount: Int! @count(relation: "studentppdbs")
 }
 
 type Major {
@@ -795,33 +803,53 @@ type FormTemplate {
     updated_at: DateTime!
 }
 
-type FormTemplateData{
-  hash: String!
-  name: String!
-  description: String
-  blocks: [Input!]!
+type FormTemplateData {
+    hash: String!
+    name: String!
+    description: String
+    blocks: [Input!]!
 }
 
 enum InputType {
-  SELECT @enum(value: "SELECT")
-  TEXT @enum(value: "TEXT")
-  NUMBER @enum(value: "NUMBER")
-  RADIO @enum(value: "RADIO")
-  FILE @enum(value: "FILE")
-  DATE @enum(value: "DATE")
-  TIME @enum(value: "TIME")
-  TEXTAREA @enum(value: "TEXTAREA")
+    SELECT @enum(value: "SELECT")
+    TEXT @enum(value: "TEXT")
+    NUMBER @enum(value: "NUMBER")
+    RADIO @enum(value: "RADIO")
+    FILE @enum(value: "FILE")
+    DATE @enum(value: "DATE")
+    TIME @enum(value: "TIME")
+    TEXTAREA @enum(value: "TEXTAREA")
 }
 
-
 type Input {
-  hash: String!
-  name: String!
-  type: InputType!
-  description: String
-  defaultValue: String
-  placeholder: String
-  required: Boolean
-  regex: String
-  options: [String]
+    hash: String!
+    name: String!
+    type: InputType!
+    description: String
+    defaultValue: String
+    placeholder: String
+    required: Boolean
+    regex: String
+    options: [String]
+}
+
+enum StudentPpdbStatus {
+    APPROVED @enum(value: "APPROVED")
+    REJECTED @enum(value: "REJECTED")
+    PROCESSED @enum(value: "PROCESSED")
+    PENDING @enum(value: "PENDING")
+}
+
+type StudentPpdb {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    status: StudentPpdbStatus!
+    comment: String
+    is_paid: Boolean!
+    changer: User
+    school: School! @belongsTo
+    user: User! @belongsTo
+    wave: Wave @belongsTo
+    form: Form @belongsTo
 }

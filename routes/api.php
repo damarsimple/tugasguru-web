@@ -12,6 +12,7 @@ use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
 use App\Http\Middleware\EnsureXendit;
 use App\Http\Middleware\EnsureAdminSchool;
+use App\Http\Middleware\EnsureStudentPPDB;
 use App\Jobs\FormApproveTest;
 use App\Models\Absent;
 use App\Models\Access;
@@ -455,6 +456,73 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
             'staging_url' => $transaction->staging_url
         ];
     });
+    Route::post('/ppdbs', function (Request $request) {
+        $user = $request->user();
+
+        $wave = $user?->studentppdb?->wave;
+
+        if (!$wave) {
+            return ['message' => 'you didnt join wave yet'];
+        }
+
+        $transaction = new Transaction();
+
+        if ($request->voucher) {
+            $voucher = Voucher::where(['code' => $request->voucher])->firstOrFail();
+
+            if (!$voucher->expired_at->lt(now())) {
+                $transaction->amount = ($wave->price - $wave->price * $voucher->percentage);
+                $transaction->voucher_id = $voucher->id;
+            } else {
+                return response([
+                    'message' => 'Voucher sudah kadaluarsa',
+                ], 403);
+            }
+        } else {
+            $transaction->amount = $wave->price;
+        }
+
+        $transaction->from = $user->balance;
+        $transaction->to = $user->balance;
+
+        $transaction->payment_method = $request->payment_method;
+
+        $transaction->transactionable_id = $wave->id;
+        $transaction->transactionable_type = $wave::class;
+        $transaction->uuid = Str::uuid();
+
+        $transaction->description = 'Pembayarn ' . $wave->name . ' sebesar ' . $transaction->amount;
+
+        $transaction->staging_url = null;
+
+        switch ($request->payment_method) {
+            case 'XENDIT':
+
+                $invoice = Xendit::makePayment(
+                    amount: $transaction->amount,
+                    uuid: $transaction->uuid,
+                    description: $transaction->description,
+                    email: $user->email
+                );
+
+                $transaction->invoice_request = $invoice;
+
+                $transaction->staging_url = $invoice['invoice_url'];
+
+                break;
+            default:
+                return ['message' => 'Metode pembayaran invalid'];
+                break;
+        }
+
+        $user->transactions()->save($transaction);
+
+        return [
+            'message' => 'ok',
+            'transaction' => $transaction,
+            'staging_url' => $transaction->staging_url
+        ];
+    });
 });
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], function () {
     Route::get('/{id}', function (Request $request, $id) {
@@ -795,7 +863,38 @@ Route::get('/{id}/rank', function (Request $request, $id) {
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], function () {
+    Route::group(['prefix' => 'ppdb', 'middleware' => [EnsureStudentPPDB::class]], function () {
+        Route::group(['prefix' => 'forms'],  function () {
+            Route::get('join', function (Request $request) {
+                $user = $request->user();
 
+                $studentppdb = $user->studentppdb;
+            });
+        });
+        Route::group(['prefix' => 'waves'], function () {
+            Route::post('join', function (Request $request) {
+                $wave = Wave::findOrFail($request->wave);
+
+                $user = $request->user();
+
+                $studentppdb = $user->studentppdb;
+
+                $studentppdb->wave_id = $wave->id;
+
+                if (!now()->between($wave->open_at, $wave->close_at)) {
+                    return ['message' => 'Sesi telah berakhir atau belum dibuka'];
+                }
+
+                if ($wave->max_join <  $wave->studentppdbs()->count()) {
+                    return ['message' => 'Gelombang ini sudah penuh'];
+                }
+
+                $studentppdb->save();
+
+                return ['message' => 'ok'];
+            });
+        });
+    });
 
     Route::group(['prefix' => 'attendances'], function () {
         Route::get('/', function (Request $request) {

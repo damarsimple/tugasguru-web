@@ -24,6 +24,9 @@ class CreateWavesTable extends Migration
             $table->boolean('allow_extracurricular')->default(false);
             $table->boolean('allow_major')->default(false);
 
+            $table->boolean('is_paid')->default(false);
+            $table->unsignedDouble('price')->default(0);
+            
             $table->timestamp('open_at')->nullable();
             $table->timestamp('close_at')->nullable();
             $table->timestamps();
