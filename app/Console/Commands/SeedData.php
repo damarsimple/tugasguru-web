@@ -521,7 +521,7 @@ class SeedData extends Command
                 $wave->max_join = 100;
                 $wave->allow_extracurricular = rand(1, 10) > 1;
                 $wave->allow_major = rand(1, 10) > 1;
-                $wave->open_at = Carbon::now();
+                $wave->open_at = Carbon::now()->subMinute(5);
                 $wave->close_at = Carbon::now()->addDay(10);
 
                 if ($i == 0) {

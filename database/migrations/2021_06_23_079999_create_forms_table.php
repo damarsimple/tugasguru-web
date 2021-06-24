@@ -17,6 +17,7 @@ class CreateFormsTable extends Migration
             $table->longText('comment')->nullable();
             $table->boolean('is_ppdb')->default(false);
             $table->boolean('is_verified')->default(false);
+            $table->boolean('is_locked')->default(false);
             $table->smallInteger('status', unsigned: true)->default(Form::PENDING);
             $table->timestamps();
         });

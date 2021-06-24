@@ -865,10 +865,18 @@ Route::get('/{id}/rank', function (Request $request, $id) {
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], function () {
     Route::group(['prefix' => 'ppdb', 'middleware' => [EnsureStudentPPDB::class]], function () {
         Route::group(['prefix' => 'forms'],  function () {
-            Route::get('join', function (Request $request) {
+            Route::put('save', function (Request $request) {
                 $user = $request->user();
-
                 $studentppdb = $user->studentppdb;
+                $form = $studentppdb->form;
+
+                $form->data = $request->data;
+
+                if ($request->locked) {
+                    $form->is_locked = true;
+                }
+
+                $form->save();
             });
         });
         Route::group(['prefix' => 'waves'], function () {

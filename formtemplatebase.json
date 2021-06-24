@@ -1,0 +1,714 @@
+[
+    {
+        "hash": "c8b1e832-3809-498a-9a5a-6f845210f8e1",
+        "name": "Data Pribadi",
+        "blocks": [
+            {
+                "hash": "25bbd492-4cf9-4c6b-ba9f-9eb1dff5a18a",
+                "name": "Jenis Kelamin",
+                "required": true,
+                "type": "RADIO",
+                "options": [
+                    "LAKI-LAKI",
+                    "PEREMPUAN"
+                ]
+            },
+            {
+                "hash": "cf35771c-f92d-46ad-af90-e6895d1fb4ef",
+                "name": "NISN",
+                "type": "TEXT",
+                "placeholder": "Nomor Induk Siswa Nasional",
+                "required": true
+            },
+            {
+                "hash": "9e158728-fd0d-4543-8eaa-4ce6dbbceabb",
+                "name": "NIK/ No.KITAS (WNA)",
+                "type": "TEXT",
+                "defaultValue": "0000000000000000",
+                "description": "Tercantum di KK / KTP 16 digit"
+            },
+            {
+                "hash": "1707acdc-d975-494a-9c98-0c500c55676b",
+                "name": "No. Kartu Keluarga",
+                "type": "TEXT",
+                "defaultValue": "0000000000000000",
+                "description": "Tercantum di KK"
+            },
+            {
+                "hash": "ed2c8155-68b0-4357-92a4-18c83ed0cff5",
+                "name": "Scan Kartu Keluarga",
+                "type": "FILE",
+                "description": "Format jpg/png, saran max. 2mb resolusi standar"
+            },
+            {
+                "hash": "b18142a1-6702-4725-bbf1-3cea4410b56f",
+                "name": "Tempat Lahir",
+                "type": "TEXT",
+                "placeholder": "Kota / Kabupaten Lahir"
+            },
+            {
+                "hash": "5f76d6fc-be16-4d3e-8f0a-66975f3c4f96",
+                "name": "Tanggal Lahir",
+                "type": "DATE",
+                "placeholder": "30-12-2000"
+            },
+            {
+                "hash": "ced38358-5eda-4c5a-a3e4-edc1a9d9095a",
+                "name": "No.Reg. Akta Lahir",
+                "type": "TEXT",
+                "placeholder": "Nomor Reg. Akta Lahir"
+            },
+            {
+                "hash": "e5d98e7d-0435-4794-a7a6-4b85a8d6c024",
+                "name": "Agama & Kepercayaan",
+                "type": "SELECT",
+                "options": [
+                    "Islam",
+                    "Kristen/Protestan",
+                    "Katholik",
+                    "Hindu",
+                    "Budda",
+                    "Kong Hu Cu"
+                ],
+                "required": true
+            },
+            {
+                "hash": "3dfb3c52-6d62-4804-94c6-066831db4b20",
+                "name": "Kewarganegaraan",
+                "type": "SELECT",
+                "options": [
+                    "Indonesia (WNI)",
+                    "Asing (WNA)"
+                ],
+                "required": true
+            },
+            {
+                "hash": "6cd84dc0-8ecb-44d6-b72b-efa06f6bdb99",
+                "name": "Nama Negara",
+                "type": "DATE",
+                "defaultValue": "Indonesia"
+            },
+            {
+                "hash": "3fa28c25-5f70-4328-af9d-bcf25ef448dd",
+                "name": "Berkebutuhan Khusus",
+                "type": "SELECT",
+                "options": [
+                    "Tidak",
+                    "Netra",
+                    "Rungu",
+                    "Grahita Ringan",
+                    "Grahita Sedang",
+                    "Daksa Ringan",
+                    "Daksa Sedang",
+                    "Laras",
+                    "Wicara",
+                    "Tuna Ganda",
+                    "Hiper Aktif",
+                    "Cerdas Istimewa",
+                    "Bakat Istimewa",
+                    "Kesulitan Belajar",
+                    "Narkoba",
+                    "Indigo",
+                    "Down Sindrome",
+                    "Autis"
+                ],
+                "required": true
+            },
+            {
+                "hash": "dbb0e227-22bc-4e59-8913-78319d3728dc",
+                "name": "Alamat",
+                "type": "TEXT",
+                "placeholder": "Kota / Kabupaten Lahir"
+            },
+            {
+                "hash": "9c501b9d-58ba-42bb-b2ba-1c2334256404",
+                "name": "RT",
+                "type": "TEXT",
+                "placeholder": "No.RT"
+            },
+            {
+                "hash": "332e7b92-db44-4b60-961a-a2f6de99dd85",
+                "name": "RW",
+                "type": "TEXT",
+                "placeholder": "No.RW"
+            },
+            {
+                "hash": "fedcfeca-e705-4ed1-8853-86427bc99f7d",
+                "name": "Dusun/Kampung",
+                "type": "TEXT",
+                "placeholder": "Nama Dusung/Kampung"
+            },
+            {
+                "hash": "091b6544-f80a-4b60-8575-26fdaf3b44a5",
+                "name": "Kelurahan / Desa",
+                "type": "TEXT",
+                "placeholder": "Nama Keluruhan / Desa"
+            },
+            {
+                "hash": "a01af959-988a-4a7e-8835-d165d6174b07",
+                "name": "Kecamatan",
+                "type": "TEXT",
+                "placeholder": "Nama Kecamatan"
+            },
+            {
+                "hash": "69824cd2-41cf-4971-a25f-7462db0ea73c",
+                "name": "Kabupaten/Kota",
+                "type": "TEXT",
+                "placeholder": "Nama Kabupaten/Kota"
+            },
+            {
+                "hash": "c7dd4303-78af-423b-a879-846fcdfbed15",
+                "name": "Propinsi",
+                "type": "TEXT",
+                "placeholder": "Nama Propinsi"
+            },
+            {
+                "hash": "615add87-86c9-4756-ab49-6ed3cd1b627b",
+                "name": "Tempat Tinggal",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Bersama Orang Tua",
+                    "Bersama Wali",
+                    "Pesantren",
+                    "Kos",
+                    "Asrama",
+                    "Panti Asuhan",
+                    "Lainnya"
+                ]
+            },
+            {
+                "hash": "e93a797c-7c9e-4d99-a3c2-7280ce6c5107",
+                "name": "Anak Keberapa",
+                "type": "NUMBER",
+                "defaultValue": 1
+            },
+            {
+                "hash": "7aefc176-f9ae-4dd7-82e6-f86b4f793969",
+                "name": "Jumlah Saudara Kandung",
+                "type": "NUMBER",
+                "defaultValue": 1
+            },
+            {
+                "hash": "f30ef953-160a-4b58-a7d7-084cc0775544",
+                "name": "No. KKS",
+                "type": "TEXT",
+                "placeholder": "Kartu Keluarga Sejahtera",
+                "description": "jika memiliki"
+            },
+            {
+                "hash": "b3b51aa9-0b9a-4cc5-bf36-d347eb4730db",
+                "name": "Penerima KPS / PKH",
+                "type": "RADIO",
+                "options": [
+                    "YA",
+                    "TIDAK"
+                ]
+            },
+            {
+                "hash": "98a0cc70-19d1-4451-bf07-e7b464bfa592",
+                "name": "No. KPS / PKH",
+                "type": "TEXT",
+                "placeholder": "Kartu Perlindungan Sosial"
+            }
+        ]
+    },
+    {
+        "hash": "1052f364-7b41-4a1b-aa99-3c9f8592c714",
+        "name": "Program Indonesia Pintar",
+        "blocks": [
+            {
+                "hash": "653518b0-e427-4718-989f-d24a1474fc72",
+                "name": "Usulan Dari Sekolah (Layak PIP)",
+                "type": "RADIO",
+                "options": [
+                    "YA",
+                    "TIDAK"
+                ]
+            },
+            {
+                "hash": "2a40c8cf-03e7-4180-8abc-784193ce3789",
+                "name": "Alasan Layak PIP",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Pemegang Kartu PKH/KPS/KIP",
+                    "Penerima BSM 2014",
+                    "Yatim Piatu/Panti Asuhan/Panti Sosial",
+                    "Dampak Bencana Alam",
+                    "Pernah Drop Out",
+                    "Siswa Miskin/Rentan Miskin",
+                    "Daerah Konflik",
+                    "Keluarga Terpidana",
+                    "Kelainan Fisik"
+                ]
+            },
+            {
+                "hash": "5a4cdb23-842b-4e13-93bb-a6ad0946f3bd",
+                "name": "Penerima Kartu Indonesia Pintar",
+                "type": "RADIO",
+                "options": [
+                    "YA",
+                    "TIDAK"
+                ]
+            },
+            {
+                "hash": "a641f069-3d29-4593-9815-f74ba877a08f",
+                "name": "Nomor KIP",
+                "type": "TEXT",
+                "placeholder": "Kartu Indonesia Pintar"
+            },
+            {
+                "hash": "387e720d-c11b-4574-bcc8-42980dee869c",
+                "name": "Nama Tertera di KIP",
+                "type": "TEXT"
+            },
+            {
+                "hash": "7396f276-6a5c-4ee3-8d1d-9aeec0fa8874",
+                "name": "Terima Fisik Kartu (KIP)",
+                "type": "RADIO",
+                "options": [
+                    "YA",
+                    "TIDAK"
+                ]
+            }
+        ]
+    },
+    {
+        "hash": "fe2cfb49-4238-45b4-9728-c413a5c4d901",
+        "name": "Data Ayah Kandung",
+        "blocks": [
+            {
+                "hash": "81362b03-9c0f-4a66-bf9c-d43710b20b82",
+                "name": "Nama Ayah Kandung",
+                "type": "TEXT"
+            },
+            {
+                "hash": "4d361a1c-5d61-4ef2-8649-c5334a97c26f",
+                "name": "NIK. Ayah",
+                "type": "NUMBER",
+                "placeholder": "0000000000"
+            },
+            {
+                "hash": "0097593b-28fc-4d7b-8b5c-cdc0bdf7aa40",
+                "name": "Tahun Lahir",
+                "type": "NUMBER",
+                "placeholder": "0000"
+            },
+            {
+                "hash": "23ef7de9-5387-4293-b5b7-eaf768e43901",
+                "name": "Pendidikan Terakhir",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Tidak Sekolah",
+                    "Putus SD",
+                    "SD Sederajat",
+                    "SMP Sederajat",
+                    "SMA Sederajat",
+                    "D1",
+                    "D2",
+                    "D3",
+                    "D4/S1",
+                    "S2",
+                    "S3"
+                ]
+            },
+            {
+                "hash": "aac15afe-1da5-4e3d-847c-d584509c347e",
+                "name": "Pekerjaan Ayah Kandung",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Tidak Bekerja",
+                    "Nelayan",
+                    "Petani",
+                    "Peternak",
+                    "Guru",
+                    "PNS/TNI/POLRI",
+                    "Karyawan Swasta",
+                    "Pedagang Kecil",
+                    "Pedagang Besar",
+                    "Wiraswasta",
+                    "Wirausaha",
+                    "Buruh",
+                    "Pensiunan",
+                    "Meninggal Dunia",
+                    "Lain-lain"
+                ]
+            },
+            {
+                "hash": "4453f00d-0515-4269-8e7d-b740f6eb7d40",
+                "name": "Penghasilan Bulanan",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Kurang dari 500.000",
+                    "500.000 - 999.999",
+                    "1.000.000 - 1.999.999",
+                    "2.000.000 - 5.000.000",
+                    "5.000.000 - 20.000.000",
+                    "Lebih dari 20.000.000",
+                    "Tidak Berpenghasilan"
+                ]
+            },
+            {
+                "hash": "c7f41dbf-31e8-4513-9929-4e76a1aa5c6c",
+                "name": "Berkebutuhan Khusus",
+                "type": "SELECT",
+                "options": [
+                    "Tidak",
+                    "Netra",
+                    "Rungu",
+                    "Grahita Ringan",
+                    "Grahita Sedang",
+                    "Daksa Ringan",
+                    "Daksa Sedang",
+                    "Laras",
+                    "Wicara",
+                    "Tuna Ganda",
+                    "Hiper Aktif",
+                    "Cerdas Istimewa",
+                    "Bakat Istimewa",
+                    "Kesulitan Belajar",
+                    "Narkoba",
+                    "Indigo",
+                    "Down Sindrome",
+                    "Autis"
+                ]
+            }
+        ]
+    },
+    {
+        "hash": "6285e7b3-c209-4509-b1be-dc7ccbd22ab2",
+        "name": "Data Ibu Kandung",
+        "blocks": [
+            {
+                "hash": "fa67bf9f-0092-4673-bcf0-234113c7eeb1",
+                "name": "Nama Ibu Kandung",
+                "type": "TEXT"
+            },
+            {
+                "hash": "8c718b4b-7945-4539-8cff-7f79e1b5746a",
+                "name": "NIK. Ibu",
+                "type": "NUMBER",
+                "placeholder": "0000000000"
+            },
+            {
+                "hash": "0915663e-b55e-4ba0-8414-c078c743f329",
+                "name": "Tahun Lahir",
+                "type": "NUMBER",
+                "placeholder": "0000"
+            },
+            {
+                "hash": "686fae37-3ca8-46d0-adbd-7b932c003f0d",
+                "name": "Pendidikan Terakhir",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Tidak Sekolah",
+                    "Putus SD",
+                    "SD Sederajat",
+                    "SMP Sederajat",
+                    "SMA Sederajat",
+                    "D1",
+                    "D2",
+                    "D3",
+                    "D4/S1",
+                    "S2",
+                    "S3"
+                ]
+            },
+            {
+                "hash": "b5d230ce-4911-425e-81b5-da957df15bf2",
+                "name": "Pekerjaan Ibu Kandung",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Tidak Bekerja",
+                    "Nelayan",
+                    "Petani",
+                    "Peternak",
+                    "Guru",
+                    "PNS/TNI/POLRI",
+                    "Karyawan Swasta",
+                    "Pedagang Kecil",
+                    "Pedagang Besar",
+                    "Wiraswasta",
+                    "Wirausaha",
+                    "Buruh",
+                    "Pensiunan",
+                    "Meninggal Dunia",
+                    "Lain-lain"
+                ]
+            },
+            {
+                "hash": "eee6f698-33eb-4077-85ba-08b3013774c2",
+                "name": "Penghasilan Bulanan",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Kurang dari 500.000",
+                    "500.000 - 999.999",
+                    "1.000.000 - 1.999.999",
+                    "2.000.000 - 5.000.000",
+                    "5.000.000 - 20.000.000",
+                    "Lebih dari 20.000.000",
+                    "Tidak Berpenghasilan"
+                ]
+            },
+            {
+                "hash": "787e2d4d-00b1-413a-b6c8-d9c1a0072264",
+                "name": "Berkebutuhan Khusus",
+                "type": "SELECT",
+                "options": [
+                    "Tidak",
+                    "Netra",
+                    "Rungu",
+                    "Grahita Ringan",
+                    "Grahita Sedang",
+                    "Daksa Ringan",
+                    "Daksa Sedang",
+                    "Laras",
+                    "Wicara",
+                    "Tuna Ganda",
+                    "Hiper Aktif",
+                    "Cerdas Istimewa",
+                    "Bakat Istimewa",
+                    "Kesulitan Belajar",
+                    "Narkoba",
+                    "Indigo",
+                    "Down Sindrome",
+                    "Autis"
+                ]
+            }
+        ]
+    },
+    {
+        "hash": "b1f4b6d5-d61d-407c-a314-970b0ab6dd47",
+        "name": "Data Wali Kandung",
+        "blocks": [
+            {
+                "hash": "ef039816-953c-4f5a-9371-d4c39d84eb76",
+                "name": "Nama Wali Kandung",
+                "type": "TEXT"
+            },
+            {
+                "hash": "e21f8a1a-a308-454b-8ee9-f648fa1d131c",
+                "name": "NIK. Wali",
+                "type": "NUMBER",
+                "placeholder": "0000000000"
+            },
+            {
+                "hash": "f625372b-437e-40bb-9e4f-290943647aed",
+                "name": "Tahun Lahir",
+                "type": "NUMBER",
+                "placeholder": "0000"
+            },
+            {
+                "hash": "64ca0d40-9a7d-4464-b1e4-ce036198051c",
+                "name": "Pendidikan Terakhir",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Tidak Sekolah",
+                    "Putus SD",
+                    "SD Sederajat",
+                    "SMP Sederajat",
+                    "SMA Sederajat",
+                    "D1",
+                    "D2",
+                    "D3",
+                    "D4/S1",
+                    "S2",
+                    "S3"
+                ]
+            },
+            {
+                "hash": "d79a03d5-942b-4864-ac22-b8041e264ec6",
+                "name": "Pekerjaan Wali",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Tidak Bekerja",
+                    "Nelayan",
+                    "Petani",
+                    "Peternak",
+                    "Guru",
+                    "PNS/TNI/POLRI",
+                    "Karyawan Swasta",
+                    "Pedagang Kecil",
+                    "Pedagang Besar",
+                    "Wiraswasta",
+                    "Wirausaha",
+                    "Buruh",
+                    "Pensiunan",
+                    "Meninggal Dunia",
+                    "Lain-lain"
+                ]
+            },
+            {
+                "hash": "a2cd05e2-243c-4468-98c0-e3872a600707",
+                "name": "Penghasilan Bulanan",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Kurang dari 500.000",
+                    "500.000 - 999.999",
+                    "1.000.000 - 1.999.999",
+                    "2.000.000 - 5.000.000",
+                    "5.000.000 - 20.000.000",
+                    "Lebih dari 20.000.000",
+                    "Tidak Berpenghasilan"
+                ]
+            },
+            {
+                "hash": "60eea9f9-8e20-4604-99b0-5e5cc0e09dbb",
+                "name": "Berkebutuhan Khusus",
+                "type": "SELECT",
+                "options": [
+                    "Tidak",
+                    "Netra",
+                    "Rungu",
+                    "Grahita Ringan",
+                    "Grahita Sedang",
+                    "Daksa Ringan",
+                    "Daksa Sedang",
+                    "Laras",
+                    "Wicara",
+                    "Tuna Ganda",
+                    "Hiper Aktif",
+                    "Cerdas Istimewa",
+                    "Bakat Istimewa",
+                    "Kesulitan Belajar",
+                    "Narkoba",
+                    "Indigo",
+                    "Down Sindrome",
+                    "Autis"
+                ]
+            }
+        ]
+    },
+    {
+        "hash": "547c7117-d90c-4a6f-be52-cd9c19c8bfa6",
+        "name": "Data Ibu Kandung",
+        "blocks": [
+            {
+                "hash": "296bd70b-7427-4240-9f6b-87da008798a5",
+                "name": "No. Telepon Rumah",
+                "type": "NUMBER"
+            },
+            {
+                "hash": "6a55e038-605f-48e5-adec-43c688192223",
+                "name": "Nomor HP",
+                "required": true,
+                "description": "Sebaiknya diisi untuk verifikasi & informasi",
+                "type": "NUMBER",
+                "placeholder": "0000000000"
+            },
+            {
+                "hash": "be6026ae-407f-4949-9ddf-2ae659021946",
+                "name": "Email",
+                "description": "Informasi akan dikirim juga ke email ini",
+                "type": "TEXT",
+                "placeholder": "sample@mail.com"
+            }
+        ]
+    },
+    {
+        "hash": "1d6a68d3-1680-481e-9a68-1c2eecd1f73d",
+        "name": "Data Periodik",
+        "blocks": [
+            {
+                "hash": "8e4c4b00-f806-4f5c-b91e-34b498d00843",
+                "name": "Tinggi Badan (cm)",
+                "type": "NUMBER"
+            },
+            {
+                "hash": "1b20e6ea-6033-44d8-a36a-eb7609f90b43",
+                "name": "Berat Badan (kg)",
+                "type": "NUMBER"
+            },
+            {
+                "hash": "9f4df21d-fa1a-4ac1-a516-f03acb5c2608",
+                "name": "Lingkar Kepala (cm)",
+                "type": "NUMBER"
+            },
+            {
+                "hash": "d7085399-3347-4128-9443-d36b2a65195e",
+                "name": "Golongan Darah",
+                "type": "SELECT",
+                "options": [
+                    "A",
+                    "B",
+                    "AB",
+                    "0"
+                ]
+            },
+            {
+                "hash": "f79b6fd8-f956-4b3a-b6b1-54a57e810ed4",
+                "name": "Jarak ke Sekolah",
+                "type": "RADIO",
+                "options": [
+                    "Kurang dari 1 km",
+                    "Lebih dari 1 km"
+                ]
+            },
+            {
+                "hash": "936075c3-bfe3-4d5f-bb87-bc3b29611127",
+                "name": "Sebutkan (dalam kilometer)",
+                "type": "NUMBER"
+            },
+            {
+                "hash": "052da43f-6c78-43e9-8287-0b4ac9bac9c0",
+                "name": "Sebutkan (dalam kilometer)",
+                "type": "TIME",
+                "description": "jam:menit - contoh: 00:30"
+            },
+            {
+                "hash": "30fc8943-e560-44fb-8f00-908813cd7bb1",
+                "name": "Sebutkan (dalam kilometer)",
+                "type": "SELECT",
+                "options": [
+                    "-- Silahkan Pilih --",
+                    "Jalan Kaki",
+                    "Kendaraan Pribadi",
+                    "Kendaraan Umum/Ojek",
+                    "Andong/Delman/Becak,dll.",
+                    "Lainnya"
+                ]
+            }
+        ]
+    },
+    {
+        "hash": "385df3a3-c38a-4e88-b0f0-a259e484d60c",
+        "name": "Data Lainnya",
+        "blocks": [
+            {
+                "hash": "d861d530-35be-43d6-b361-d695e34b181a",
+                "name": "No. Seri Ijazah",
+                "type": "NUMBER",
+                "placeholder": "000000000000000",
+                "descriptions": "16 digit di Ijazah jenjang sebelumnya (jika sudah ada)"
+            },
+            {
+                "hash": "6ba5b260-3d3d-40ac-82b9-6bfb1b9f6151",
+                "name": "No. Seri SKHUN",
+                "type": "NUMBER",
+                "placeholder": "000000000000000",
+                "descriptions": "16 digit di SKHU jenjang sebelumnya (jika memiliki)"
+            },
+            {
+                "hash": "03b368f8-0823-477a-95fa-856f9b9eee1e",
+                "name": "Hobi",
+                "type": "TEXT"
+            },
+            {
+                "hash": "ff7c6802-57c9-4a8f-b9bd-bb69b1915fde",
+                "name": "Pas Photo",
+                "type": "FILE",
+                "description": "Jika ada, Image only, format jpg/png, saran max. 2mb resolusi standar "
+            }
+        ]
+    }
+]

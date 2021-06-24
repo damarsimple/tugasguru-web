@@ -638,15 +638,19 @@ type FormData {
     message: String
 }
 
+union FormTemplateDataInput = FormTemplateData | FormData
+
 type Form {
     id: ID!
     created_at: DateTime!
     updated_at: DateTime!
+    # the type should be [FormTemplateDataInput] but i cant get it to work
     user: User! @belongsTo
-    data: FormData
+    data: Mixed
     type: FormType
     is_ppdb: Boolean!
     is_verified: Boolean!
+    is_locked: Boolean!
     attachments: [Attachment!]! @morphMany
     comment: String
     status: FormStatus
@@ -831,6 +835,9 @@ type Input {
     required: Boolean
     regex: String
     options: [String]
+
+    value: String
+    metadata: String
 }
 
 enum StudentPpdbStatus {

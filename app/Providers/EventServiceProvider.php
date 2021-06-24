@@ -12,7 +12,9 @@ use App\Models\Form;
 use App\Models\Meeting;
 use App\Models\Message;
 use App\Models\Quiz;
+use App\Models\School;
 use App\Models\StudentAssigment;
+use App\Models\StudentPpdb;
 use App\Models\Transaction;
 use App\Observers\ArticleObserver;
 use App\Observers\AssigmentObserver;
@@ -24,7 +26,9 @@ use App\Observers\FormObserver;
 use App\Observers\MeetingObserver;
 use App\Observers\MessageObserver;
 use App\Observers\QuizObserver;
+use App\Observers\SchoolObserver;
 use App\Observers\StudentAssigmentObserver;
+use App\Observers\StudentPpdbObserver;
 use App\Observers\TransactionObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -61,5 +65,7 @@ class EventServiceProvider extends ServiceProvider
         Quiz::observe(QuizObserver::class);
         Assigment::observe(AssigmentObserver::class);
         Attendance::observe(AttendanceObserver::class);
+        StudentPpdb::observe(StudentPpdbObserver::class);
+        School::observe(SchoolObserver::class);
     }
 }
