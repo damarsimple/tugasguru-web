@@ -877,6 +877,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
                 }
 
                 $form->save();
+
+                return ['message' => 'ok'];
             });
         });
         Route::group(['prefix' => 'waves'], function () {
@@ -1486,7 +1488,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             Route::post('', function (Request $request) {
                 $school = $request->user()->adminschools()->first();
 
-                $formTemplate = new FormTemplate;
+                $formTemplate = new FormTemplate();
                 $formTemplate->data = $request->data;
                 $formTemplate->save();
 

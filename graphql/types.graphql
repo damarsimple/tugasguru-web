@@ -837,7 +837,7 @@ type Input {
     options: [String]
 
     value: String
-    metadata: String
+    metadata: Mixed
 }
 
 enum StudentPpdbStatus {
@@ -859,4 +859,5 @@ type StudentPpdb {
     user: User! @belongsTo
     wave: Wave @belongsTo
     form: Form @belongsTo
+    identifier: String!
 }

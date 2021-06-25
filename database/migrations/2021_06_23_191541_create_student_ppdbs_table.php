@@ -18,6 +18,7 @@ class CreateStudentPpdbsTable extends Migration
             $table->id();
             $table->foreignId('changer_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('status')->default(StudentPpdb::PENDING);
+            $table->uuid('identifier')->nullable();
             $table->longText('comment')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('school_id')->constrained()->onDelete('cascade');

@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Form;
 use App\Models\StudentPpdb;
+use Illuminate\Support\Str;
 
 class StudentPpdbObserver
 {
@@ -15,6 +16,8 @@ class StudentPpdbObserver
      */
     public function created(StudentPpdb $studentPpdb)
     {
+        $studentPpdb->identifier = Str::uuid();
+        $studentPpdb->saveQuietly();
         $this->handleCreateForm($studentPpdb);
     }
 

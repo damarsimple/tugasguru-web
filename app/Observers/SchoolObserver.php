@@ -21,7 +21,7 @@ class SchoolObserver
             $formTemplate->save();
         }
 
-        $school->form_template_id = $formTemplate->id;
+        $school->form_template_id = $formTemplate?->id ?? 1;
 
         $school->saveQuietly();
     }
