@@ -11,8 +11,16 @@ class CreateFormsTable extends Migration
     {
         Schema::create('forms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade')->index();
-            $table->foreignId('school_id')->constrained()->onDelete('cascade')->index();
+            $table
+                ->foreignId("user_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("school_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
             $table->json('data');
             $table->string('type')->nullable();
             $table->longText('comment')->nullable();
