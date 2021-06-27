@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Form;
 use App\Models\StudentPpdb;
+use App\Models\User;
 use Illuminate\Support\Str;
 
 class StudentPpdbObserver
@@ -45,6 +46,18 @@ class StudentPpdbObserver
     public function updated(StudentPpdb $studentPpdb)
     {
         $this->handleCreateForm($studentPpdb);
+
+        switch ($studentPpdb) {
+            case StudentPpdb::APPROVED:
+                $user = $studentPpdb->user;
+                $user->roles = User::STUDENT;
+                $schooltype = $studentPpdb?->school()?->schooltype;
+                $user->classtype_id = $schooltype?->classtypes()?->orderBy('level')?->first()?->id;
+                $user->save();
+                break;
+            default:
+                break;
+        }
     }
 
     /**

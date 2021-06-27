@@ -126,4 +126,9 @@ class School extends Model
     {
         return $this->hasMany('App\Models\Wave')->where('close_at', '>', now());
     }
+
+    public function studentppdbs(): HasMany
+    {
+        return $this->hasMany("App\Models\StudentPpdb")->latest();
+    }
 }

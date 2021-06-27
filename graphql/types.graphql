@@ -70,6 +70,7 @@ type School {
     majors: [Major!]! @belongsToMany
     waves: [Wave!]! @hasMany
     openWaves: [Wave!]! @hasMany
+    studentppdbs: [StudentPpdb!]! @paginate(type: CONNECTION)
 }
 
 type Absent {
@@ -627,11 +628,12 @@ enum FormStatus {
 }
 
 enum FormType {
-    REQUEST_TUTOR
-    REQUEST_COUNSELOR
-    REQUEST_HEADMASTER
-    REQUEST_ADMIN_SCHOOL
-    REQUEST_HOMEROOM
+    REQUEST_TUTOR @enum(value: "REQUEST_TUTOR")
+    REQUEST_COUNSELOR @enum(value: "REQUEST_COUNSELOR")
+    REQUEST_HEADMASTER @enum(value: "REQUEST_HEADMASTER")
+    REQUEST_ADMIN_SCHOOL @enum(value: "REQUEST_ADMIN_SCHOOL")
+    REQUEST_HOMEROOM @enum(value: "REQUEST_HOMEROOM")
+    REQUEST_STUDENT_PPDB @enum(value: "REQUEST_STUDENT_PPDB")
 }
 
 type FormData {

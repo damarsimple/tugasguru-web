@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -50,6 +51,11 @@ class Form extends Model
     public function attachments(): MorphMany
     {
         return $this->morphMany("App\Models\Attachment", "attachable");
+    }
+
+    public function studentppdb(): HasOne
+    {
+        return $this->hasOne("App\Models\StudentPpdb");
     }
 
     public function ppdbforms($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder

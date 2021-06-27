@@ -73,4 +73,8 @@ type Query {
         @paginate(type: CONNECTION)
         @orderBy(column: "created_at", direction: DESC)
     subjectsAdmin: [Subject!]! @paginate(type: CONNECTION)
+
+    studentppdb(id: ID! @eq): StudentPpdb!
+        @find
+        @can(ability: "view", find: "id")
 }

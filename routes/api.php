@@ -48,6 +48,7 @@ use App\Models\Room;
 use App\Models\School;
 use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
+use App\Models\StudentPpdb;
 use App\Models\Subject;
 use App\Models\Transaction;
 use App\Models\User;
@@ -1484,6 +1485,20 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
     Route::group(['prefix' => 'ppdb', 'middleware' => [EnsureAdminSchool::class]], function () {
+        Route::group(['prefix' => 'application'], function () {
+            Route::put('{id}', function (Request $request, $id) {
+
+                $studentppdb = StudentPpdb::findOrFail($id);
+
+                $studentppdb->status = $request->status;
+
+                $studentppdb->changer_id = $request->user()->id;
+
+                $studentppdb->save();
+
+                return ['message' => 'ok'];
+            });
+        });
         Route::group(['prefix' => 'forms'], function () {
             Route::post('', function (Request $request) {
                 $school = $request->user()->adminschools()->first();
@@ -1504,6 +1519,30 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $formTemplate = $school->ppdbform;
                 $formTemplate->data = $request->data;
                 $formTemplate->save();
+
+                return ['message' => 'ok'];
+            });
+            Route::put('{id}', function (Request $request, $id) {
+
+                $form = Form::findOrFail($id);
+                
+                $studentppdb  = $form->studentppdb;
+
+                if (!$studentppdb) {
+                    return response(['message' => 'no'], 403);
+                }
+
+                $form->data = $request->data;
+                $form->is_locked = $request->locked;
+                $form->is_verified = $request->verify;
+                $form->data = $request->data;
+                $form->comment = $request->comment;
+
+                $form->save();
+
+                $studentppdb->changer_id = $request->user()->id;
+
+                $studentppdb->save();
 
                 return ['message' => 'ok'];
             });
