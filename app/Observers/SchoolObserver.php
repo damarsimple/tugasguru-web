@@ -19,9 +19,11 @@ class SchoolObserver
             $formTemplate = new FormTemplate();
             $formTemplate->data = json_decode(file_get_contents(base_path() . '/formtemplatebase.json'));
             $formTemplate->save();
+            $school->form_template_id = $formTemplate->id;
+        } else {
+            $school->form_template_id =  1;
         }
 
-        $school->form_template_id = $formTemplate?->id ?? 1;
 
         $school->saveQuietly();
     }
