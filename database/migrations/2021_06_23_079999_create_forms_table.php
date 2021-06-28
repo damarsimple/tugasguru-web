@@ -18,6 +18,7 @@ class CreateFormsTable extends Migration
                 ->onDelete("cascade");
             $table
                 ->foreignId("school_id")
+                ->nullable()
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");

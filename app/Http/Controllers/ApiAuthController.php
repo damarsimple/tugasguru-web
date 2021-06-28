@@ -89,7 +89,6 @@ class ApiAuthController extends Controller
                 $validationArray["npsn"] = ["required", "numeric", "in:" . School::find($input['school_id'])->npsn];
                 break;
             case "STUDENT_PPDB":
-                $validationArray["school_id"] = ["required", "numeric"];
                 $validationArray["nisn"] = ["required", "numeric"];
                 break;
             case "STUDENT":
@@ -123,8 +122,6 @@ class ApiAuthController extends Controller
                 $user->schools()->attach($input["school_id"]);
                 break;
             case "BIMBEL":
-                // $user->is_bimbel =
-                //     $input["roles"] == "TEACHER_BIMBEL" ? true : false;
 
                 $form = new Form();
 
@@ -151,14 +148,7 @@ class ApiAuthController extends Controller
                 $user->school_id = $input["school_id"];
                 break;
             case "STUDENT_PPDB":
-
                 $user->nisn = $input["nisn"];
-                $user->school_id = $input["school_id"];
-
-                $studentPpdb = new StudentPpdb();
-                $studentPpdb->school_id = $user->school_id;
-
-                $user->studentppdb()->save($studentPpdb);
                 break;
             default:
                 break;

@@ -559,7 +559,7 @@ type User {
     classtype: Classtype
     parent: User
 
-    studentppdb: StudentPpdb
+    studentppdbs: [StudentPpdb!]! @hasMany
     "Teacher"
     is_bimbel: Boolean!
     adminschools(where: _ @whereConditions(columns: ["school_id"])): [School!]!
@@ -847,6 +847,7 @@ enum StudentPpdbStatus {
     REJECTED @enum(value: "REJECTED")
     PROCESSED @enum(value: "PROCESSED")
     PENDING @enum(value: "PENDING")
+    PERMANENT_REJECTED @enum(value: "PERMANENT_REJECTED")
 }
 
 type StudentPpdb {
@@ -862,4 +863,6 @@ type StudentPpdb {
     wave: Wave @belongsTo
     form: Form @belongsTo
     identifier: String!
+    major: Major @belongsTo
+    extracurriculars: [Extracurricular!]! @belongsToMany
 }

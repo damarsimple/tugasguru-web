@@ -321,8 +321,8 @@ class User extends Authenticatable
         return $this->belongsTo("App\Models\Major");
     }
 
-    public function studentppdb(): HasOne
+    public function studentppdbs(): HasMany
     {
-        return $this->hasOne('App\Models\StudentPpdb');
+        return $this->hasMany('App\Models\StudentPpdb');
     }
 }

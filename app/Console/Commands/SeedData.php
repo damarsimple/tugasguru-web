@@ -453,12 +453,15 @@ class SeedData extends Command
         if ($onTest) {
 
             $majors = [
+                'Ilmu Pengetahuan Alam',
+                'Ilmu Pengetahuan Sosial',
+                'Bahasa',
                 'Jurusan Animasi Dan Multimedia',
                 'Farmasi', 'Pemasaran',
                 'Akuntansi',
                 'Pelayaran', 'Pariwisata',
                 'Tata Boga', 'Tata Busana',
-                'Tehnik Otomotif', 'Administrasi Perkantoran atau Otomatisasi dan Tata Kelola Perkantoran', 'IPA', 'IPS'
+                'Tehnik Otomotif', 'Administrasi Perkantoran atau Otomatisasi dan Tata Kelola Perkantoran'
             ];
 
             foreach ($majors as $major) {
@@ -512,24 +515,45 @@ class SeedData extends Command
                 $extraculiculerModel->save();
             }
 
-            for ($i = 0; $i < 3; $i++) {
-                $wave = new Wave();
-                $wave->name = "Gelombang " . $i + 1;
-                $wave->school_id = 1;
-                $wave->education_year_start = Carbon::now()->year;
-                $wave->education_year_end = Carbon::now()->year + 1;
-                $wave->max_join = 100;
-                $wave->allow_extracurricular = rand(1, 10) > 1;
-                $wave->allow_major = rand(1, 10) > 1;
-                $wave->open_at = Carbon::now()->subMinute(5);
-                $wave->close_at = Carbon::now()->addDay(10);
+            $majorsId = Major::all()->pluck('id')->toArray();
+            $extraculiculerId = Extracurricular::all()->pluck('id')->toArray();
+            for ($j = 1; $j <= 100; $j++) {
+                $school = School::find($j);
+                $school->majors()->attach($majorsId);
+                $school->extracurriculars()->attach($extraculiculerId);
+                for ($i = 0, $x = mt_rand(1, 3); $i < $x; $i++) {
+                    $wave = new Wave();
 
-                if ($i == 0) {
-                    $wave->is_paid = true;
-                    $wave->price = 300000;
+                    $rand = mt_rand(1, 5);
+
+                    switch ($rand) {
+                        case 1:
+                            $wave->name = "Jalur Prestasi Olahraga";
+                            break;
+                        case 2:
+                            $wave->name = "Jalur Prestasi E-Sport";
+                            break;
+                        default:
+                            $wave->name = "Gelombang " . $i + 1;
+                            break;
+                    }
+
+                    $wave->school_id = $j;
+                    $wave->education_year_start = Carbon::now()->year;
+                    $wave->education_year_end = Carbon::now()->year + 1;
+                    $wave->max_join = 100;
+                    $wave->allow_extracurricular = rand(1, 10) > 1;
+                    $wave->allow_major = rand(1, 10) > 1;
+                    $wave->open_at = Carbon::now()->subMinute(5);
+                    $wave->close_at = Carbon::now()->addDay(10);
+
+                    if ($i == 0) {
+                        $wave->is_paid = true;
+                        $wave->price = 300000;
+                    }
+
+                    $wave->save();
                 }
-
-                $wave->save();
             }
 
 
@@ -613,7 +637,7 @@ class SeedData extends Command
             $studentPpdb = new StudentPpdb();
             $studentPpdb->school_id = $secondstudent->school_id;
 
-            $secondstudent->studentppdb()->save($studentPpdb);
+            $secondstudent->studentppdbs()->save($studentPpdb);
 
             $studentIds = [$student->id, $secondstudent->id];
 

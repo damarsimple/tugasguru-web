@@ -8,6 +8,21 @@ class CreatePivotsTable extends Migration
 {
     public function up()
     {
+        Schema::create("extracurricular_student_ppdb", function (Blueprint $table) {
+            $table->id();
+            $table
+                ->foreignId("student_ppdb_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table
+                ->foreignId("extracurricular_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table->timestamps();
+        });
+
         Schema::create("user_school", function (Blueprint $table) {
             $table->id();
             $table
@@ -71,7 +86,7 @@ class CreatePivotsTable extends Migration
         Schema::create("major_school", function (Blueprint $table) {
             $table->id();
             $table
-                ->foreignId("subject_id")
+                ->foreignId("school_id")
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");

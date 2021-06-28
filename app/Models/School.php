@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -130,5 +131,11 @@ class School extends Model
     public function studentppdbs(): HasMany
     {
         return $this->hasMany("App\Models\StudentPpdb")->latest();
+    }
+
+
+    public function hasWave(Builder $builder): Builder
+    {
+        return $builder->whereHas('openWaves');
     }
 }

@@ -28,6 +28,11 @@ type Query {
     user(id: ID! @eq): User @find
     school(id: ID! @eq): School @find
 
+    ppdbschools(schooltype_id: ID @where): [School!]!
+        @inject(context: "user.province_id", name: "province_id")
+        @builder(method: "App\\Models\\School@hasWave")
+        @all
+
     schools(
         where: _
             @whereConditions(

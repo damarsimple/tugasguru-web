@@ -33,6 +33,7 @@ use App\Models\Examtracker;
 use App\Models\Examtype;
 use App\Models\Form;
 use App\Models\FormTemplate;
+use App\Models\Major;
 use App\Models\Meeting;
 use App\Models\Message;
 use App\Models\Packagequestion;
@@ -868,7 +869,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
         Route::group(['prefix' => 'forms'],  function () {
             Route::put('save', function (Request $request) {
                 $user = $request->user();
-                $studentppdb = $user->studentppdb;
+                $studentppdb = $user->studentppdbs()->where('id', $request->id)->firstOrFail();
                 $form = $studentppdb->form;
 
                 $form->data = $request->data;
@@ -888,12 +889,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 
                 $user = $request->user();
 
-                $studentppdb = $user->studentppdb;
+                $studentppdb = $user->studentppdbs()->where('school_id', $wave->school_id)->firstOrFail();
 
                 $studentppdb->wave_id = $wave->id;
 
                 if (!now()->between($wave->open_at, $wave->close_at)) {
-                    return ['message' => 'Sesi telah berakhir atau belum dibuka'];
+                    return ['message' => 'Gelombang telah berakhir atau belum dibuka'];
                 }
 
                 if ($wave->max_join <  $wave->studentppdbs()->count()) {
@@ -901,6 +902,52 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
                 }
 
                 $studentppdb->save();
+
+                return ['message' => 'ok'];
+            });
+        });
+        Route::group(['prefix' => 'schools'],  function () {
+            Route::post('join', function (Request $request) {
+                $user = $request->user();
+
+                $school = School::findOrFail($request->school);
+
+                if (!$school->openWaves()->exists()) {
+                    return response(['message' => 'Sekolah tidak memiliki gelombang terbuka'], 403);
+                }
+
+                $studentppdb = new StudentPpdb();
+
+                $studentppdb->school_id = $school->id;
+
+                $user->studentppdbs()->save($studentppdb);
+
+                return ['message' => 'ok'];
+            });
+        });
+        Route::group(['prefix' => 'majors'],  function () {
+            Route::post('join', function (Request $request) {
+                $user = $request->user();
+
+                $studentppdb = $user->studentppdbs()->where('id', $request?->id)->firstOrFail();
+
+                $major = Major::findOrFail($request->major);
+
+                $studentppdb->major_id = $major->id;
+
+                $studentppdb->save();
+
+                return ['message' => 'ok'];
+            });
+        });
+        Route::group(['prefix' => 'extracurriculars'],  function () {
+            Route::post('join', function (Request $request) {
+                $user = $request->user();
+
+                $studentppdb = $user->studentppdbs()->where('id', $request?->id)->firstOrFail();
+
+                if (!$studentppdb->extracurriculars()->where('extracurricular_id', $request->extracurricular)->exists())
+                    $studentppdb->extracurriculars()->attach($request->extracurricular);
 
                 return ['message' => 'ok'];
             });
@@ -1525,7 +1572,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             Route::put('{id}', function (Request $request, $id) {
 
                 $form = Form::findOrFail($id);
-                
+
                 $studentppdb  = $form->studentppdb;
 
                 if (!$studentppdb) {
