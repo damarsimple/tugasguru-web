@@ -17,7 +17,7 @@ class StudentPpdbObserver
      */
     public function created(StudentPpdb $studentPpdb)
     {
-        $studentPpdb->identifier = Str::uuid();
+        $studentPpdb->identifier = now()->format('dmY') .'-'. $studentPpdb->id;
         $studentPpdb->saveQuietly();
         $this->handleCreateForm($studentPpdb);
     }
