@@ -27,8 +27,13 @@ type Query {
     ): User @paginate(type: CONNECTION)
     user(id: ID! @eq): User @find
     school(id: ID! @eq): School @find
-
-    ppdbschools(schooltype_id: ID @where): [School!]!
+    ppdbschools(
+        schooltype_id: ID @where
+        city_id: ID @where
+        province_id: ID @where
+        district_id: ID @where
+        name: String @where(operator: "like")
+    ): [School!]!
         @inject(context: "user.province_id", name: "province_id")
         @builder(method: "App\\Models\\School@hasWave")
         @all
