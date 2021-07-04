@@ -195,7 +195,7 @@ class SeedData extends Command
 
         $classTypeMap = [];
 
-        $count = 0;
+        $SDCOUNT = 0;
 
         foreach (glob(base_path() . "/data/schools/*.json") as $filename) {
             $schoolsData = file_get_contents($filename);
@@ -206,12 +206,14 @@ class SeedData extends Command
 
             foreach ($schoolsData as $key => $schools) {
                 foreach ($schools as $key => $school) {
-                    if ($onTest && str_contains($school->sekolah, "SD")) {
-                        $count++;
-                    }
-                    if (str_contains($school->sekolah, "SD") && $count > 100) {
-                        continue;
-                    }
+                    // if (str_contains($school->sekolah, "SD")) {
+                    //     if ($SDCOUNT > 100) {
+                    //         continue;
+                    //     } else {
+                    //         $SDCOUNT++;
+                    //     }
+                    // }
+
                     if (str_contains($school->sekolah, "SMPLB") || str_contains($school->sekolah, "SMALB")) {
                         continue;
                     }
