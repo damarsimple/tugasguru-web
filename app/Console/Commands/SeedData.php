@@ -212,7 +212,7 @@ class SeedData extends Command
                     if (str_contains($school->sekolah, "SD") && $count > 100) {
                         continue;
                     }
-                    if (str_contains($school->sekolah, "SMPLB")) {
+                    if (str_contains($school->sekolah, "SMPLB") || str_contains($school->sekolah, "SMALB")) {
                         continue;
                     }
                     // if (str_contains($school->sekolah, "SMA")) {
