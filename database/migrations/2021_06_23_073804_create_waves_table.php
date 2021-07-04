@@ -21,12 +21,12 @@ class CreateWavesTable extends Migration
             $table->year("education_year_end");
             $table->unsignedBigInteger('max_join');
 
-            $table->boolean('allow_extracurricular')->default(false);
-            $table->boolean('allow_major')->default(false);
+            $table->boolean('allow_extracurricular')->default(true);
+            $table->boolean('allow_major')->default(true);
 
             $table->boolean('is_paid')->default(false);
             $table->unsignedDouble('price')->default(0);
-            
+
             $table->timestamp('open_at')->nullable();
             $table->timestamp('close_at')->nullable();
             $table->timestamps();

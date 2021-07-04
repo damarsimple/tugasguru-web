@@ -62,6 +62,7 @@ class User extends Authenticatable
     public const DOCUMENTS  = 'DOCUMENTS';
 
     public const STUDENT = 'STUDENT';
+    public const GUARDIAN = 'GUARDIAN';
     public const TEACHER = 'TEACHER';
     public const BIMBEL = 'BIMBEL';
     public const GENERAL = 'GENERAL';

@@ -133,7 +133,7 @@ class SeedData extends Command
 
                 foreach ($districts as $disctrictBase) {
                     $district = new District();
-                    $district->name = $disctrictBase->nama;
+                    $district->name = trim($disctrictBase->nama);
                     $districtsModel[] = $district;
                 }
                 $city->districts()->saveMany($districtsModel);
@@ -195,6 +195,8 @@ class SeedData extends Command
 
         $classTypeMap = [];
 
+        $count = 0;
+
         foreach (glob(base_path() . "/data/schools/*.json") as $filename) {
             $schoolsData = file_get_contents($filename);
 
@@ -204,21 +206,27 @@ class SeedData extends Command
 
             foreach ($schoolsData as $key => $schools) {
                 foreach ($schools as $key => $school) {
-                    if (str_contains($school->sekolah, "SD")) {
+                    if ($onTest && str_contains($school->sekolah, "SD")) {
+                        $count++;
+                    }
+                    if (str_contains($school->sekolah, "SD") && $count > 100) {
                         continue;
                     }
-                    if (str_contains($school->sekolah, "SMP")) {
+                    if (str_contains($school->sekolah, "SMPLB")) {
                         continue;
                     }
-                    if (str_contains($school->sekolah, "SMA")) {
-                        continue;
-                    }
+                    // if (str_contains($school->sekolah, "SMA")) {
+                    //     continue;
+                    // }
 
                     $disctrictName = preg_replace(
                         ["/Kec./", "/KEC. /", "/Kecamatan/"],
                         "",
                         $school->kecamatan
                     );
+
+                    $disctrictName = trim($disctrictName);
+
                     if (str_contains($school->kabupaten_kota, "Kab.")) {
                         $cityName = str_replace(
                             "Kab. ",
@@ -227,6 +235,7 @@ class SeedData extends Command
                         );
                     }
 
+                    $cityName = trim($cityName);
                     $provinceName = str_replace(
                         "Prov. ",
                         "",
@@ -235,6 +244,8 @@ class SeedData extends Command
                     if ($onTest && $provinceName !== "Kalimantan Timur") {
                         continue;
                     }
+
+                    $provinceName = trim($provinceName);
 
                     print $school->sekolah . PHP_EOL;
                     if (str_contains($provinceName, "D.K.I. ")) {
@@ -547,10 +558,10 @@ class SeedData extends Command
                     $wave->open_at = Carbon::now()->subMinute(5);
                     $wave->close_at = Carbon::now()->addDay(10);
 
-                    if ($i == 0) {
-                        $wave->is_paid = true;
-                        $wave->price = 300000;
-                    }
+                    // if ($i == 0) {
+                    //     $wave->is_paid = true;
+                    //     $wave->price = 300000;
+                    // }
 
                     $wave->save();
                 }
@@ -682,6 +693,7 @@ class SeedData extends Command
             $firstclassroom->meetings()->save($meeting);
 
             $access = new Access();
+            $access->roles = User::TEACHER;
             $access->name = "Guru Plus 1 Tahun";
             $access->duration = 12 * 30;
             $access->price = 50000;
@@ -693,6 +705,7 @@ class SeedData extends Command
             $access->save();
 
             $access = new Access();
+            $access->roles = User::TEACHER;
             $access->name = "Wali Kelas 1 Tahun";
             $access->duration = 12 * 30;
             $access->price = 50000;
@@ -701,6 +714,7 @@ class SeedData extends Command
             $access->save();
 
             $access = new Access();
+            $access->roles = User::TEACHER;
             $access->name = "Guru BK 1 Tahun";
             $access->duration = 12 * 30;
             $access->price = 50000;
@@ -709,7 +723,17 @@ class SeedData extends Command
             $access->save();
 
             $access = new Access();
+            $access->roles = User::TEACHER;
             $access->name = "Kepala Sekolah 1 Tahun";
+            $access->duration = 12 * 30;
+            $access->price = 50000;
+            $access->ability = [Ability::HEADMASTER];
+
+            $access->save();
+
+            $access = new Access();
+            $access->roles = User::GUARDIAN;
+            $access->name = "Akses Orang Tua";
             $access->duration = 12 * 30;
             $access->price = 50000;
             $access->ability = [Ability::HEADMASTER];

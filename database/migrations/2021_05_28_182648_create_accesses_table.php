@@ -12,6 +12,7 @@ class CreateAccessesTable extends Migration
             $table->id();
             $table->string("name");
             $table->double("price");
+            $table->string('roles')->nullable();
             $table->unsignedBigInteger("duration");
             $table->json("ability");
             $table->timestamps();
