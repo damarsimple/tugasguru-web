@@ -1588,7 +1588,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 $form->save();
 
                 $studentppdb->changer_id = $request->user()->id;
-
+                $studentppdb->wave_id = $request->wave ?? $studentppdb->wave_id;
                 $studentppdb->save();
 
                 return ['message' => 'ok'];

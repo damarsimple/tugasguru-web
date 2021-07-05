@@ -195,7 +195,7 @@ class SeedData extends Command
 
         $classTypeMap = [];
 
-        $SDCOUNT = 0;
+        $XDCOUNT = 0;
 
         foreach (glob(base_path() . "/data/schools/*.json") as $filename) {
             $schoolsData = file_get_contents($filename);
@@ -206,6 +206,11 @@ class SeedData extends Command
 
             foreach ($schoolsData as $key => $schools) {
                 foreach ($schools as $key => $school) {
+                    if ($XDCOUNT > 1500) {
+                        continue;
+                    } else {
+                        $XDCOUNT++;
+                    }
                     // if (str_contains($school->sekolah, "SD")) {
                     //     if ($SDCOUNT > 100) {
                     //         continue;
