@@ -11,4 +11,5 @@ class Ability
     const HEADMASTER = "HEADMASTER";
     const ABSENT_CONSULT = "ABSENT_CONSULT";
     const ADMIN_SCHOOL = "ADMIN_SCHOOL";
+    const GUARDIAN = "GUARDIAN";
 }

@@ -205,18 +205,11 @@ class SeedData extends Command
             // var_dump($schoolsData);
 
             foreach ($schoolsData as $key => $schools) {
+
                 foreach ($schools as $key => $school) {
-                    if ($XDCOUNT > 1500) {
-                        continue;
-                    } else {
-                        $XDCOUNT++;
-                    }
+
                     // if (str_contains($school->sekolah, "SD")) {
-                    //     if ($SDCOUNT > 100) {
-                    //         continue;
-                    //     } else {
-                    //         $SDCOUNT++;
-                    //     }
+                    //   
                     // }
 
                     if (str_contains($school->sekolah, "SMPLB") || str_contains($school->sekolah, "SMALB")) {
@@ -459,6 +452,10 @@ class SeedData extends Command
                             }
                         }
                         print $schoolModel->id . PHP_EOL;
+
+                        if ($schoolModel->id > 300) {
+                            break;
+                        }
                     } catch (\Throwable $th) {
                         print $th->getMessage() . PHP_EOL;
                         print $th->getLine() . PHP_EOL;
@@ -537,7 +534,9 @@ class SeedData extends Command
             $extraculiculerId = Extracurricular::all()->pluck('id')->toArray();
             for ($j = 1; $j <= 100; $j++) {
                 $school = School::find($j);
+                if (!$school) continue;
                 $school->majors()->attach($majorsId);
+
                 $school->extracurriculars()->attach($extraculiculerId);
                 for ($i = 0, $x = mt_rand(1, 3); $i < $x; $i++) {
                     $wave = new Wave();
@@ -746,6 +745,29 @@ class SeedData extends Command
             $access->ability = [Ability::HEADMASTER];
 
             $access->save();
+
+            $guardian = new User();
+            $guardian->name = "Damar Albaribin Orang Tua 1";
+            $guardian->email = "damara3@gmail.com";
+            $guardian->password = Hash::make("123456789");
+            $guardian->city_id = 1;
+            $guardian->school_id = 1;
+            $guardian->province_id = 1;
+            $guardian->district_id = 1;
+            $guardian->gender = 1;
+            $guardian->phone = "08987181033";
+            $guardian->roles = User::GUARDIAN;
+            $guardian->access = [Ability::GUARDIAN];
+            $guardian->nisn = 1234568123;
+            $guardian->school_id = 1;
+            $guardian->classtype_id = 1;
+
+            $guardian->save();
+
+            $secondstudent->parent_id = $guardian->id;
+
+            $secondstudent->save();
+
 
             // $transaction = new Transaction();
 

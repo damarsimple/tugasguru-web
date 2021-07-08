@@ -530,6 +530,7 @@ type User {
     city: City @belongsTo
     district: District @belongsTo
     childrens: [User!]! @hasMany
+    child(id: ID! @eq): User @find
     attachments: [Attachment!]! @hasMany
     articles: [Article!]! @hasMany
     frontarticles: [Article!]! @hasMany
@@ -723,6 +724,7 @@ type Access {
     updated_at: DateTime!
     price: Float!
     duration: Int!
+    roles: Roles
     ability: [String]
 }
 

@@ -57,7 +57,7 @@ type Query {
     transactions: Transaction
         @paginate(type: CONNECTION)
         @can(ability: "viewAny")
-    accesses: [Access!]! @all
+    accesses(roles: Roles @where(operator: "=")): [Access!]! @all
     examtypes: [Examtype!]! @all
     subjects: [Subject!]! @all
     classtypes: [Classtype!]! @all

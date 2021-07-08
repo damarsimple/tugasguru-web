@@ -12,6 +12,8 @@ use App\Http\Middleware\EnsureStudent;
 use App\Http\Middleware\EnsureTeacher;
 use App\Http\Middleware\EnsureXendit;
 use App\Http\Middleware\EnsureAdminSchool;
+use App\Http\Middleware\EnsureGuardian;
+use App\Http\Middleware\EnsureGuardianPaid;
 use App\Http\Middleware\EnsureStudentPPDB;
 use App\Jobs\FormApproveTest;
 use App\Models\Absent;
@@ -213,6 +215,78 @@ Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], func
     });
 });
 
+Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, EnsureGuardianPaid::class]], function () {
+
+    Route::get('/', fn (Request $request) => $request->user()->childrens);
+
+    Route::group(
+        ['prefix' => '/recap'],
+        function () {
+            Route::group(
+                ['prefix' => '/grades'],
+                function () {
+                    Route::get('/', function (Request $request) {
+                        $child = $request->user()->childrens()->findOrFail($request->children);
+                        $examresultSubjects = $child->examresults()->get()->groupBy('exam.subject.name');
+                        $studentassigments = $child->studentassigments()->get()->groupBy('assigment.subject.name');
+
+
+                        $map = [];
+
+                        foreach ($examresultSubjects as $subject => $examresult) {
+
+                            $types = $examresult->groupBy('exam.examtype.name');
+
+                            foreach ($types as $type => $value) {
+                                $map[$subject][$type] = $value;
+                            }
+                        }
+                        foreach ($studentassigments as $subject => $value) {
+                            $map[$subject]["Tugas"] = $value;
+                        }
+
+                        return $map;
+                    });
+                }
+            );
+            Route::group(
+                ['prefix' => '/absents'],
+                function () {
+                    Route::get('/', function (Request $request) {
+                        $child = $request->user()->childrens()->findOrFail($request->child);
+                        return $child->user()->absents()->paginate(10);
+                    });
+                    Route::post(
+                        '/',
+                        function (Request $request) {
+                            $user = $request->user()->childrens()->findOrFail($request->child);
+
+                            $startAt =  Carbon::parse($request->start_at);
+                            $finishAt = Carbon::parse($request->finish_at);
+
+                            $startAt->hour = now()->hour;
+                            $startAt->minute = now()->minute;
+                            $startAt->second = now()->second;
+
+                            $finishAt->hour = $startAt->hour;
+                            $finishAt->minute = $startAt->minute;
+                            $finishAt->second = $startAt->second;
+
+                            $absent = new Absent();
+                            $absent->receiver_id = $request->teacher;
+                            $absent->type = $request->type;
+                            $absent->reason = $request->reason;
+                            $absent->start_at = $startAt;
+                            $absent->finish_at = $finishAt;
+
+                            $user->absents()->save($absent);
+                        }
+                    );
+                }
+            );
+        }
+    );
+});
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function () {
 
