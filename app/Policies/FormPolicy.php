@@ -18,9 +18,13 @@ class FormPolicy
      */
     public function viewAny(User $user)
     {
-        if ($user->is_admin) return true;
+        if ($user->is_admin) {
+            return true;
+        }
 
-        if ($user->adminschools()->exists()) return true;
+        if ($user->adminschools()->exists()) {
+            return true;
+        }
 
         return false;
     }
@@ -34,11 +38,17 @@ class FormPolicy
      */
     public function view(User $user, Form $form)
     {
-        if ($user->is_admin) return true;
+        if ($user->is_admin) {
+            return true;
+        }
 
-        if ($user->id == $form->user->id) return true;
+        if ($user->id == $form->user->id) {
+            return true;
+        }
 
-        if (in_array($form->school_id, $user->adminschools->pluck('id'))) return true;
+        if (in_array($form->school_id, $user->adminschools->pluck('id'))) {
+            return true;
+        }
 
         return false;
     }

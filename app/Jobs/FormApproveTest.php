@@ -12,7 +12,10 @@ use Illuminate\Queue\SerializesModels;
 
 class FormApproveTest implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * Create a new job instance.
@@ -33,6 +36,5 @@ class FormApproveTest implements ShouldQueue
     {
         sleep(7);
         $form = $this->form;
-        
     }
 }

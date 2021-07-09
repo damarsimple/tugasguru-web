@@ -14,7 +14,9 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory;
+    use Notifiable;
+    use HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -195,7 +197,8 @@ class User extends Authenticatable
 
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;
+        return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');
+        ;
     }
 
     public function exams(): HasMany
@@ -256,8 +259,9 @@ class User extends Authenticatable
 
     public function getMainschoolAttribute(): School|null
     {
-        if ($this->roles == self::TEACHER)
+        if ($this->roles == self::TEACHER) {
             return $this->schools()->first();
+        }
 
         return null;
     }

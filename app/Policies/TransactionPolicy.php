@@ -18,7 +18,9 @@ class TransactionPolicy
      */
     public function viewAny(User $user)
     {
-        if ($user->is_admin) return true;
+        if ($user->is_admin) {
+            return true;
+        }
 
 
         return false;
@@ -33,9 +35,13 @@ class TransactionPolicy
      */
     public function view(User $user, Transaction $transaction)
     {
-        if ($user->is_admin) return true;
+        if ($user->is_admin) {
+            return true;
+        }
 
-        if ($user->id == $transaction->user_id) return true;
+        if ($user->id == $transaction->user_id) {
+            return true;
+        }
 
         return false;
     }

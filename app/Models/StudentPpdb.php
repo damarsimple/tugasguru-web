@@ -50,10 +50,13 @@ class StudentPpdb extends Model
 
     public function getIsPaidAttribute(): bool
     {
+        if (!$this->wave_id) {
+            return false;
+        }
 
-        if (!$this->wave_id) return false;
-
-        if (!$this->wave->is_paid) return true;
+        if (!$this->wave->is_paid) {
+            return true;
+        }
 
         return Transaction::where([
             'transactionable_id' => $this->wave_id,

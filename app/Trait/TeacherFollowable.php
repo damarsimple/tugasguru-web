@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait TeacherFollowable
 {
-
     public function teachers(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\User')->wherePivot('is_accepted', true);

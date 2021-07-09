@@ -8,9 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
-    use HasFactory, TeacherFollowable;
+    use HasFactory;
+    use TeacherFollowable;
 
     public $with = ['user', 'school'];
-
-  
 }

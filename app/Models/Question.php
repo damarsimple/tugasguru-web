@@ -16,12 +16,12 @@ class Question extends Model
 
     public $with = ["attachments", "answers"];
 
-    const MULTI_CHOICE = "MULTI_CHOICE";
-    const FILLER = "FILLER";
-    const ESSAY = "ESSAY";
-    const SURVEY = "SURVEY";
-    const SLIDE = "SLIDE";
-    const MANY_ANSWERS = "MANY_ANSWERS";
+    public const MULTI_CHOICE = "MULTI_CHOICE";
+    public const FILLER = "FILLER";
+    public const ESSAY = "ESSAY";
+    public const SURVEY = "SURVEY";
+    public const SLIDE = "SLIDE";
+    public const MANY_ANSWERS = "MANY_ANSWERS";
 
     public function user(): BelongsTo
     {

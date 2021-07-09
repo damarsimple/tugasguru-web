@@ -87,9 +87,7 @@ Broadcast::routes(['middleware' => ['api', 'auth:sanctum']]);
 Route::get('me', fn (Request $request) => $request->user());
 
 Route::group(['prefix' => 'attachments'], function () {
-
     Route::post('/temp', function (Request $request) {
-
         $files = $request->file('file');
         $isProcessed = (bool) $request->get('is_proccessed') ?? false;
         $originalSize = (int) $request->get('original_size') ?? false;
@@ -101,7 +99,6 @@ Route::group(['prefix' => 'attachments'], function () {
 });
 
 Route::middleware('web')->get('auth/google/callback', function () {
-
     $data =  Socialite::driver('google')?->stateless()?->user();
 
     $user = User::where('email', $data?->email)->first();
@@ -156,7 +153,6 @@ Route::middleware('auth:sanctum')->get("/user", [ApiAuthController::class, 'prof
 Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'refresh']);
 
 Route::middleware('auth:sanctum')->get('attendances/{uuid}', function ($uuid) {
-
     $attendance = Attendance::where('uuid', $uuid)->firstOrFail();
 
     $attendance->attended = true;
@@ -181,7 +177,6 @@ Route::middleware('auth:sanctum')->get("/agenda/{uuid}", function (Request $requ
 
 Route::group(['middleware' => [EnsureAdmin::class], 'prefix' => 'admins'], function () {
     Route::put('/forms/{id}', function (Request $request, $id) {
-
         $form = Form::findOrFail($id);
 
         $form->comment = $request->comment;
@@ -195,11 +190,9 @@ Route::group(['middleware' => [EnsureAdmin::class], 'prefix' => 'admins'], funct
 
 Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], function () {
     Route::post('/invoices/paid', function (Request $request) {
-
         $transaction = Transaction::where('uuid', $request->external_id)->firstOrFail();
 
         if ($request->status == "PAID" || $request->status == "SETTLED") {
-
             $transaction->is_paid = true;
             $transaction->status = Transaction::SUCCESS;
             $transaction->invoice_response = $request->toArray();
@@ -217,13 +210,11 @@ Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], func
 });
 
 Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, EnsureGuardianPaid::class]], function () {
-
     Route::get('/', fn (Request $request) => $request->user()->childrens);
     Route::group(
         ['prefix' => '/childrens'],
         function () {
             Route::post('admit', function (Request $request) {
-
                 $child = User::where('nisn', $request->nisn)->firstOrFail();
 
                 $user = $request->user();
@@ -239,11 +230,11 @@ Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, E
                 return response('OK', 200);
             });
             Route::post('kick', function (Request $request) {
-
-
                 $user = $request->user()->childrens()->where('id', $request->children)->firstOrFail();
 
-                if (!$user) return response('Anak tidak ditemukan', 400);
+                if (!$user) {
+                    return response('Anak tidak ditemukan', 400);
+                }
 
                 $user->parent_id = null;
                 $user->save();
@@ -267,7 +258,6 @@ Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, E
                         $map = [];
 
                         foreach ($examresultSubjects as $subject => $examresult) {
-
                             $types = $examresult->groupBy('exam.examtype.name');
 
                             foreach ($types as $type => $value) {
@@ -322,7 +312,6 @@ Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, E
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function () {
-
     Route::post('/', function (Request $request) {
         $quiz = new Quiz();
         $quiz->subject_id = $request->subject;
@@ -339,7 +328,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
 
         foreach ($request->questions as $questionData) {
             if (!array_key_exists('id', $questionData)) {
-
                 $question = new Question();
 
                 $question->content = $questionData['content'];
@@ -635,7 +623,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
 });
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], function () {
     Route::get('/{id}', function (Request $request, $id) {
-
         $user = $request->user();
 
         if ($user->roles == "TEACHER") {
@@ -663,13 +650,11 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'meetings'], functio
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function () {
-
     Route::get('/{id}', function (Request $request, $id) {
         $user = $request->user();
         return  $user->rooms()->find($id)->messages;
     });
     Route::post('/{id}', function (Request $request, $id) {
-
         $sender = $request->user();
 
         $message = new Message();
@@ -716,7 +701,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
         });
     });
     Route::group(['prefix' => 'followers'], function () {
-
         Route::get('/following', function (Request $request) {
             $user = $request->user();
 
@@ -724,7 +708,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
         });
 
         Route::get('/myfollowing', function (Request $request) {
-
             return $request->user()->followings;
         });
 
@@ -738,12 +721,10 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
 
         Route::get('/myfollower', function (Request $request) {
-
             return $request->user()->followers;
         });
 
         Route::post('/deny', function (Request $request) {
-
             $request->user()->requestfollowers()->detach($request->userId);
 
             return ['message' => 'ok'];
@@ -769,9 +750,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
 
             if ($user->roles == User::TEACHER && $candidate->roles !== "TEACHER") {
-
                 return ['message' => 'invalid follow target'];
-            } else  if (
+            } elseif (
                 $candidate->roles == "TEACHER" &&
                 !$user->school->teachers->pluck('id')->contains($request->user)
             ) {
@@ -794,7 +774,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
     Route::group(['prefix' => 'transactions'], function () {
         Route::get('/{id}', function (Request $request, $id) {
-            if ($id == 0) return null;
+            if ($id == 0) {
+                return null;
+            }
             return $request->user()->transactions()->findOrFail($id);
         });
     });
@@ -811,14 +793,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
     });
 
     Route::get('mark-read-all', function (Request $request) {
-
         $request->user()->unreadNotifications->markAsRead();
 
         return ['message' => 'ok'];
     });
 
     Route::get('notifications', function (Request $request) {
-
         return $request->user()->notifications;
     });
 
@@ -855,9 +835,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
     });
 
     Route::group(['prefix' => 'messages'], function () {
-
         Route::group(['prefix' => 'private'], function () {
-
             Route::get('/targets', function (Request $request) {
                 $user = $request->user();
 
@@ -873,7 +851,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
                         }
                     }
                     return array_merge($users, $user->followers->toArray());
-                } else if ($user->roles == User::STUDENT) {
+                } elseif ($user->roles == User::STUDENT) {
                     $y = $user->school;
                     return array_merge($y->teachers->toArray(), $y->students->toArray(), $user->followers->toArray());
                 } else {
@@ -881,14 +859,14 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
                 }
             });
             Route::get('rooms', function (Request $request) {
-
                 $sender = $request->user();
 
                 return PrivateRoom::where('first_id', $sender->id)->orWhere('second_id', $sender->id)->latest('updated_at')->get();
             });
             Route::get('rooms/{id}', function (Request $request, $id) {
-
-                if ($id == 'undefined') return ['message' => 'ok'];
+                if ($id == 'undefined') {
+                    return ['message' => 'ok'];
+                }
 
                 $sender = $request->user();
 
@@ -902,7 +880,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             });
 
             Route::post('rooms/{id}', function (Request $request, $id) {
-
                 $sender = $request->user();
 
                 $message = new Message();
@@ -965,7 +942,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'articles'], functio
 
 
 Route::get('/{id}/rank', function (Request $request, $id) {
-
     return Examresult::where('exam_id', $id)
         ->orderBy('grade', 'DESC')
         ->get();
@@ -973,7 +949,7 @@ Route::get('/{id}/rank', function (Request $request, $id) {
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], function () {
     Route::group(['prefix' => 'ppdb', 'middleware' => [EnsureStudentPPDB::class]], function () {
-        Route::group(['prefix' => 'forms'],  function () {
+        Route::group(['prefix' => 'forms'], function () {
             Route::put('save', function (Request $request) {
                 $user = $request->user();
                 $studentppdb = $user->studentppdbs()->where('id', $request->id)->firstOrFail();
@@ -1013,7 +989,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
                 return ['message' => 'ok'];
             });
         });
-        Route::group(['prefix' => 'schools'],  function () {
+        Route::group(['prefix' => 'schools'], function () {
             Route::post('join', function (Request $request) {
                 $user = $request->user();
 
@@ -1032,7 +1008,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
                 return ['message' => 'ok'];
             });
         });
-        Route::group(['prefix' => 'majors'],  function () {
+        Route::group(['prefix' => 'majors'], function () {
             Route::post('join', function (Request $request) {
                 $user = $request->user();
 
@@ -1047,14 +1023,15 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
                 return ['message' => 'ok'];
             });
         });
-        Route::group(['prefix' => 'extracurriculars'],  function () {
+        Route::group(['prefix' => 'extracurriculars'], function () {
             Route::post('join', function (Request $request) {
                 $user = $request->user();
 
                 $studentppdb = $user->studentppdbs()->where('id', $request?->id)->firstOrFail();
 
-                if (!$studentppdb->extracurriculars()->where('extracurricular_id', $request->extracurricular)->exists())
+                if (!$studentppdb->extracurriculars()->where('extracurricular_id', $request->extracurricular)->exists()) {
                     $studentppdb->extracurriculars()->attach($request->extracurricular);
+                }
 
                 return ['message' => 'ok'];
             });
@@ -1067,21 +1044,17 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
         });
     });
     Route::group(['prefix' => 'subjects'], function () {
-
         Route::get('/all', function (Request $request) {
             return Subject::all();
         });
     });
     Route::group(['prefix' => 'grades'], function () {
-
         Route::get('/', function (Request $request) {
-
             $examresultSubjects = $request->user()->examresults()->get()->groupBy('exam.subject.name');
             $studentassigments = $request->user()->studentassigments()->get()->groupBy('assigment.subject.name');
             $map = [];
 
             foreach ($examresultSubjects as $subject => $examresult) {
-
                 $types = $examresult->groupBy('exam.examtype.name');
 
                 foreach ($types as $type => $value) {
@@ -1156,7 +1129,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
         }
 
         if ($request->profilepicture) {
-
             $user->profilepicture?->delete();
 
             $profilepicture = Attachment::findOrFail($request->profilepicture);
@@ -1169,7 +1141,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
     });
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' => 'students'], function () {
-
     Route::group(['prefix' => 'absents'], function () {
         Route::post('/', function (Request $request) {
             $user = $request->user();
@@ -1215,7 +1186,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 
 
     Route::group(['prefix' => 'posts'], function () {
-
         Route::get('/', function (Request $request) {
             return  Article::latest()->where('role', Article::POST)->paginate(10);
         });
@@ -1234,7 +1204,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
     });
     Route::group(['prefix' => 'classrooms'], function () {
-
         Route::get('/', function (Request $request) {
             $user = $request->user();
 
@@ -1268,7 +1237,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $classrooms  = [];
 
             foreach ($user->followings()->where('roles', User::TEACHER)->get() as $teacher) {
-
                 if ($user->classtype_id) {
                     $candidateclasrooms = $teacher->classrooms()->where('classtype_id', $user->classtype_id);
                 } else {
@@ -1293,7 +1261,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     });
 
     Route::group(['prefix' => 'events'], function () {
-
         Route::get('/', function (Request $request) {
             $user = $request->user();
 
@@ -1384,7 +1351,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
     });
     Route::group(['prefix' => 'exams'], function () {
-
         Route::post('{id}/reportbegin', function (Request $request, $id) {
             $user = $request->user();
 
@@ -1427,7 +1393,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                 ->where('user_id', $user->id)
                 ->where('exam_id', $exam->id)->exists()
             ) {
-
                 $studentanswers = StudentAnswer::where([
                     'user_id' => $user->id,
                     'examsession_id' => $examsession->id,
@@ -1641,7 +1606,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'ppdb', 'middleware' => [EnsureAdminSchool::class]], function () {
         Route::group(['prefix' => 'application'], function () {
             Route::put('{id}', function (Request $request, $id) {
-
                 $studentppdb = StudentPpdb::findOrFail($id);
 
                 $studentppdb->status = $request->status;
@@ -1677,7 +1641,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 return ['message' => 'ok'];
             });
             Route::put('{id}', function (Request $request, $id) {
-
                 $form = Form::findOrFail($id);
 
                 $studentppdb  = $form->studentppdb;
@@ -1791,7 +1754,9 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     });
     Route::group(['prefix' => 'attendances'], function () {
         Route::get('/school/{id}', function (Request $request, $id) {
-            if ($id == 'undefined') return ['data' => []];
+            if ($id == 'undefined') {
+                return ['data' => []];
+            }
             $school =  $request->user()->schools()->findOrFail($id);
             $attendances = $school->attendances();
 
@@ -1813,7 +1778,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
     Route::group(['prefix' => 'forms'], function () {
         Route::get('/status', function () {
-
             $maps = [];
 
             foreach ([
@@ -1864,7 +1828,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             /**  @var App/Models/User $user  */
             $user = $request->user();
 
-            $checkSemesterAndSubject = fn ($q) => $q->where('is_odd_semester', $request->isOdd  == "true" ?  true : false)->where('subject_id', $request->subject);
+            $checkSemesterAndSubject = fn ($q) => $q->where('is_odd_semester', $request->isOdd  == "true" ? true : false)->where('subject_id', $request->subject);
 
             $studentIds = $user->classrooms()->findOrFail($classroomId)->students->pluck('id');
 
@@ -1886,7 +1850,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     });
 
     Route::group(['prefix' => 'consultations'], function () {
-
         Route::get('/', function (Request $request) {
             /**  @var App/Models/User $user  */
             $user = $request->user();
@@ -1948,13 +1911,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::put('{assigmentId}/answers/{studentAssigmentId}', function (Request $request, $assigmentId, $studentAssigmentId) {
-
-
             $assigment = Assigment::findOrFail($assigmentId);
 
             $studentanswer = StudentAssigment::findOrFail($studentAssigmentId);
 
-            if ($assigment->id != $studentanswer->assigment_id) return ['message' => 'ilegal move'];
+            if ($assigment->id != $studentanswer->assigment_id) {
+                return ['message' => 'ilegal move'];
+            }
 
 
             $studentanswer->grade = $request->grade;
@@ -1970,7 +1933,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
     });
     Route::group(['prefix' => 'meetings'], function () {
-
         Route::get('/', function (Request $request) {
             $user = $request->user();
             return $user->meetings()->latest()->whereNull('finish_at')->get();
@@ -2058,7 +2020,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return $meeting;
         });
 
-        Route::post('{meetingId}/rooms', function (Request $request, $meetingId,) {
+        Route::post('{meetingId}/rooms', function (Request $request, $meetingId, ) {
             $user = $request->user();
 
             $meeting =  $user->meetings()->findOrFail($meetingId);
@@ -2123,7 +2085,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
     Route::group(['prefix' => 'posts'], function () {
-
         Route::get('/', function (Request $request) {
             return  Article::latest()->where('role', Article::POST)->paginate(10);
         });
@@ -2143,7 +2104,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
     Route::group(['prefix' => 'events'], function () {
-
         Route::get('/', function (Request $request) {
             $user = $request->user();
 
@@ -2245,7 +2205,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
     Route::group(['prefix' => 'announcements'], function () {
-
         Route::get('/', function (Request $request) {
             return Article::latest()
                 ->where('school_id', $request->user()?->schools()?->first()?->id)
@@ -2278,7 +2237,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     });
 
     Route::group(['prefix' => 'theories'], function () {
-
         Route::get('/', function (Request $request) {
             return Article::latest()->where('role', Article::THEORY)->paginate(10);
         });
@@ -2324,9 +2282,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     });
 
     Route::group(['prefix' => 'classtypes'], function () {
-
         Route::get('/', function () {
-
             return Classtype::all();
         });
         Route::get('/myschool', function (Request $request) {
@@ -2369,7 +2325,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return $request->user()->exams()?->paginate(10);
         });
         Route::post('/create', function (Request $request) {
-
             $user = $request->user();
 
 
@@ -2395,8 +2350,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             foreach ($request->examsessions as $examsessionData) {
                 $examsession = new Examsession();
                 $examsession->name = $examsessionData['name'];
-                $examsession->open_at = Carbon::createFromFormat("Y-m-d H:i",  $examsessionData['open_at']);
-                $examsession->close_at = Carbon::createFromFormat("Y-m-d H:i",  $examsessionData['close_at']);
+                $examsession->open_at = Carbon::createFromFormat("Y-m-d H:i", $examsessionData['open_at']);
+                $examsession->close_at = Carbon::createFromFormat("Y-m-d H:i", $examsessionData['close_at']);
                 $examsession->token = $examsessionData['token'];
                 $examsessions[] = $examsession;
             }
@@ -2504,7 +2459,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::post('/', function (Request $request) {
-
             $report = new Report();
             $report->name = $request->name;
             $report->data = $request->data;
@@ -2521,7 +2475,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::put('/{id}', function (Request $request, $id) {
-
             $report = $request->user()->reports()->findOrFail($id);
             $report->name = $request->name;
             $report->data = $request->data;
@@ -2539,7 +2492,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     });
 
     Route::group(['prefix' => 'schools'], function () {
-
         Route::post('/update/thumbnail', function (Request $request) {
             $user = $request->user();
 
@@ -2568,7 +2520,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::get('/', function (Request $request) {
-
             return $request->user()->schools()->with(
                 'homeroomteachers',
                 'counselors',
@@ -2608,7 +2559,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     });
 
     Route::group(['prefix' => 'classrooms'], function () {
-
         Route::post('/admit', function (Request $request) {
             $user = $request->user();
 
@@ -2723,7 +2673,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
     Route::group(['prefix' => 'questions'], function () {
-
         Route::get('/', function (Request $request) {
             $user = $request->user();
 
@@ -2745,7 +2694,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             if ($request->visibility) {
                 if ($request->visibility == "SELECTPEOPLE") {
-                } else if ($request->visibility == "") {
+                } elseif ($request->visibility == "") {
                 } else {
                     $questions =  $questions->where('visibility', $request->visibility);
                 }
@@ -2756,7 +2705,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
         });
 
         Route::get('/package', function (Request $request) {
-
             $user = $request->user();
 
 
@@ -2779,7 +2727,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             }
             if ($request->visibility) {
                 if ($request->visibility == "SELECTPEOPLE") {
-                } else if ($request->visibility == "") {
+                } elseif ($request->visibility == "") {
                 } else {
                     $packagequestions =  $packagequestions->where('visibility', $request->visibility);
                 }
@@ -2861,7 +2809,6 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
 
     Route::group(['prefix' => 'subjects'], function () {
-
         Route::get('/all', function (Request $request) {
             return Subject::all();
         });

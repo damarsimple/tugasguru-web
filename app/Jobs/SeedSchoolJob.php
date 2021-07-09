@@ -13,7 +13,10 @@ use Illuminate\Queue\SerializesModels;
 
 class SeedSchoolJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * Create a new job instance.
@@ -28,8 +31,7 @@ class SeedSchoolJob implements ShouldQueue
         public $schooltypeId,
         public $classTypeMap,
         public $subjectsIds,
-    )
-    {
+    ) {
         //
     }
 
@@ -47,7 +49,7 @@ class SeedSchoolJob implements ShouldQueue
         $schooltypeId = $this->schooltypeId;
         $subjectsIds = $this->subjectsIds;
         $classTypeMap = $this->classTypeMap;
-        
+
         $schoolModel = new School();
 
         $schoolModel->name =  $school->sekolah;
@@ -70,8 +72,6 @@ class SeedSchoolJob implements ShouldQueue
         $classtypesIds = [];
 
         try {
-
-
             switch (strtolower($school->bentuk)) {
                 case 'smk':
                 case 'sma':

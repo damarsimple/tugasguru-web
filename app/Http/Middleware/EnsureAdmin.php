@@ -16,7 +16,9 @@ class EnsureAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->user()->is_admin) return $next($request);
+        if ($request->user()->is_admin) {
+            return $next($request);
+        }
 
 
         return response(["message" => "Unauthorized"], 401);

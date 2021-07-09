@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Teacher extends Model
 {
-    use HasFactory, TeacherFollowable;
+    use HasFactory;
+    use TeacherFollowable;
 
     public $with = ['user', 'school', 'subjects'];
 
@@ -24,7 +25,7 @@ class Teacher extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-   
+
 
     public function followers(): BelongsToMany
     {
@@ -35,6 +36,4 @@ class Teacher extends Model
     {
         return $this->belongsToMany('App\Models\User')->where('is_accepted', false);
     }
-
-  
 }

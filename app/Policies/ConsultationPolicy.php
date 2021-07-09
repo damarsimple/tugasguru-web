@@ -30,8 +30,9 @@ class ConsultationPolicy
      */
     public function view(User $user, Consultation $consultation)
     {
-        if ($user->roles == User::ADMIN || $user->id == $consultation->user_id || $user->id == $consultation->consultant_id)
+        if ($user->roles == User::ADMIN || $user->id == $consultation->user_id || $user->id == $consultation->consultant_id) {
             return true;
+        }
 
         return false;
     }

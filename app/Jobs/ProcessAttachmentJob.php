@@ -15,7 +15,10 @@ use WebPConvert\WebPConvert;
 
 class ProcessAttachmentJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     private $check = false;
 
@@ -54,7 +57,6 @@ class ProcessAttachmentJob implements ShouldQueue
      */
     public function handle()
     {
-
         $attachment = $this->attachment;
 
         $mediaExtensions = [
@@ -222,8 +224,6 @@ class ProcessAttachmentJob implements ShouldQueue
         $docsExtension = ['pdf'];
 
         if (in_array($attachment->ext, $mediaExtensions)) {
-
-
             $process = new Process(['ffmpeg', "-i", $attachment->file_path, "-vf", "scale=-1:360", "-preset", "veryslow", "$attachment->temp_file_path"]);
 
             $process->mustRun();
@@ -263,7 +263,6 @@ class ProcessAttachmentJob implements ShouldQueue
         }
 
         if (in_array($attachment->ext, $imgExtensions)) {
-
             try {
                 $compressedPath = str_replace($attachment->ext, "webp", $attachment->temp_file_path);
                 WebPConvert::convert($attachment->file_path, $compressedPath);

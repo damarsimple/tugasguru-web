@@ -4,12 +4,12 @@ namespace App\Enum;
 
 class Ability
 {
-    const GRADE_REPORT = "GRADE_REPORT";
-    const ATTENDANCE_REPORT = "ATTENDANCE_REPORT";
-    const HOMEROOM = "HOMEROOM";
-    const COUNSELING = "COUNSELING";
-    const HEADMASTER = "HEADMASTER";
-    const ABSENT_CONSULT = "ABSENT_CONSULT";
-    const ADMIN_SCHOOL = "ADMIN_SCHOOL";
-    const GUARDIAN = "GUARDIAN";
+    public const GRADE_REPORT = "GRADE_REPORT";
+    public const ATTENDANCE_REPORT = "ATTENDANCE_REPORT";
+    public const HOMEROOM = "HOMEROOM";
+    public const COUNSELING = "COUNSELING";
+    public const HEADMASTER = "HEADMASTER";
+    public const ABSENT_CONSULT = "ABSENT_CONSULT";
+    public const ADMIN_SCHOOL = "ADMIN_SCHOOL";
+    public const GUARDIAN = "GUARDIAN";
 }

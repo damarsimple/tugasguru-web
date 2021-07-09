@@ -16,7 +16,7 @@ class Attachment extends Model
         return $this->morphTo();
     }
 
-    function getPathAttribute()
+    public function getPathAttribute()
     {
         return env("APP_URL", "http://localhost") .
             "/attachments/" .

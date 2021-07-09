@@ -17,7 +17,9 @@ class UserPolicy
      */
     public function viewAny(User $user)
     {
-        if ($user->is_admin) return true;
+        if ($user->is_admin) {
+            return true;
+        }
 
         return false;
     }
@@ -31,9 +33,13 @@ class UserPolicy
      */
     public function view(User $user, User $model)
     {
-        if ($user->is_admin) return true;
+        if ($user->is_admin) {
+            return true;
+        }
 
-        if ($user->id == $model->id) return true;
+        if ($user->id == $model->id) {
+            return true;
+        }
 
         return false;
     }

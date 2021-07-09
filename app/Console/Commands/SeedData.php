@@ -205,11 +205,10 @@ class SeedData extends Command
             // var_dump($schoolsData);
 
             foreach ($schoolsData as $key => $schools) {
-
                 foreach ($schools as $key => $school) {
 
                     // if (str_contains($school->sekolah, "SD")) {
-                    //   
+                    //
                     // }
 
                     if (str_contains($school->sekolah, "SMPLB") || str_contains($school->sekolah, "SMALB")) {
@@ -466,7 +465,6 @@ class SeedData extends Command
         }
 
         if ($onTest) {
-
             $majors = [
                 'Ilmu Pengetahuan Alam',
                 'Ilmu Pengetahuan Sosial',
@@ -534,7 +532,9 @@ class SeedData extends Command
             $extraculiculerId = Extracurricular::all()->pluck('id')->toArray();
             for ($j = 1; $j <= 100; $j++) {
                 $school = School::find($j);
-                if (!$school) continue;
+                if (!$school) {
+                    continue;
+                }
                 $school->majors()->attach($majorsId);
 
                 $school->extracurriculars()->attach($extraculiculerId);

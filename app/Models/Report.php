@@ -11,7 +11,7 @@ class Report extends Model
 {
     use HasFactory;
 
-    const GRADE = "GRADE";
+    public const GRADE = "GRADE";
 
     protected $casts = [
         "data" => "object",

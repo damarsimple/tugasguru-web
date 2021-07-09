@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 
 class Upload
 {
-
     public static function handle(
         \Illuminate\Http\UploadedFile $file,
         bool $isProcessed = false,
