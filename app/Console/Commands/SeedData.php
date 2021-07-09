@@ -757,7 +757,7 @@ class SeedData extends Command
             $guardian->gender = 1;
             $guardian->phone = "08987181033";
             $guardian->roles = User::GUARDIAN;
-            $guardian->access = [Ability::GUARDIAN];
+            $guardian->access = [];
             $guardian->school_id = 1;
             $guardian->classtype_id = 1;
 
