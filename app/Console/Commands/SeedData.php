@@ -589,7 +589,7 @@ class SeedData extends Command
 
             $teacher->save();
 
-            $teacher->schools()->attach(1, ['is_administrator' => true]);
+            $teacher->schools()->attach(1, ['is_administrator' => true, 'is_homeroom' => true, 'is_counselor' => true]);
 
             $teacher->is_bimbel = false;
 
@@ -762,6 +762,11 @@ class SeedData extends Command
             $guardian->classtype_id = 1;
 
             $guardian->save();
+
+            $student->parent_id = $guardian->id;
+
+            $student->save();
+
 
             // $transaction = new Transaction();
 

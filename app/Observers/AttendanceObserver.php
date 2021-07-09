@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Models\Attendance;
+use App\Models\User;
+use App\Notifications\AttendanceAttended;
 use App\Notifications\NewAttendance;
 use Illuminate\Support\Str;
 
@@ -29,7 +31,11 @@ class AttendanceObserver
      */
     public function updated(Attendance $attendance)
     {
-        //
+        if ($attendance->attended && $attendance->user->roles == User::STUDENT && $attendance->user->guardian) {
+            $guardian = $attendance->user->guardian;
+            $attendance->agenda = $attendance->agenda;
+            $guardian->notify(new AttendanceAttended($attendance));
+        }
     }
 
     /**

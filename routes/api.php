@@ -210,6 +210,56 @@ Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], func
 });
 
 Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, EnsureGuardianPaid::class]], function () {
+    Route::group(['prefix' => 'consultations'], function () {
+        Route::post('/', function (Request $request) {
+
+            $user = $request->user()->childrens()->findOrFail($request->child);
+
+            $constult = new Consultation();
+            $constult->consultant_id = User::findOrFail($request->teacher)->id;
+            $constult->name = $request->name;
+            $constult->problem = $request->problem;
+            $user->consultations()->save($constult);
+        });
+
+        Route::get('/', fn (Request $request) => $request->user()->consultations()->paginate(10));
+        Route::get('{id}', fn (Request $request, $id) => $request->user()->consultations()->findOrFail($id));
+    });
+    Route::group(
+        ['prefix' => '/absents'],
+        function () {
+            Route::get('/', function (Request $request) {
+                $child = $request->user()->childrens()->findOrFail($request->child);
+                return $child->user()->absents()->paginate(10);
+            });
+            Route::post(
+                '/',
+                function (Request $request) {
+                    $user = $request->user()->childrens()->findOrFail($request->child);
+
+                    $startAt =  Carbon::parse($request->start_at);
+                    $finishAt = Carbon::parse($request->finish_at);
+
+                    $startAt->hour = now()->hour;
+                    $startAt->minute = now()->minute;
+                    $startAt->second = now()->second;
+
+                    $finishAt->hour = $startAt->hour;
+                    $finishAt->minute = $startAt->minute;
+                    $finishAt->second = $startAt->second;
+
+                    $absent = new Absent();
+                    $absent->receiver_id = $request->teacher;
+                    $absent->type = $request->type;
+                    $absent->reason = $request->reason;
+                    $absent->start_at = $startAt;
+                    $absent->finish_at = $finishAt;
+
+                    $user->absents()->save($absent);
+                }
+            );
+        }
+    );
     Route::get('/', fn (Request $request) => $request->user()->childrens);
     Route::group(
         ['prefix' => '/childrens'],
@@ -270,41 +320,6 @@ Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, E
 
                         return $map;
                     });
-                }
-            );
-            Route::group(
-                ['prefix' => '/absents'],
-                function () {
-                    Route::get('/', function (Request $request) {
-                        $child = $request->user()->childrens()->findOrFail($request->child);
-                        return $child->user()->absents()->paginate(10);
-                    });
-                    Route::post(
-                        '/',
-                        function (Request $request) {
-                            $user = $request->user()->childrens()->findOrFail($request->child);
-
-                            $startAt =  Carbon::parse($request->start_at);
-                            $finishAt = Carbon::parse($request->finish_at);
-
-                            $startAt->hour = now()->hour;
-                            $startAt->minute = now()->minute;
-                            $startAt->second = now()->second;
-
-                            $finishAt->hour = $startAt->hour;
-                            $finishAt->minute = $startAt->minute;
-                            $finishAt->second = $startAt->second;
-
-                            $absent = new Absent();
-                            $absent->receiver_id = $request->teacher;
-                            $absent->type = $request->type;
-                            $absent->reason = $request->reason;
-                            $absent->start_at = $startAt;
-                            $absent->finish_at = $finishAt;
-
-                            $user->absents()->save($absent);
-                        }
-                    );
                 }
             );
         }
@@ -2020,7 +2035,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return $meeting;
         });
 
-        Route::post('{meetingId}/rooms', function (Request $request, $meetingId, ) {
+        Route::post('{meetingId}/rooms', function (Request $request, $meetingId,) {
             $user = $request->user();
 
             $meeting =  $user->meetings()->findOrFail($meetingId);
