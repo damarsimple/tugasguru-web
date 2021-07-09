@@ -63,7 +63,7 @@
         "remigrate": [
             "@php artisan migrate:fresh",
             "@php artisan seed:data --test",
-            "composer dump-autoload"
+            "composer dump-autoload -n"
         ]
     },
     "extra": {

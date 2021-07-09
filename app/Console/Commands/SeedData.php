@@ -627,7 +627,7 @@ class SeedData extends Command
             $student->phone = "08987181014";
             $student->roles = "STUDENT";
 
-            $student->nisn = 1234568123;
+            $student->nisn = 1234568145;
             $student->school_id = 1;
             $student->classtype_id = 1;
 
@@ -645,7 +645,7 @@ class SeedData extends Command
             $secondstudent->phone = "08987181015";
             $secondstudent->roles = "STUDENT_PPDB";
 
-            $secondstudent->nisn = 1234568123;
+            $secondstudent->nisn = 1234565122;
             $secondstudent->school_id = 1;
             $secondstudent->classtype_id = 1;
 
@@ -758,16 +758,10 @@ class SeedData extends Command
             $guardian->phone = "08987181033";
             $guardian->roles = User::GUARDIAN;
             $guardian->access = [Ability::GUARDIAN];
-            $guardian->nisn = 1234568123;
             $guardian->school_id = 1;
             $guardian->classtype_id = 1;
 
             $guardian->save();
-
-            $secondstudent->parent_id = $guardian->id;
-
-            $secondstudent->save();
-
 
             // $transaction = new Transaction();
 

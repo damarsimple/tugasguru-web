@@ -151,6 +151,7 @@ Route::get('/cities/{id}/schools', function (Request $request, $id) {
 Route::post("/token", [ApiAuthController::class, "token"]);
 Route::post("/login", [ApiAuthController::class, "login"]);
 Route::post("/register", [ApiAuthController::class, "register"]);
+
 Route::middleware('auth:sanctum')->get("/user", [ApiAuthController::class, 'profile']);
 Route::middleware('auth:sanctum')->get("/refresh", [ApiAuthController::class, 'refresh']);
 
@@ -218,7 +219,39 @@ Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], func
 Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, EnsureGuardianPaid::class]], function () {
 
     Route::get('/', fn (Request $request) => $request->user()->childrens);
+    Route::group(
+        ['prefix' => '/childrens'],
+        function () {
+            Route::post('admit', function (Request $request) {
 
+                $child = User::where('nisn', $request->nisn)->firstOrFail();
+
+                $user = $request->user();
+
+                if ($child->phone != $request->phone) {
+                    return response('Nomor Telepon Salah', 400);
+                }
+
+                $child->parent_id = $user->id;
+
+                $child->save();
+
+                return response('OK', 200);
+            });
+            Route::post('kick', function (Request $request) {
+
+
+                $user = $request->user()->childrens()->where('id', $request->children)->firstOrFail();
+
+                if (!$user) return response('Anak tidak ditemukan', 400);
+
+                $user->parent_id = null;
+                $user->save();
+
+                return response('OK', 200);
+            });
+        }
+    );
     Route::group(
         ['prefix' => '/recap'],
         function () {
