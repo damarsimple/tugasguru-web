@@ -739,10 +739,10 @@ class SeedData extends Command
 
             $access = new Access();
             $access->roles = User::GUARDIAN;
-            $access->name = "Akses Orang Tua";
-            $access->duration = 12 * 30;
+            $access->name = "Akses Orang Tua 3 Tahun";
+            $access->duration = 3 * 12 * 30;
             $access->price = 50000;
-            $access->ability = [Ability::HEADMASTER];
+            $access->ability = [Ability::GUARDIAN];
 
             $access->save();
 
