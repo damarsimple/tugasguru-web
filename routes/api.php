@@ -1050,6 +1050,17 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 
                 return ['message' => 'ok'];
             });
+            Route::post('remove', function (Request $request) {
+                $user = $request->user();
+
+                $studentppdb = $user->studentppdbs()->where('id', $request?->id)->firstOrFail();
+
+                if (!$studentppdb->extracurriculars()->where('extracurricular_id', $request->extracurricular)->exists()) {
+                    $studentppdb->extracurriculars()->detach($request->extracurricular);
+                }
+
+                return ['message' => 'ok'];
+            });
         });
     });
 
