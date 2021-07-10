@@ -49,6 +49,7 @@ use App\Models\Quizresult;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\School;
+use App\Models\Schooltype;
 use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\StudentPpdb;
@@ -124,6 +125,7 @@ Route::middleware('web')->get('social', function () {
 });
 Route::get('examtypes', fn () => Examtype::all());
 Route::get('/provinces', fn () => Province::all());
+Route::get('/schooltypes', fn () => Schooltype::all());
 Route::get('/subjects', fn () => Subject::all());
 Route::get('/classtypes', fn () => Classtype::all());
 Route::get('/provinces/{id}/city', fn ($id) => Province::findOrFail($id)->cities);
