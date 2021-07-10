@@ -1055,7 +1055,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'students'], functio
 
                 $studentppdb = $user->studentppdbs()->where('id', $request?->id)->firstOrFail();
 
-                if (!$studentppdb->extracurriculars()->where('extracurricular_id', $request->extracurricular)->exists()) {
+                if ($studentppdb->extracurriculars()->where('extracurricular_id', $request->extracurricular)->exists()) {
                     $studentppdb->extracurriculars()->detach($request->extracurricular);
                 }
 
