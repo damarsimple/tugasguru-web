@@ -123,13 +123,13 @@ type Article {
     morphable: String!
     likes: [Like!]!
         @orderBy(column: "created_at", direction: DESC)
-        @paginate(type: CONNECTION)
+        @morphMany(type: CONNECTION)
     comments: [Comment!]!
         @orderBy(column: "created_at", direction: DESC)
-        @paginate(type: CONNECTION)
+        @morphMany(type: CONNECTION)
 
-    likeCount: Int! @count(model: "Like")
-    commentCount: Int! @count(model: "Comment")
+    likeCount: Int! @count(relation: "likes")
+    commentCount: Int! @count(relation: "comments")
 }
 
 type Assigment {
@@ -766,13 +766,13 @@ type Quiz {
     morphable: String!
     likes: [Like!]!
         @orderBy(column: "created_at", direction: DESC)
-        @paginate(type: CONNECTION)
+        @morphMany(type: CONNECTION)
     comments: [Comment!]!
         @orderBy(column: "created_at", direction: DESC)
-        @paginate(type: CONNECTION)
+        @morphMany(type: CONNECTION)
 
-    likeCount: Int! @count(model: "Like")
-    commentCount: Int! @count(model: "Comment")
+    likeCount: Int! @count(relation: "likes")
+    commentCount: Int! @count(relation: "comments")
 }
 
 type Like {

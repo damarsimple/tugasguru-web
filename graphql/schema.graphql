@@ -26,6 +26,7 @@ type Query {
         nisn: String @where(operator: "=")
         is_bimbel: Boolean @where(operator: "=")
     ): User @paginate(type: CONNECTION)
+    quiz(id: ID! @eq): Quiz @find
     user(id: ID! @eq): User @find
     school(id: ID! @eq): School @find
     ppdbschools(
