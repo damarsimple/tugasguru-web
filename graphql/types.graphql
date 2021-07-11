@@ -119,6 +119,17 @@ type Article {
     subjects: [Subject!]! @belongsToMany
     classtypes: [Classtype!]! @belongsToMany
     meetings: [Meeting!]! @hasMany
+
+    morphable: String!
+    likes: [Like!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @paginate(type: CONNECTION)
+    comments: [Comment!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @paginate(type: CONNECTION)
+
+    likeCount: Int! @count(model: "Like")
+    commentCount: Int! @count(model: "Comment")
 }
 
 type Assigment {
@@ -751,6 +762,32 @@ type Quiz {
     is_rewarded: Boolean!
     difficulty: QuizDifficulty
     visibility: Visibility
+
+    morphable: String!
+    likes: [Like!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @paginate(type: CONNECTION)
+    comments: [Comment!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @paginate(type: CONNECTION)
+
+    likeCount: Int! @count(model: "Like")
+    commentCount: Int! @count(model: "Comment")
+}
+
+type Like {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User! @belongsTo
+}
+
+type Comment {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User! @belongsTo
+    content: String!
 }
 
 type Quizreward {

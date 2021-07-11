@@ -47,7 +47,7 @@ class SeedData extends Command
      *
      * @var string
      */
-    protected $signature = "seed:data {--test}";
+    protected $signature = "seed:data {--test} {--mail}";
 
     /**
      * The console command description.
@@ -590,7 +590,7 @@ class SeedData extends Command
 
             $teacher->save();
 
-            event(new Registered($teacher));
+            if ($this->option('mail'))   event(new Registered($teacher));
 
             $teacher->schools()->attach(1, ['is_administrator' => true, 'is_homeroom' => true, 'is_counselor' => true]);
 

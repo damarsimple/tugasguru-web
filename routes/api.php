@@ -28,6 +28,7 @@ use App\Models\Attendance;
 use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
+use App\Models\Comment;
 use App\Models\Consultation;
 use App\Models\Exam;
 use App\Models\Examresult;
@@ -36,6 +37,7 @@ use App\Models\Examtracker;
 use App\Models\Examtype;
 use App\Models\Form;
 use App\Models\FormTemplate;
+use App\Models\Like;
 use App\Models\Major;
 use App\Models\Meeting;
 use App\Models\Message;
@@ -808,6 +810,43 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
     Route::group(['prefix' => 'transactions'], function () {
         Route::get('/', function (Request $request) {
             return  $request->user()->transactions()->paginate(10);
+        });
+    });
+    Route::group(['prefix' => 'comments'], function () {
+        Route::post('/', function (Request $request) {
+            $comment = new Comment();
+
+            $comment->commentable_id = $request->commentable_id;
+            $comment->commentable_type = $request->commentable_type;
+
+            $comment->content = $request->content;
+
+            $request->user()->comments()->save($comment);
+
+            return response('OK', 200);
+        });
+    });
+    Route::group(['prefix' => 'likes'], function () {
+        Route::post('/', function (Request $request) {
+            $check = $request->user()->likes()
+                ->where('likeable_id', $request->likeable_id)
+                ->where('likeable_type', $request->likeable_type);
+
+            if ($check->exists()) {
+                $check->delete();
+                $check = false;
+            } else {
+                $like = new Like();
+
+                $like->likeable_id = $request->likeable_id;
+                $like->likeable_type = $request->likeable_type;
+
+                $request->user()->likes()->save($like);
+                $check = true;
+            }
+
+
+            return response($check, 200);
         });
     });
     Route::group(['prefix' => 'attendances'], function () {

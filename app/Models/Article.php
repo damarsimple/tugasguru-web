@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Trait\Sociable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Article extends Model
 {
-    use HasFactory;
+    use HasFactory, Sociable;
 
     public const THUMBNAIL = "THUMBNAIL";
     public const ANNOUNCEMENT = "ANNOUNCEMENT";
