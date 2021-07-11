@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use GuzzleHttp\Client;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Auth\Events\Registered;
 
 class ApiAuthController extends Controller
 {
@@ -174,6 +175,8 @@ class ApiAuthController extends Controller
                 return $user;
             }
         }
+
+        event(new Registered($user));
 
         return response()->json([
             "user" => $user,

@@ -4,6 +4,7 @@ use App\Actions\Attachment\Upload;
 use App\Events\MeetingChangeEvent;
 use App\Events\QuizRoomChangeEvent;
 use App\Http\Controllers\ApiAuthController;
+use App\Http\Controllers\VerifyEmailController;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureGradeReport;
 use App\Http\Middleware\EnsureHeadmaster;
@@ -61,8 +62,12 @@ use App\Models\Wave;
 use App\Notifications\QuizInvite;
 use App\Payment\Xendit;
 use Carbon\Carbon;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Laravel\Octane\Facades\Octane;
@@ -98,6 +103,63 @@ Route::group(['prefix' => 'attachments'], function () {
         return $attachment;
     });
 });
+
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth:sanctum')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
+
+Route::post('/forgot-password', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
+
+    return $status === Password::RESET_LINK_SENT
+        ? ['status' => $status]
+        : ['email' => $status];
+})->name('password.email');
+
+
+Route::get('/reset-password/{token}', function (Request $request, $token) {
+    return redirect(env('SPA_URL') . "/forgot-token/$token?email=" . $request->email);
+})->name('password.reset');
+
+Route::post('/reset-password', function (Request $request) {
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email',
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->forceFill([
+                'password' => Hash::make($password)
+            ])->setRememberToken(Str::random(60));
+
+            $user->save();
+
+            event(new PasswordReset($user));
+        }
+    );
+
+    return $status === Password::PASSWORD_RESET
+        ? ['status' => $status]
+        : ['email' => [__($status)]];
+})->name('password.update');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
 
 Route::middleware('web')->get('auth/google/callback', function () {
     $data =  Socialite::driver('google')?->stateless()?->user();
@@ -186,6 +248,42 @@ Route::group(['middleware' => [EnsureAdmin::class], 'prefix' => 'admins'], funct
         $form->status = $request->status;
 
         $form->save();
+    });
+    Route::group(['prefix' => 'schools'], function () {
+        Route::post('/', function (Request $request) {
+            $school = new School();
+
+            $school->name = $request->name;
+            $school->npsn = $request->npsn;
+
+            $school->province_id = $request->province_id;
+            $school->city_id = $request->city_id;
+            $school->district_id = $request->district_id;
+            $school->schooltype_id = $request->schooltype_id;
+
+            $school->save();
+
+            return response('OK', 200);
+        });
+        Route::post('/{id}', function (Request $request, $id) {
+            $school = School::findOrFail($id);
+
+            $school->name = $request->name;
+            $school->npsn = $request->npsn;
+
+            $school->province_id = $request->province_id ?? $school->province_id;
+            $school->city_id = $request->city_id ?? $school->city_id;
+            $school->district_id = $request->district_id ?? $school->district_id;
+            $school->schooltype_id = $request->schooltype_id ?? $school->schooltype_id;
+            $school->address = $request->address;
+
+            $school->address = $request->address;
+
+
+            $school->save();
+
+            return response('OK', 200);
+        });
     });
 });
 

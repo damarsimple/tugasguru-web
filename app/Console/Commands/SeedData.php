@@ -36,6 +36,7 @@ use App\Models\User;
 use App\Models\Voucher;
 use App\Models\Wave;
 use Carbon\Carbon;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
@@ -588,6 +589,8 @@ class SeedData extends Command
             $teacher->roles = "TEACHER";
 
             $teacher->save();
+
+            event(new Registered($teacher));
 
             $teacher->schools()->attach(1, ['is_administrator' => true, 'is_homeroom' => true, 'is_counselor' => true]);
 
