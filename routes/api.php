@@ -2382,6 +2382,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             $article = new Article();
             $article->name = $request->name;
             $article->content = $request->content;
+            $article->school_id = $request->school_id;
             $article->visibility = 'PUBLIK';
             $article->user_id = $user->id;
             $article->role = Article::ANNOUNCEMENT;

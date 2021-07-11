@@ -24,6 +24,12 @@ class School extends Model
         );
     }
 
+
+    public function announcements(): HasMany
+    {
+        return $this->hasMany("App\Models\Article")->where('role', Article::ANNOUNCEMENT);
+    }
+
     public function homeroomteachers(): BelongsToMany
     {
         return $this->belongsToMany("App\Models\User")

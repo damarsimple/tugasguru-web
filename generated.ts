@@ -151,6 +151,7 @@ export interface School {
   majors: Major[];
   waves: Wave[];
   openWaves: Wave[];
+  announcements: Maybe<ArticleConnection>;
   attendances: Maybe<AttendanceConnection>;
   studentppdbs: Maybe<StudentPpdbConnection>;
 }
@@ -815,6 +816,22 @@ export enum StudentPpdbStatus {
   Pending = 'PENDING',
   Permanent_rejected = 'PERMANENT_REJECTED',
 }
+/** A paginated list of Article edges. */
+export interface ArticleConnection {
+  /** Pagination information about the list of edges.*/
+  pageInfo: PageInfo;
+  /** A list of Article edges.*/
+  edges: Maybe<ArticleEdge[]>;
+}
+
+/** An edge that contains a node of type Article and a cursor. */
+export interface ArticleEdge {
+  /** The Article node.*/
+  node: Maybe<Article>;
+  /** A unique cursor that can be used for pagination.*/
+  cursor: string;
+}
+
 /** Dynamic WHERE conditions for the `where` argument on the query `attendances`. */
 export interface SchoolAttendancesWhereWhereConditions {
   /** The column that is used for the condition.*/
@@ -1780,6 +1797,10 @@ export interface districtsArgs {
 }
 
 export interface meArgs {}
+
+export interface quizArgs {
+  id: string;
+}
 
 export interface userArgs {
   id: string;
