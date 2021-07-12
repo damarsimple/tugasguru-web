@@ -20,6 +20,8 @@ class Form extends Model
     public const REQUEST_ADMIN_SCHOOL = "REQUEST_ADMIN_SCHOOL";
     public const REQUEST_HOMEROOM = "REQUEST_HOMEROOM";
     public const REQUEST_STUDENT_PPDB = "REQUEST_STUDENT_PPDB";
+    public const REQUEST_ADD_SUBJECT = "REQUEST_ADD_SUBJECT";
+
 
     public const PENDING = 0;
     public const PROCESSED = 1;

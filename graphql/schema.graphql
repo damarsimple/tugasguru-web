@@ -12,6 +12,8 @@ type Query {
         @paginate(type: CONNECTION, builder: "App\\Models\\Form@ppdbforms")
     form(id: ID! @eq): Form! @find @can(ability: "view", find: "id")
     provinces: [Province!]! @all
+    extracurriculars: [Extracurricular!]! @all
+    majors: [Major!]! @all
 
     cities: [City!]! @all
     districts(city_id: ID @where(operator: "=")): [District!]! @all

@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Form;
 use App\Models\School;
+use App\Models\Subject;
 use App\Notifications\FormApproved;
 use App\Notifications\FormProcessed;
 use App\Notifications\FormRejected;
@@ -75,6 +76,13 @@ class FormObserver
                 $user = $form->user;
                 $user->is_bimbel = true;
                 $user->save();
+                break;
+            case Form::REQUEST_ADD_SUBJECT:
+                $subject =  new Subject();
+                $subject->name = $form->data->name;
+                $subject->type = $form->data->type;
+
+                $subject->save();
                 break;
         }
     }

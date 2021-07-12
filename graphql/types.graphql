@@ -641,6 +641,7 @@ enum FormStatus {
 
 enum FormType {
     REQUEST_TUTOR @enum(value: "REQUEST_TUTOR")
+    REQUEST_ADD_SUBJECT @enum(value: "REQUEST_ADD_SUBJECT")
     REQUEST_COUNSELOR @enum(value: "REQUEST_COUNSELOR")
     REQUEST_HEADMASTER @enum(value: "REQUEST_HEADMASTER")
     REQUEST_ADMIN_SCHOOL @enum(value: "REQUEST_ADMIN_SCHOOL")

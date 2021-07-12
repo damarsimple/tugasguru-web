@@ -15,6 +15,7 @@ use App\Models\Quiz;
 use App\Models\School;
 use App\Models\StudentAssigment;
 use App\Models\StudentPpdb;
+use App\Models\Subject;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Observers\ArticleObserver;
@@ -30,6 +31,7 @@ use App\Observers\QuizObserver;
 use App\Observers\SchoolObserver;
 use App\Observers\StudentAssigmentObserver;
 use App\Observers\StudentPpdbObserver;
+use App\Observers\SubjectObserver;
 use App\Observers\TransactionObserver;
 use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
@@ -70,5 +72,6 @@ class EventServiceProvider extends ServiceProvider
         StudentPpdb::observe(StudentPpdbObserver::class);
         School::observe(SchoolObserver::class);
         User::observe(UserObserver::class);
+        Subject::observe(SubjectObserver::class);
     }
 }

@@ -27,6 +27,7 @@ class School extends Model
 
     public function announcements(): HasMany
     {
+
         return $this->hasMany("App\Models\Article")->where('role', Article::ANNOUNCEMENT);
     }
 

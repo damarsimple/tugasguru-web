@@ -35,6 +35,7 @@ use App\Models\Examresult;
 use App\Models\Examsession;
 use App\Models\Examtracker;
 use App\Models\Examtype;
+use App\Models\Extracurricular;
 use App\Models\Form;
 use App\Models\FormTemplate;
 use App\Models\Like;
@@ -1769,6 +1770,42 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
     Route::group(['prefix' => 'ppdb', 'middleware' => [EnsureAdminSchool::class]], function () {
+        Route::group(['prefix' => 'extracurriculars'], function () {
+            Route::post('{id}', function (Request $request, $id) {
+
+                $school = School::findOrFail($request->school);
+
+                $school->extracurriculars()->detach($id);
+
+                return ['message' => 'ok'];
+            });
+            Route::post('', function (Request $request) {
+
+                $school = School::findOrFail($request->school);
+
+                $school->extracurriculars()->syncWithoutDetaching($request->extracurricular);
+
+                return ['message' => 'ok'];
+            });
+        });
+        Route::group(['prefix' => 'majors'], function () {
+            Route::post('{id}', function (Request $request, $id) {
+
+                $school = School::findOrFail($request->school);
+
+                $school->majors()->detach($id);
+
+                return ['message' => 'ok'];
+            });
+            Route::post('', function (Request $request) {
+
+                $school = School::findOrFail($request->school);
+
+                $school->majors()->syncWithoutDetaching($request->major);
+
+                return ['message' => 'ok'];
+            });
+        });
         Route::group(['prefix' => 'application'], function () {
             Route::put('{id}', function (Request $request, $id) {
                 $studentppdb = StudentPpdb::findOrFail($id);
