@@ -25,6 +25,7 @@ use App\Models\Article;
 use App\Models\Assigment;
 use App\Models\Attachment;
 use App\Models\Attendance;
+use App\Models\Autosave;
 use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
@@ -1952,6 +1953,35 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             }
 
             return ['grade' => $map];
+        });
+    });
+    Route::group(['prefix' => 'autosaves'], function () {
+        Route::delete('/{uuid}', function (Request $request, $uuid) {
+
+            $request->user()->autosaves()->where('identifier', $uuid)->delete();
+
+            return response('OK', 200);
+        });
+        Route::put('/{uuid}', function (Request $request, $uuid) {
+
+            $autosave =  $request->user()->autosaves()->where('identifier', $uuid)->first();
+
+            $autosave->data = $request->data;
+
+            $autosave->save();
+
+            return response('OK', 200);
+        });
+        Route::post('/', function (Request $request) {
+            $autosave = new Autosave();
+
+            $autosave->data = $request->data;
+            $autosave->type = $request->type;
+
+
+            $request->user()->autosaves()->save($autosave);
+
+            return response(['identifier' => $autosave->identifier], 200);
         });
     });
     Route::group(['prefix' => 'attendances'], function () {
