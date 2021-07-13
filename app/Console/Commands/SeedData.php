@@ -452,10 +452,6 @@ class SeedData extends Command
                             }
                         }
                         print $schoolModel->id . PHP_EOL;
-
-                        if ($schoolModel->id > 300) {
-                            break;
-                        }
                     } catch (\Throwable $th) {
                         print $th->getMessage() . PHP_EOL;
                         print $th->getLine() . PHP_EOL;
