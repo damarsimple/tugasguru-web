@@ -18,12 +18,12 @@ class CreateBookingsTable extends Migration
             $table
                 ->foreignId("booker_id")
                 ->index()
-                ->constrained()
+                ->constrained('users')
                 ->onDelete("cascade");
             $table
                 ->foreignId("teacher_id")
                 ->index()
-                ->constrained()
+                ->constrained('users')
                 ->onDelete("cascade");
             $table->string('reason')->nullable();
             $table->string('status')->default('PENDING');
