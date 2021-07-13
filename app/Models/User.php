@@ -339,4 +339,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany('App\Models\Like');
     }
+
+    public function autosaves(): HasMany
+    {
+        return $this->hasMany('App\Models\Autosave');
+    }
 }

@@ -630,6 +630,24 @@ type User {
 
     major: Major @belongsTo
     extracurriculars: [Extracurricular!]! @belongsToMany
+    autosaves(type: AutosaveType @where): [Autosave!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @hasMany
+}
+
+type Autosave {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User! @belongsTo
+    identifier: String!
+    data: Mixed!
+    type: AutosaveType
+}
+
+enum AutosaveType {
+    QUESTION_EDITOR @enum(value: "QUESTION_EDITOR")
+    EXAM_EDITOR @enum(value: "EXAM_EDITOR")
 }
 
 enum FormStatus {
