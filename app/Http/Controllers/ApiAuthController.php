@@ -44,7 +44,8 @@ class ApiAuthController extends Controller
                     "school",
                     "followings",
                     "requestfollowers",
-                    "city"
+                    "city",
+                    'followings'
                 ),
                 "token" => $user->createToken($user->name)->plainTextToken,
             ]);

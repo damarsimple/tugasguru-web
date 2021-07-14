@@ -665,7 +665,7 @@ class SeedData extends Command
             $firstclassroom->classtype_id = 1;
             $school->classrooms()->save($firstclassroom);
 
-            $firstclassroom->students()->attach($studentIds);
+            // $firstclassroom->students()->attach($studentIds);
 
             $classroom = new Classroom();
             $classroom->name = "Test Kedua ";
@@ -673,7 +673,7 @@ class SeedData extends Command
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
-            $classroom->students()->attach($studentIds);
+            // $classroom->students()->attach($studentIds);
 
             $absent = new Absent();
 
@@ -956,12 +956,12 @@ class SeedData extends Command
 
             $teacher->assigments()->save($assigment);
 
-            $teacher
-                ->followers()
-                ->attach([$student->id => ["is_accepted" => true]]);
-            $teacher
-                ->followers()
-                ->attach([$secondstudent->id => ["is_accepted" => true]]);
+            // $teacher
+            //     ->followers()
+            //     ->attach([$student->id => ["is_accepted" => true]]);
+            // $teacher
+            //     ->followers()
+            //     ->attach([$secondstudent->id => ["is_accepted" => true]]);
 
             $quiz = new Quiz();
             $quiz->subject_id = 1;
