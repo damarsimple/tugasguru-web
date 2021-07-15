@@ -145,4 +145,9 @@ class School extends Model
     {
         return $builder->whereHas('openWaves');
     }
+
+    public function consultations(): HasMany
+    {
+        return $this->hasMany('App\Models\Consultation');
+    }
 }

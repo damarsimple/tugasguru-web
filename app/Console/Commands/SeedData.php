@@ -29,6 +29,7 @@ use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
 use App\Models\Access;
+use App\Models\Consultation;
 use App\Models\Extracurricular;
 use App\Models\Major;
 use App\Models\StudentPpdb;
@@ -579,7 +580,7 @@ class SeedData extends Command
             $teacher->city_id = 1;
             $teacher->province_id = 1;
             $teacher->district_id = 1;
-            $teacher->access = [Ability::GRADE_REPORT, Ability::HEADMASTER, Ability::ADMIN_SCHOOL];
+            $teacher->access = [Ability::GRADE_REPORT, Ability::HOMEROOM, Ability::COUNSELING, Ability::HEADMASTER, Ability::ADMIN_SCHOOL];
             $teacher->gender = 1;
             $teacher->phone = "08987181017";
             $teacher->roles = "TEACHER";
@@ -631,6 +632,15 @@ class SeedData extends Command
             $student->classtype_id = 1;
 
             $student->save();
+
+            for ($i = 0; $i < 40; $i++) {
+                $constult = new Consultation();
+                $constult->consultant_id = $secondteacher->id;
+                $constult->school_id = $student->school_id;
+                $constult->name = 'Test ' . $i + 1;
+                $constult->problem = 'Problem ' . $i + 1;
+                $student->consultations()->save($constult);
+            }
 
             $secondstudent = new User();
             $secondstudent->name = "Damar Albaribin Siswa 2";

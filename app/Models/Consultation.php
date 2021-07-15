@@ -19,4 +19,9 @@ class Consultation extends Model
     {
         return $this->belongsTo("App\Models\User", "consultant_id");
     }
+
+    public function consultation(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Consultation');
+    }
 }

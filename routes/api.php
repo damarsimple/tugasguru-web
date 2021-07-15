@@ -321,6 +321,7 @@ Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, E
 
             $constult = new Consultation();
             $constult->consultant_id = User::findOrFail($request->teacher)->id;
+            $constult->school_id = $user->school_id;
             $constult->name = $request->name;
             $constult->problem = $request->problem;
             $user->consultations()->save($constult);
@@ -1343,6 +1344,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
             $constult = new Consultation();
             $constult->consultant_id = User::findOrFail($request->teacher)->id;
             $constult->name = $request->name;
+            $constult->school_id = $user->school_id;
             $constult->problem = $request->problem;
             $user->consultations()->save($constult);
         });

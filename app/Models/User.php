@@ -196,6 +196,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany('App\Models\School')->wherePivot('is_administrator', true);
     }
 
+    public function counselorschools(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\School')->wherePivot('is_counselor', true);
+    }
+
     public function subjects(): BelongsToMany
     {
         return $this->belongsToMany('App\Models\Subject')->withPivot('kkm');;

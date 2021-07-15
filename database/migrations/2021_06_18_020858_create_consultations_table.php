@@ -19,6 +19,11 @@ class CreateConsultationsTable extends Migration
                 ->index()
                 ->constrained('users')
                 ->onDelete("cascade");
+            $table
+                ->foreignId("school_id")
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
             $table->string("name");
             $table->string("problem");
             $table->longText("notes")->nullable();

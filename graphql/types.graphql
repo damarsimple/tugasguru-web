@@ -71,6 +71,7 @@ type School {
     waves: [Wave!]! @hasMany
     openWaves: [Wave!]! @hasMany
     studentppdbs: [StudentPpdb!]! @paginate(type: CONNECTION)
+    consultations: [Consultation!]! @hasMany(type: CONNECTION)
 }
 
 type Absent {
@@ -224,11 +225,12 @@ type Consultation {
     name: String!
     created_at: DateTime!
     updated_at: DateTime!
-    problem: String!
-    notes: String!
-    advice: String!
+    problem: String
+    notes: String
+    advice: String
     user: User @belongsTo
     consultant: User @belongsTo
+    school: School @belongsTo
 }
 
 type Exam {
@@ -582,6 +584,10 @@ type User {
     headmasterschools(
         where: _ @whereConditions(columns: ["school_id"])
     ): [School!]! @belongsToMany
+    counselorschools(
+        where: _ @whereConditions(columns: ["school_id"])
+    ): [School!]! @belongsToMany
+
     academic_degree: String
     specialty: String
     hidden_attribute: [String]

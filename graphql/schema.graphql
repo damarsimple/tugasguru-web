@@ -22,6 +22,7 @@ type Query {
     districtsAdmin: [District!]! @paginate(type: CONNECTION)
     me: User @auth
     users(
+        name: String @where(operator: "like")
         district_id: ID @where(operator: "=")
         city_id: ID @where(operator: "=")
         roles: Roles @where(operator: "=")

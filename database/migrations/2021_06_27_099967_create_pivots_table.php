@@ -23,21 +23,6 @@ class CreatePivotsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create("user_school", function (Blueprint $table) {
-            $table->id();
-            $table
-                ->foreignId("user_id")
-                ->index()
-                ->constrained()
-                ->onDelete("cascade");
-            $table
-                ->foreignId("school_id")
-                ->index()
-                ->constrained()
-                ->onDelete("cascade");
-            $table->timestamps();
-        });
-
         Schema::create("classroom_school", function (Blueprint $table) {
             $table->id();
             $table
@@ -338,6 +323,7 @@ class CreatePivotsTable extends Migration
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");
+
             $table->boolean("is_homeroom")->default(false);
             $table->boolean("is_headmaster")->default(false);
             $table->boolean("is_administrator")->default(false);
