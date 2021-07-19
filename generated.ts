@@ -71,6 +71,7 @@ export interface User {
   adminschools: School[];
   homeroomschools: School[];
   headmasterschools: School[];
+  counselorschools: School[];
   academic_degree: Maybe<string>;
   specialty: Maybe<string>;
   hidden_attribute: Maybe<string[]>;
@@ -102,6 +103,8 @@ export interface User {
   major: Maybe<Major>;
   extracurriculars: Extracurricular[];
   autosaves: Autosave[];
+  bookings: Maybe<BookingConnection>;
+  mybookings: Maybe<BookingConnection>;
 }
 
 export interface Province {
@@ -968,9 +971,9 @@ export interface Consultation {
   name: string;
   created_at: string;
   updated_at: string;
-  problem: string;
-  notes: string;
-  advice: string;
+  problem: Maybe<string>;
+  notes: Maybe<string>;
+  advice: Maybe<string>;
   user: Maybe<User>;
   consultant: Maybe<User>;
   school: Maybe<School>;
@@ -1102,6 +1105,38 @@ export interface UserHeadmasterschoolsWhereWhereConditionsRelation {
   amount?: number;
   /** Additional condition logic.*/
   condition?: UserHeadmasterschoolsWhereWhereConditions;
+}
+
+/** Dynamic WHERE conditions for the `where` argument on the query `counselorschools`. */
+export interface UserCounselorschoolsWhereWhereConditions {
+  /** The column that is used for the condition.*/
+  column?: UserCounselorschoolsWhereColumn;
+  /** @default EQThe operator that is used for the condition.*/
+  operator?: SQLOperator;
+  /** The value that is used for the condition.*/
+  value?: any;
+  /** A set of conditions that requires all conditions to match.*/
+  AND?: UserCounselorschoolsWhereWhereConditions[];
+  /** A set of conditions that requires at least one condition to match.*/
+  OR?: UserCounselorschoolsWhereWhereConditions[];
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied.*/
+  HAS?: UserCounselorschoolsWhereWhereConditionsRelation;
+}
+
+/** Allowed column names for the `where` argument on field `counselorschools` on type `User`. */
+export enum UserCounselorschoolsWhereColumn {
+  School_id = 'SCHOOL_ID',
+}
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument on the query `counselorschools`. */
+export interface UserCounselorschoolsWhereWhereConditionsRelation {
+  /** The relation that is checked.*/
+  relation: string;
+  /** @default GTEThe comparison operator to test against the amount.*/
+  operator?: SQLOperator;
+  /** @default 1The amount to test.*/
+  amount?: number;
+  /** Additional condition logic.*/
+  condition?: UserCounselorschoolsWhereWhereConditions;
 }
 
 /** Dynamic WHERE conditions for the `where` argument on the query `absents`. */
@@ -1509,6 +1544,37 @@ export interface Autosave {
   type: Maybe<AutosaveType>;
 }
 
+/** A paginated list of Booking edges. */
+export interface BookingConnection {
+  /** Pagination information about the list of edges.*/
+  pageInfo: PageInfo;
+  /** A list of Booking edges.*/
+  edges: Maybe<BookingEdge[]>;
+}
+
+/** An edge that contains a node of type Booking and a cursor. */
+export interface BookingEdge {
+  /** The Booking node.*/
+  node: Maybe<Booking>;
+  /** A unique cursor that can be used for pagination.*/
+  cursor: string;
+}
+
+export interface Booking {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  user: User;
+  teacher: User;
+  status: Maybe<BookingStatus>;
+  reason: string;
+}
+
+export enum BookingStatus {
+  Ongoing = 'ONGOING',
+  Rejected = 'REJECTED',
+  Pending = 'PENDING',
+}
 export enum FormType {
   Request_tutor = 'REQUEST_TUTOR',
   Request_add_subject = 'REQUEST_ADD_SUBJECT',

@@ -7,6 +7,7 @@ use App\Models\Assigment;
 use App\Models\Attachment;
 use App\Models\Attendance;
 use App\Models\Autosave;
+use App\Models\Booking;
 use App\Models\Consultation;
 use App\Models\Exam;
 use App\Models\Form;
@@ -24,6 +25,7 @@ use App\Observers\AssigmentObserver;
 use App\Observers\AttachmentObserver;
 use App\Observers\AttendanceObserver;
 use App\Observers\AutosaveObserver;
+use App\Observers\BookingObserver;
 use App\Observers\ConsultationObserver;
 use App\Observers\ExamObserver;
 use App\Observers\FormObserver;
@@ -76,5 +78,6 @@ class EventServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Subject::observe(SubjectObserver::class);
         Autosave::observe(AutosaveObserver::class);
+        Booking::observe(BookingObserver::class);
     }
 }

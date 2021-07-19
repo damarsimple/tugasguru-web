@@ -97,6 +97,25 @@ type Answer {
     attachment: Attachment @morphOne
 }
 
+type Booking {
+    id: ID!
+    created_at: DateTime!
+    updated_at: DateTime!
+    user: User! @belongsTo
+    teacher: User! @belongsTo
+    status: BookingStatus
+    reason: String
+    start_at: String!
+}
+
+enum BookingStatus {
+    DIPERJALANAN @enum(value: "DIPERJALANAN")
+    DITOLAK @enum(value: "DITOLAK")
+    SELESAI @enum(value: "SELESAI")
+    SEDANG_BERJALAN @enum(value: "SEDANG_BERJALAN")
+    MENUNGGU @enum(value: "MENUNGGU")
+}
+
 enum Visibility {
     PUBLIK
     PRIVAT
@@ -639,6 +658,8 @@ type User {
     autosaves(type: AutosaveType @where): [Autosave!]!
         @orderBy(column: "created_at", direction: DESC)
         @hasMany
+    bookings: [Booking!]! @hasMany(type: CONNECTION)
+    mybookings: [Booking!]! @hasMany(type: CONNECTION)
 }
 
 type Autosave {

@@ -29,6 +29,7 @@ use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
 use App\Models\Access;
+use App\Models\Booking;
 use App\Models\Consultation;
 use App\Models\Extracurricular;
 use App\Models\Major;
@@ -574,6 +575,8 @@ class SeedData extends Command
 
             $teacher = new User();
             $teacher->is_admin = true;
+            $teacher->is_bimbel = true;
+
             $teacher->name = "Damar Albaribin Guru 1";
             $teacher->email = "damaralbaribin@gmail.com";
             $teacher->password = Hash::make("we5n9t5ReNV8gNE");
@@ -675,7 +678,7 @@ class SeedData extends Command
             $firstclassroom->classtype_id = 1;
             $school->classrooms()->save($firstclassroom);
 
-            // $firstclassroom->students()->attach($studentIds);
+            $firstclassroom->students()->attach($studentIds);
 
             $classroom = new Classroom();
             $classroom->name = "Test Kedua ";
@@ -1015,6 +1018,14 @@ class SeedData extends Command
                     "agenda_id" => $agenda->id,
                 ]);
             }
+
+            $booking = new Booking();
+            $booking->user_id = 3;
+            $booking->teacher_id = 1;
+            $booking->start_at = now()->addDay(1);
+            $booking->address = "JL. Any";
+            $booking->status = Booking::MENUNGGU;
+            $booking->save();
         }
 
         print "finish at " . time() - $start . PHP_EOL;

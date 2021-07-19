@@ -26,6 +26,7 @@ use App\Models\Assigment;
 use App\Models\Attachment;
 use App\Models\Attendance;
 use App\Models\Autosave;
+use App\Models\Booking;
 use App\Models\City;
 use App\Models\Classroom;
 use App\Models\Classtype;
@@ -800,6 +801,76 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
+    Route::group(['prefix' => 'bookings'], function () {
+        Route::post('/', function (Request $request) {
+            $user = $request->user();
+
+            $teacher = User::findOrFail($request->teacher);
+
+            $booking = new Booking();
+
+            $booking->teacher_id = $request->teacher;
+            $booking->start_at = Carbon::parse($request->start);
+            $booking->address = $request->address;
+            $booking->status = Booking::MENUNGGU;
+            $user->bookings()->save($booking);
+
+            $transaction = new Transaction();
+
+            $transaction->amount = 50000;
+
+            $transaction->from = $user->balance;
+            $transaction->to = $user->balance;
+
+            $transaction->payment_method = 'XENDIT';
+
+            $transaction->transactionable_id = $booking->id;
+            $transaction->transactionable_type = $booking::class;
+            $transaction->uuid = Str::uuid();
+
+            $transaction->description = 'Pembayaran Guru Bimbel ' . $teacher->name . ' sebesar ' . $transaction->amount;
+
+            $transaction->staging_url = null;
+
+            switch ('XENDIT') {
+                case 'XENDIT':
+
+                    $invoice = Xendit::makePayment(
+                        amount: $transaction->amount,
+                        uuid: $transaction->uuid,
+                        description: $transaction->description,
+                        email: $user->email
+                    );
+
+                    $transaction->invoice_request = $invoice;
+
+                    $transaction->staging_url = $invoice['invoice_url'];
+
+                    break;
+                case 'BALANCE':
+                    if ($user->balance < $transaction->amount) {
+                        return ['message' => 'Uang anda tidak cukup'];
+                    }
+
+                    $transaction->is_paid = true;
+                    $transaction->status = Transaction::SUCCESS;
+
+                    break;
+                default:
+                    return ['message' => 'Metode pembayaran invalid'];
+                    break;
+            }
+
+            $user->transactions()->save($transaction);
+
+
+            return [
+                'message' => 'ok',
+                'transaction' => $transaction,
+                'staging_url' => $transaction->staging_url
+            ];
+        });
+    });
     Route::group(['prefix' => 'attachments'], function () {
         Route::post('/temp', function (Request $request) {
             $files = $request->file('file');

@@ -349,4 +349,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany('App\Models\Autosave');
     }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany('App\Models\Booking');
+    }
+
+    public function mybookings(): HasMany
+    {
+        return $this->hasMany('App\Models\Booking', foreignKey: 'teacher_id');
+    }
 }
