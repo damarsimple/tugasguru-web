@@ -27,12 +27,11 @@ class BookingObserver
      */
     public function updated(Booking $booking)
     {
-        if ($booking->status == Booking::FINISHED) {
+        if ($booking->status == Booking::SELESAI) {
+
             $transaction = new Transaction();
 
             $transaction->amount = 50000;
-
-
 
             $transaction->payment_method = 'BALANCE';
 
