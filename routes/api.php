@@ -870,6 +870,13 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
                 'staging_url' => $transaction->staging_url
             ];
         });
+        Route::put('{id}', function (Request $request, $id) {
+            $booking = Booking::findOrFail($id);
+            $booking->is_approved = $request->approved;
+            $booking->save();
+
+            return ['message' => 'ok'];
+        });
     });
     Route::group(['prefix' => 'attachments'], function () {
         Route::post('/temp', function (Request $request) {
@@ -1843,6 +1850,20 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
     });
 });
 Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' => 'teachers'], function () {
+    Route::group(['prefix' => 'bookings'], function () {
+        Route::put('{id}', function (Request $request, $id) {
+            $booking = Booking::findOrFail($id);
+            if ($booking->is_approved) {
+                $booking->status = $request->status;
+                $booking->save();
+
+                return ['message' => 'ok'];
+            } else {
+                return response(['message' => 'Client belum menyelesaikan pesanan'], 400);
+            }
+        });
+    });
+
     Route::group(['prefix' => 'ppdb', 'middleware' => [EnsureAdminSchool::class]], function () {
         Route::group(['prefix' => 'extracurriculars'], function () {
             Route::post('{id}', function (Request $request, $id) {

@@ -28,6 +28,7 @@ class CreateBookingsTable extends Migration
             $table->timestamp('start_at');
             $table->string('reason')->nullable();
             $table->string('address');
+            $table->boolean('is_approved')->default(false);
             $table->string('status')->default('PENDING');
             $table->timestamps();
         });
