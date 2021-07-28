@@ -68,6 +68,11 @@
             "@php artisan migrate:fresh",
             "@php artisan seed:data --test",
             "composer dump-autoload -n"
+        ],
+        "rmnoextra": [
+            "@php artisan migrate:fresh",
+            "@php artisan seed:data --test --noextra",
+            "composer dump-autoload -n"
         ]
     },
     "extra": {

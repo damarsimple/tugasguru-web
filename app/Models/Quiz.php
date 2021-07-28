@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Trait\Sociable;
+use App\Trait\Thumbnailable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,9 +14,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Quiz extends Model
 {
-    use HasFactory, Sociable;
+    use HasFactory, Sociable, Thumbnailable;
 
-    public const THUMBNAIL = "THUMBNAIL";
 
     public function quizreward(): HasOne
     {
@@ -40,14 +40,6 @@ class Quiz extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");
-    }
-
-    public function thumbnail(): MorphOne
-    {
-        return $this->morphOne("App\Models\Attachment", "attachable")->where(
-            "role",
-            self::THUMBNAIL
-        );
     }
 
     public function rooms(): MorphMany

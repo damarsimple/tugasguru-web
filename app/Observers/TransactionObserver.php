@@ -5,9 +5,12 @@ namespace App\Observers;
 use App\Enum\Ability;
 use App\Events\TransactionEvent;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Notifications\TransactionFailed;
 use App\Notifications\TransactionPending;
 use App\Notifications\TransactionSuccess;
+use Illuminate\Support\Str;
+
 
 class TransactionObserver
 {
@@ -19,6 +22,11 @@ class TransactionObserver
      */
     public function created(Transaction $transaction)
     {
+
+        $transaction->uuid = Str::uuid();
+
+        $transaction->saveQuietly();
+
         if (
             $transaction->payment_method == Transaction::BALANCE &&
             $transaction->is_paid &&
@@ -52,7 +60,35 @@ class TransactionObserver
         }
     }
 
-    public function handlePaid(Transaction $transaction)
+    private function payAdmin(Transaction $transaction)
+    {
+        $admin = User::where('is_admin', true)->first();
+
+        if (!$admin) return;
+
+        $adminTransaction = new Transaction();
+
+        $adminTransaction->from = $admin->balance;
+        $adminTransaction->to = $admin->balance + $transaction->amount;
+
+        $adminTransaction->payment_method  = Transaction::BALANCE;
+
+        $adminTransaction->transaction_id = $transaction->id;
+
+        $adminTransaction->amount = $transaction->amount;
+
+        $adminTransaction->description =
+            $transaction->description;
+
+        $adminTransaction->is_paid = true;
+
+        $adminTransaction->status = Transaction::SUCCESS;
+
+        $admin->transactions()->save($transaction);
+    }
+
+
+    private function handlePaid(Transaction $transaction)
     {
         $user = $transaction->user;
 
@@ -71,6 +107,8 @@ class TransactionObserver
                 foreach ($subscription->ability as $ability) {
                     $abilities[] = $ability;
                 }
+
+                $this->payAdmin($transaction);
 
                 break;
 

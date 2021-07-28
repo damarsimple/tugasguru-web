@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Attachment\Upload;
+use App\Enum\Constant;
 use App\Events\MeetingChangeEvent;
 use App\Events\QuizRoomChangeEvent;
 use App\Http\Controllers\ApiAuthController;
@@ -497,7 +498,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
 
         if ($request->attachment) {
             $attachment = Attachment::findOrFail($request->attachment);
-            $attachment->role = Quiz::THUMBNAIL;
+            $attachment->role = Constant::THUMBNAIL;
             $attachment->save();
             $quiz->thumbnail()->save($attachment);
         }
@@ -631,11 +632,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
 
         $transaction->transactionable_id = $subscription->id;
         $transaction->transactionable_type = $subscription::class;
-        $transaction->uuid = Str::uuid();
 
         $transaction->description = 'Pembelian ' . $subscription->name . ' sebesar ' . $transaction->amount;
-
-        $transaction->staging_url = null;
 
         switch ($request->payment_method) {
             case 'XENDIT':
@@ -707,7 +705,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
 
         $transaction->transactionable_id = $wave->id;
         $transaction->transactionable_type = $wave::class;
-        $transaction->uuid = Str::uuid();
 
         $transaction->description = 'Pembayarn ' . $wave->name . ' sebesar ' . $transaction->amount;
 
@@ -826,7 +823,6 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
             $transaction->transactionable_id = $booking->id;
             $transaction->transactionable_type = $booking::class;
-            $transaction->uuid = Str::uuid();
 
             $transaction->description = 'Pembayaran Guru Bimbel ' . $teacher->name . ' sebesar ' . $transaction->amount;
 
@@ -2552,7 +2548,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             if ($request->thumbnail) {
                 $thumbnail = Attachment::findOrFail($request->thumbnail);
-                $thumbnail->role = Article::THUMBNAIL;
+                $thumbnail->role = Constant::THUMBNAIL;
 
                 $thumbnail->attachable()->associate($article)->save();
 
@@ -2590,7 +2586,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             if ($request->thumbnail) {
                 $thumbnail = Attachment::findOrFail($request->thumbnail);
 
-                $thumbnail->role = Article::THUMBNAIL;
+                $thumbnail->role = Constant::THUMBNAIL;
 
                 $thumbnail->attachable()->associate($article)->save();
 

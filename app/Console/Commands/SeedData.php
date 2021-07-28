@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Enum\Ability;
+use App\Enum\Constant;
 use App\Models\Absent;
 use App\Models\Agenda;
 use App\Models\Answer;
@@ -31,10 +32,12 @@ use App\Models\Subject;
 use App\Models\Access;
 use App\Models\Booking;
 use App\Models\Consultation;
+use App\Models\Course;
 use App\Models\Extracurricular;
 use App\Models\Major;
 use App\Models\StudentPpdb;
 use App\Models\User;
+use App\Models\Video;
 use App\Models\Voucher;
 use App\Models\Wave;
 use Carbon\Carbon;
@@ -49,7 +52,7 @@ class SeedData extends Command
      *
      * @var string
      */
-    protected $signature = "seed:data {--test} {--mail}";
+    protected $signature = "seed:data {--test} {--mail} {--noextra}";
 
     /**
      * The console command description.
@@ -199,7 +202,7 @@ class SeedData extends Command
         $classTypeMap = [];
 
         $XDCOUNT = 0;
-
+        $withoutExtra = $this->option('mail');
         foreach (glob(base_path() . "/data/schools/*.json") as $filename) {
             $schoolsData = file_get_contents($filename);
 
@@ -208,8 +211,15 @@ class SeedData extends Command
             // var_dump($schoolsData);
 
             foreach ($schoolsData as $key => $schools) {
+                if ($withoutExtra && $XDCOUNT < 100) {
+                    break;
+                }
                 foreach ($schools as $key => $school) {
+                    $XDCOUNT++;
 
+                    if ($withoutExtra && $XDCOUNT < 100) {
+                        break;
+                    }
                     // if (str_contains($school->sekolah, "SD")) {
                     //
                     // }
@@ -758,6 +768,39 @@ class SeedData extends Command
 
             $access->save();
 
+            $access = new Access();
+            $access->roles = Constant::GENERAL;
+            $access->name = "BASIC";
+            $access->duration = 12 * 30;
+            $access->price = 0;
+            $access->ability = [
+                Ability::COURSE_BASIC,
+            ];
+
+            $access->save();
+
+            $access = new Access();
+            $access->roles = Constant::GENERAL;
+            $access->name = "PREMIUM";
+            $access->duration = 12 * 30;
+            $access->price = 500000;
+            $access->ability = [
+                Ability::COURSE_PREMIUM,
+            ];
+
+            $access->save();
+
+            $access = new Access();
+            $access->roles = Constant::GENERAL;
+            $access->name = "PRO";
+            $access->duration = 12 * 30;
+            $access->price = 1000000;
+            $access->ability = [
+                Ability::COURSE_PRO,
+            ];
+
+            $access->save();
+
             $guardian = new User();
             $guardian->name = "Damar Albaribin Orang Tua 1";
             $guardian->email = "damara3@gmail.com";
@@ -787,7 +830,6 @@ class SeedData extends Command
 
             // $transaction->transactionable_id = $subscription->id;
             // $transaction->transactionable_type = $subscription::class;
-            // $transaction->uuid = Str::uuid();
 
             // try {
             //     $model = app($transaction->transactionable_type)->findOrFail($transaction->transactionable_id);
@@ -1026,6 +1068,43 @@ class SeedData extends Command
             $booking->address = "JL. Any";
             $booking->status = Booking::MENUNGGU;
             $booking->save();
+
+
+            for ($i = 0, $rand = rand(1, 10); $i < $rand; $i++) {
+
+                $course = new Course();
+                $course->name = "Cara Bermain PUBG Dengan Baik dan benar " . $i;
+                $course->user_id = $teacher->id;
+                $course->subject_id = $subject->id;
+                $course->classtype_id = $classtype->id;
+                $course->is_paid = $i < 7;
+                $course->save();
+
+
+                print("course " . $i + 1 . PHP_EOL);
+
+                $videosName = [
+                    "Cara Proning",
+                    "Cara Aim",
+                    "Cara Positioning",
+                    "Cara Terbang",
+                    "Cara Menang",
+                    "Cara Kalah",
+                    "Cara Jadi Jago",
+                    "Siap Abang Jago"
+                ];
+
+                for ($j = 0, $rand = rand(1, 15); $j < $rand; $j++) {
+                    $video = new Video();
+                    $video->name = $videosName[$j] ?? "Cara Proning";
+                    $video->course_id = $course->id;
+                    $video->duration = rand(1, rand(1, 10) * 60) + rand(1, 100);
+
+                    $video->save();
+
+                    print("video " . $i + 1 . PHP_EOL);
+                }
+            }
         }
 
         print "finish at " . time() - $start . PHP_EOL;

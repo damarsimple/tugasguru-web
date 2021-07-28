@@ -14,8 +14,11 @@ class UserObserver
      */
     public function created(User $user)
     {
-        // $user->access = [];
-        // $user->saveQuietly();
+        $user->metadata = [
+            'video_access_limit' => 0
+        ];
+        $user->access = [];
+        $user->saveQuietly();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Trait\Attachable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Meeting extends Model
 {
-    use HasFactory;
+    use HasFactory, Attachable;
 
     public $appends = ["absents"];
 
@@ -59,11 +60,6 @@ class Meeting extends Model
     public function rooms(): MorphMany
     {
         return $this->morphMany("App\Models\Room", "roomable");
-    }
-
-    public function attachments()
-    {
-        return $this->morphMany("App\Models\Attachment", "attachable");
     }
 
     public function agenda(): MorphOne

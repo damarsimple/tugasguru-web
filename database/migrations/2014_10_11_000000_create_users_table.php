@@ -47,6 +47,10 @@ class CreateUsersTable extends Migration
 
             $table->json("access")->nullable();
             $table->json("identity")->nullable();
+
+            $table->json("metadata")->nullable();
+
+
             // students
             $table
                 ->foreignId("parent_id")
@@ -62,6 +66,9 @@ class CreateUsersTable extends Migration
             // teachers
 
             $table->boolean("is_bimbel")->default(false);
+            $table->boolean("is_bimbel_active")->default(false);
+
+
             $table->boolean("is_admin")->default(false);
             $table->rememberToken();
             $table->timestamps();

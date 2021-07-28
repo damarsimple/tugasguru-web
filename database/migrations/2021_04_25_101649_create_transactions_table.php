@@ -12,6 +12,12 @@ class CreateTransactionsTable extends Migration
         Schema::create("transactions", function (Blueprint $table) {
             $table->id();
             $table
+                ->foreignId("transaction_id")
+                ->nullable()
+                ->index()
+                ->constrained()
+                ->onDelete("cascade");
+            $table
                 ->foreignId("user_id")
                 ->index()
                 ->constrained()

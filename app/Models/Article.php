@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Trait\Sociable;
+use App\Trait\Thumbnailable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,9 +13,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Article extends Model
 {
-    use HasFactory, Sociable;
+    use HasFactory, Sociable, Thumbnailable;
 
-    public const THUMBNAIL = "THUMBNAIL";
     public const ANNOUNCEMENT = "ANNOUNCEMENT";
     public const THEORY = "THEORY";
     public const POST = "POST";
@@ -27,14 +27,6 @@ class Article extends Model
     public function price()
     {
         return $this->morphOne("App\Models\Price", "priceable");
-    }
-
-    public function thumbnail(): MorphOne
-    {
-        return $this->morphOne("App\Models\Attachment", "attachable")->where(
-            "role",
-            self::THUMBNAIL
-        );
     }
 
     public function subjects(): BelongsToMany

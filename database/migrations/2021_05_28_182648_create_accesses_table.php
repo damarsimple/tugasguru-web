@@ -15,6 +15,8 @@ class CreateAccessesTable extends Migration
             $table->string('roles')->nullable();
             $table->unsignedBigInteger("duration");
             $table->json("ability");
+            $table->unsignedBigInteger("limit")->default(0);
+            $table->boolean("is_limit")->default(false);
             $table->timestamps();
         });
     }

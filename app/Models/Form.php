@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Trait\Attachable;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,8 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Form extends Model
 {
-    use HasFactory;
+    use HasFactory, Attachable;
+
     public const REQUEST_TUTOR = "REQUEST_TUTOR";
     public const REQUEST_COUNSELOR = "REQUEST_COUNSELOR";
     public const REQUEST_HEADMASTER = "REQUEST_HEADMASTER";
@@ -47,11 +49,6 @@ class Form extends Model
     public function wave(): BelongsTo
     {
         return $this->belongsTo("App\Models\Wave");
-    }
-
-    public function attachments(): MorphMany
-    {
-        return $this->morphMany("App\Models\Attachment", "attachable");
     }
 
     public function studentppdb(): HasOne

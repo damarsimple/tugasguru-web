@@ -668,6 +668,8 @@ export interface Access {
   price: number;
   duration: number;
   roles: Maybe<Roles>;
+  is_limit: boolean;
+  limit: number;
   ability: Maybe<string[]>;
 }
 
@@ -1567,13 +1569,17 @@ export interface Booking {
   user: User;
   teacher: User;
   status: Maybe<BookingStatus>;
-  reason: string;
+  reason: Maybe<string>;
+  is_approved: boolean;
+  start_at: string;
 }
 
 export enum BookingStatus {
-  Ongoing = 'ONGOING',
-  Rejected = 'REJECTED',
-  Pending = 'PENDING',
+  Diperjalanan = 'DIPERJALANAN',
+  Ditolak = 'DITOLAK',
+  Selesai = 'SELESAI',
+  Sedang_berjalan = 'SEDANG_BERJALAN',
+  Menunggu = 'MENUNGGU',
 }
 export enum FormType {
   Request_tutor = 'REQUEST_TUTOR',
@@ -1780,6 +1786,46 @@ export interface SubjectEdge {
   node: Maybe<Subject>;
   /** A unique cursor that can be used for pagination.*/
   cursor: string;
+}
+
+/** A paginated list of Course edges. */
+export interface CourseConnection {
+  /** Pagination information about the list of edges.*/
+  pageInfo: PageInfo;
+  /** A list of Course edges.*/
+  edges: Maybe<CourseEdge[]>;
+}
+
+/** An edge that contains a node of type Course and a cursor. */
+export interface CourseEdge {
+  /** The Course node.*/
+  node: Maybe<Course>;
+  /** A unique cursor that can be used for pagination.*/
+  cursor: string;
+}
+
+export interface Course {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  is_paid: boolean;
+  description: Maybe<string>;
+  views: number;
+  classtype: Classtype;
+  subject: Subject;
+  user: User;
+  videos: Video[];
+}
+
+export interface Video {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  description: Maybe<string>;
+  duration: number;
+  course: Course;
 }
 
 export type Agendaable = Meeting | Exam;
@@ -2012,6 +2058,7 @@ export interface usersArgs {
   roles?: Roles;
   nisn?: string;
   is_bimbel?: boolean;
+  subjects?: string[];
   /** Limits number of fetched elements.*/
   first: number;
   /** A cursor after which elements are returned.*/
@@ -2062,6 +2109,13 @@ export interface packagequestionsArgs {
 }
 
 export interface subjectsAdminArgs {
+  /** Limits number of fetched elements.*/
+  first: number;
+  /** A cursor after which elements are returned.*/
+  after?: string;
+}
+
+export interface coursesArgs {
   /** Limits number of fetched elements.*/
   first: number;
   /** A cursor after which elements are returned.*/

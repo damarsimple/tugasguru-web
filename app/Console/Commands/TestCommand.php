@@ -39,15 +39,21 @@ class TestCommand extends Command
      */
     public function handle()
     {
-        $bookie = User::find(3);
-        $booker = User::find(1);
+        // $bookie = User::find(3);
+        // $booker = User::find(1);
 
-        $booking = new Booking();
+        // $booking = new Booking();
 
-        $booking->user_id = 3;
-        $booking->teacher_id = 1;
+        // $booking->user_id = 3;
+        // $booking->teacher_id = 1;
 
-        $booking->save();
+        // $booking->save();
+
+        $users = User::whereHas('subjects', function ($q) {
+            return $q->where('subjects.id', 1);
+        });
+
+        dd($users->get()->count());
 
         return 0;
     }

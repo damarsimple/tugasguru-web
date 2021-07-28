@@ -54,7 +54,6 @@ class QuizObserver
 
             $transaction = new Transaction();
             $transaction->payment_method = Transaction::ADMIN;
-            $transaction->uuid = Str::uuid();
             $transaction->amount = $quizreward->reward;
             $transaction->from = $user->balance;
             $transaction->to = $user->balance + $quizreward->reward;

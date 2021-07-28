@@ -105,6 +105,7 @@ type Booking {
     teacher: User! @belongsTo
     status: BookingStatus
     reason: String
+    address: String
     is_approved: Boolean!
     start_at: String!
 }
@@ -118,9 +119,9 @@ enum BookingStatus {
 }
 
 enum Visibility {
-    PUBLIK
-    PRIVAT
-    SELECTPEOPLE
+    PUBLIK @enum(value: "PUBLIK")
+    PRIVAT @enum(value: "PRIVAT")
+    SELECTPEOPLE @enum(value: "SELECTPEOPLE")
 }
 
 type Article {
@@ -336,12 +337,12 @@ interface MeetingData {
     attachment: Attachment
 }
 enum MeetingMedia {
-    YOUTUBE
-    IMAGE
-    AUDIO
-    VIDEO
-    DOCUMENT
-    ARTICLE_NOW
+    YOUTUBE @enum(value: "YOUTUBE")
+    IMAGE @enum(value: "IMAGE")
+    AUDIO @enum(value: "AUDIO")
+    VIDEO @enum(value: "VIDEO")
+    DOCUMENT @enum(value: "DOCUMENT")
+    ARTICLE_NOW @enum(value: "ARTICLE_NOW")
 }
 
 type Meeting {
@@ -403,12 +404,12 @@ type PrivateRoom {
     second: User! @belongsTo
 }
 enum QuestionType {
-    MULTI_CHOICE
-    ESSAY
-    FILLER
-    SURVEY
-    SLIDE
-    MANY_ANSWERS
+    MULTI_CHOICE @enum(value: "MULTI_CHOICE")
+    ESSAY @enum(value: "ESSAY")
+    FILLER @enum(value: "FILLER")
+    SURVEY @enum(value: "SURVEY")
+    SLIDE @enum(value: "SLIDE")
+    MANY_ANSWERS @enum(value: "MANY_ANSWERS")
 }
 type Question {
     id: ID!
@@ -508,10 +509,10 @@ type Subject {
 union Transactionable = Access | Quizreward
 
 enum TransactionStatus {
-    STAGING
-    PENDING
-    SUCCESS
-    FAILED
+    STAGING @enum(value: "STAGING")
+    PENDING @enum(value: "PENDING")
+    SUCCESS @enum(value: "SUCCESS")
+    FAILED @enum(value: "FAILED")
 }
 
 type Transaction {
@@ -535,17 +536,18 @@ type Transaction {
 }
 
 enum Gender {
-    Male
-    Female
+    Male @enum(value: 0)
+    Female @enum(value: 1)
 }
+
 enum Roles {
-    ADMIN
-    STUDENT_PPDB
-    GENERAL
-    TEACHER
-    STUDENT
-    BIMBEL
-    GUARDIAN
+    ADMIN @enum(value: "ADMIN")
+    STUDENT_PPDB @enum(value: "STUDENT_PPDB")
+    GENERAL @enum(value: "GENERAL")
+    TEACHER @enum(value: "TEACHER")
+    STUDENT @enum(value: "STUDENT")
+    BIMBEL @enum(value: "BIMBEL")
+    GUARDIAN @enum(value: "GUARDIAN")
 }
 
 type Identity {
@@ -761,7 +763,7 @@ type Extracurricular {
 }
 
 enum ReportType {
-    GRADE
+    GRADE @enum(value: "GRADE")
 }
 
 type Report {
@@ -783,13 +785,15 @@ type Access {
     price: Float!
     duration: Int!
     roles: Roles
+    is_limit: Boolean!
+    limit: Int!
     ability: [String]
 }
 
 enum QuizDifficulty {
-    EASY
-    MEDIUM
-    HARD
+    EASY @enum(value: "EASY")
+    MEDIUM @enum(value: "MEDIUM")
+    HARD @enum(value: "HARD")
 }
 
 type Quiz {
@@ -951,4 +955,30 @@ type StudentPpdb {
     identifier: String!
     major: Major @belongsTo
     extracurriculars: [Extracurricular!]! @belongsToMany
+}
+
+type Course {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    is_paid: Boolean!
+    description: String
+    views: Int!
+    classtype: Classtype! @belongsTo
+    subject: Subject! @belongsTo
+    user: User! @belongsTo
+    videos: [Video!]! @hasMany
+}
+
+type Video {
+    id: ID!
+    name: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    description: String
+    duration: Int!
+    course: Course! @belongsTo
 }

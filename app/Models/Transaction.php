@@ -31,4 +31,9 @@ class Transaction extends Model
     {
         return $this->morphTo();
     }
+
+    public function refer(): BelongsTo
+    {
+        return $this->belongsTo(self::class);
+    }
 }

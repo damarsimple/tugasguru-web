@@ -20,6 +20,7 @@ type Query {
     provincesAdmin: [Province!]! @paginate(type: CONNECTION)
     citiesAdmin: [City!]! @paginate(type: CONNECTION)
     districtsAdmin: [District!]! @paginate(type: CONNECTION)
+
     me: User @auth
     users(
         name: String @where(operator: "like")
@@ -28,7 +29,8 @@ type Query {
         roles: Roles @where(operator: "=")
         nisn: String @where(operator: "=")
         is_bimbel: Boolean @where(operator: "=")
-    ): User @paginate(type: CONNECTION)
+        subject_id: ID
+    ): User @paginate(type: CONNECTION, builder: "App\\Models\\User@bimbels")
     quiz(id: ID! @eq): Quiz @find
     user(id: ID! @eq): User @find
     school(id: ID! @eq): School @find
@@ -92,4 +94,6 @@ type Query {
     studentppdb(id: ID! @eq): StudentPpdb!
         @find
         @can(ability: "view", find: "id")
+
+    courses: [Course!]! @paginate(type: CONNECTION)
 }

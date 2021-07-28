@@ -37,9 +37,6 @@ class BookingObserver
 
             $transaction->transactionable_id = $booking->id;
             $transaction->transactionable_type = $booking::class;
-
-            $transaction->uuid = Str::uuid();
-
             $transaction->description = 'Pembayaran Bimbel dari' . $booking->user->name . ' sebesar ' . $transaction->amount;
 
             $transaction->staging_url = null;

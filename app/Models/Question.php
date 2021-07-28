@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Trait\Attachable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Question extends Model
 {
-    use HasFactory;
+    use HasFactory, Attachable;
 
     protected $fillable = ["editable"];
 
@@ -36,11 +37,6 @@ class Question extends Model
     public function correctanswer(): HasOne
     {
         return $this->hasOne("App\Models\Answer")->where("is_correct", true);
-    }
-
-    public function attachments()
-    {
-        return $this->morphMany("App\Models\Attachment", "attachable");
     }
 
     public function subject(): BelongsTo

@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder as EBuilder;
+use Illuminate\Database\Query\Builder as QBuilder;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -58,6 +63,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'hidden_attribute' => 'array',
         'access' => 'array',
+        'video_access_limit' => 'array',
         'identity' => 'array'
     ];
 
@@ -358,5 +364,18 @@ class User extends Authenticatable implements MustVerifyEmail
     public function mybookings(): HasMany
     {
         return $this->hasMany('App\Models\Booking', foreignKey: 'teacher_id');
+    }
+
+    public function bimbels($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QBuilder|EBuilder
+    {
+        $builder = User::getQuery();
+
+        if (array_key_exists('subject_id', $args)) {
+            $builder = User::whereHas('subjects', function ($q) use ($args) {
+                return $q->where('subjects.id', $args['subject_id']);
+            });
+        }
+
+        return $builder;
     }
 }
