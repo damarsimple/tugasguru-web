@@ -296,6 +296,11 @@ Route::group(['middleware' => [EnsureAdmin::class], 'prefix' => 'admins'], funct
 
 Route::group(['middleware' => [EnsureXendit::class], 'prefix' => 'xendit'], function () {
     Route::post('/invoices/paid', function (Request $request) {
+
+        if ($request->external_id == Constant::XENDIT_TEST_EXTERNAL_UUID) {
+            return response('OK', 200);
+        }
+
         $transaction = Transaction::where('uuid', $request->external_id)->firstOrFail();
 
         if ($request->status == "PAID" || $request->status == "SETTLED") {

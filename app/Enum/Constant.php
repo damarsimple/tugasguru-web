@@ -4,6 +4,9 @@ namespace App\Enum;
 
 class Constant
 {
+
+    public const XENDIT_TEST_EXTERNAL_UUID = 'invoice_123124123';
+
     public const THUMBNAIL = "THUMBNAIL";
 
     public const VIDEO = "VIDEO";
