@@ -634,6 +634,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
         $transaction->transactionable_type = $subscription::class;
 
         $transaction->description = 'Pembelian ' . $subscription->name . ' sebesar ' . $transaction->amount;
+        $transaction->uuid = Str::uuid();
 
         switch ($request->payment_method) {
             case 'XENDIT':
@@ -709,6 +710,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'payments'], functio
         $transaction->description = 'Pembayarn ' . $wave->name . ' sebesar ' . $transaction->amount;
 
         $transaction->staging_url = null;
+        $transaction->uuid = Str::uuid();
 
         switch ($request->payment_method) {
             case 'XENDIT':
@@ -827,6 +829,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             $transaction->description = 'Pembayaran Guru Bimbel ' . $teacher->name . ' sebesar ' . $transaction->amount;
 
             $transaction->staging_url = null;
+            $transaction->uuid = Str::uuid();
 
             switch ('XENDIT') {
                 case 'XENDIT':

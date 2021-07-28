@@ -23,10 +23,6 @@ class TransactionObserver
     public function created(Transaction $transaction)
     {
 
-        $transaction->uuid = Str::uuid();
-
-        $transaction->saveQuietly();
-
         if (
             $transaction->payment_method == Transaction::BALANCE &&
             $transaction->is_paid &&
