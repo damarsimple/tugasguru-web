@@ -64,7 +64,10 @@ class TransactionObserver
 
         $adminTransaction = new Transaction();
 
+        $adminTransaction->uuid = Str::uuid();
+
         $adminTransaction->from = $admin->balance;
+
         $adminTransaction->to = $admin->balance + $transaction->amount;
 
         $adminTransaction->payment_method  = Transaction::BALANCE;
@@ -80,7 +83,7 @@ class TransactionObserver
 
         $adminTransaction->status = Transaction::SUCCESS;
 
-        $admin->transactions()->save($transaction);
+        $admin->transactions()->save($adminTransaction);
     }
 
 

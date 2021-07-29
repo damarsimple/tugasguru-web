@@ -22,9 +22,9 @@ class CreateTransactionsTable extends Migration
                 ->index()
                 ->constrained()
                 ->onDelete("cascade");
-            $table->unsignedBigInteger("from")->default(0);
-            $table->unsignedBigInteger("to")->default(0);
-            $table->unsignedBigInteger("amount");
+            $table->unsignedDouble("from")->default(0);
+            $table->unsignedDouble("to")->default(0);
+            $table->unsignedDouble("amount");
             $table
                 ->foreignId("voucher_id")
                 ->nullable()

@@ -137,18 +137,21 @@ type Article {
     visibility: Visibility
     school: School
     price: Price
-    thumbnail: Attachment @morphOne
+
     subjects: [Subject!]! @belongsToMany
     classtypes: [Classtype!]! @belongsToMany
     meetings: [Meeting!]! @hasMany
 
     morphable: String!
+
+    thumbnail: Attachment @morphOne
     likes: [Like!]!
         @orderBy(column: "created_at", direction: DESC)
         @morphMany(type: CONNECTION)
     comments: [Comment!]!
         @orderBy(column: "created_at", direction: DESC)
         @morphMany(type: CONNECTION)
+    attachments: Attachment @morphMany
 
     likeCount: Int! @count(relation: "likes")
     commentCount: Int! @count(relation: "comments")
@@ -970,6 +973,17 @@ type Course {
     subject: Subject! @belongsTo
     user: User! @belongsTo
     videos: [Video!]! @hasMany
+
+    videoCount: Int! @count(model: "Video")
+
+    thumbnail: Attachment @morphOne
+    likes: [Like!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @morphMany(type: CONNECTION)
+    comments: [Comment!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @morphMany(type: CONNECTION)
+    attachments: Attachment @morphMany
 }
 
 type Video {
@@ -981,4 +995,13 @@ type Video {
     description: String
     duration: Int!
     course: Course! @belongsTo
+
+    thumbnail: Attachment @morphOne
+    likes: [Like!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @morphMany(type: CONNECTION)
+    comments: [Comment!]!
+        @orderBy(column: "created_at", direction: DESC)
+        @morphMany(type: CONNECTION)
+    attachments: Attachment @morphMany
 }

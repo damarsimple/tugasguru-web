@@ -472,11 +472,12 @@ export interface Article {
   visibility: Maybe<Visibility>;
   school: Maybe<School>;
   price: Maybe<Price>;
-  thumbnail: Maybe<Attachment>;
   subjects: Subject[];
   classtypes: Classtype[];
   meetings: Meeting[];
   morphable: string;
+  thumbnail: Maybe<Attachment>;
+  attachments: Maybe<Attachment>;
   likeCount: number;
   commentCount: number;
   likes: Maybe<LikeConnection>;
@@ -1570,6 +1571,7 @@ export interface Booking {
   teacher: User;
   status: Maybe<BookingStatus>;
   reason: Maybe<string>;
+  address: Maybe<string>;
   is_approved: boolean;
   start_at: string;
 }
@@ -1816,6 +1818,11 @@ export interface Course {
   subject: Subject;
   user: User;
   videos: Video[];
+  videoCount: number;
+  thumbnail: Maybe<Attachment>;
+  attachments: Maybe<Attachment>;
+  likes: Maybe<LikeConnection>;
+  comments: Maybe<CommentConnection>;
 }
 
 export interface Video {
@@ -1826,6 +1833,10 @@ export interface Video {
   description: Maybe<string>;
   duration: number;
   course: Course;
+  thumbnail: Maybe<Attachment>;
+  attachments: Maybe<Attachment>;
+  likes: Maybe<LikeConnection>;
+  comments: Maybe<CommentConnection>;
 }
 
 export type Agendaable = Meeting | Exam;
@@ -2058,7 +2069,7 @@ export interface usersArgs {
   roles?: Roles;
   nisn?: string;
   is_bimbel?: boolean;
-  subjects?: string[];
+  subject_id?: string;
   /** Limits number of fetched elements.*/
   first: number;
   /** A cursor after which elements are returned.*/

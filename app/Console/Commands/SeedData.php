@@ -1080,15 +1080,17 @@ class SeedData extends Command
             $booking->status = Booking::MENUNGGU;
             $booking->save();
 
+            $subjects = Subject::all();
 
-            for ($i = 0, $rand = rand(1, 10); $i < $rand; $i++) {
+            for ($i = 0, $rand = rand(5, 20); $i < $rand; $i++) {
 
                 $course = new Course();
                 $course->name = "Cara Bermain PUBG Dengan Baik dan benar " . $i;
                 $course->user_id = $teacher->id;
-                $course->subject_id = $subject->id;
-                $course->classtype_id = $classtype->id;
-                $course->is_paid = $i < 7;
+                $course->subject_id = rand(1, $subjects->count());
+                $course->classtype_id = rand(1, 12);
+                $course->is_paid = rand(1, 2) % 2 == 0;
+
                 $course->save();
 
 
@@ -1105,9 +1107,9 @@ class SeedData extends Command
                     "Siap Abang Jago"
                 ];
 
-                for ($j = 0, $rand = rand(1, 15); $j < $rand; $j++) {
+                for ($j = 0, $randInside = rand(1, 15); $j < $randInside; $j++) {
                     $video = new Video();
-                    $video->name = $videosName[$j] ?? "Cara Proning";
+                    $video->name = $videosName[$j] ?? "Cara Proning " . $j + 1;
                     $video->course_id = $course->id;
                     $video->duration = rand(1, rand(1, 10) * 60) + rand(1, 100);
 
