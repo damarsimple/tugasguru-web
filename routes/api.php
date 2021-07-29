@@ -33,6 +33,7 @@ use App\Models\Classroom;
 use App\Models\Classtype;
 use App\Models\Comment;
 use App\Models\Consultation;
+use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Examresult;
 use App\Models\Examsession;
@@ -63,6 +64,7 @@ use App\Models\StudentPpdb;
 use App\Models\Subject;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Video;
 use App\Models\Voucher;
 use App\Models\Wave;
 use App\Notifications\QuizInvite;
@@ -437,9 +439,72 @@ Route::group(['prefix' => 'guardians', 'middleware' => [EnsureGuardian::class, E
         }
     );
 });
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'courses'], function () {
+    Route::post('/', function (Request $request) {
+        $user = $request->user();
+
+        if ($user->is_admin) {
+            $course = new Course();
+            $course->subject_id = $request->subject;
+            $course->classtype_id = $request->classtype;
+
+            $course->name = $request->name;
+            $course->description = $request->description;
+
+
+            if ($request->as_id) {
+                $user = User::findOrFail($request->as_id);
+            }
+
+            $user->courses()->save($course);
+
+
+            foreach ($request->videos as $videoData) {
+                $video = new Video();
+
+                $video->description = $videoData['description'] ?? "";
+
+                $video->name = $videoData['name'];
+
+                $course->videos()->save($video);
+
+                $attachment = Attachment::findOrFail($videoData['file']['id']);
+
+                $attachment->role = Constant::VIDEO;
+
+                $attachment->attachable_id = $video->id;
+
+                $attachment->attachable_type = $video::class;
+
+                $attachment->save();
+            }
+
+
+            if ($request->attachment) {
+                $attachment = Attachment::findOrFail($request->attachment);
+                $attachment->role = Constant::THUMBNAIL;
+                $attachment->save();
+                $course->thumbnail()->save($attachment);
+            }
+        } else {
+            $form = new Form();
+
+            $form->type = $request->type;
+
+            $form->data = $request->toArray();
+
+            $user->forms()->save($form);
+        }
+        return ['message' => 'ok'];
+    });
+    Route::get('/', function () {
+        return Quiz::latest()->paginate(10);
+    });
+});
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function () {
     Route::post('/', function (Request $request) {
+
         $quiz = new Quiz();
         $quiz->subject_id = $request->subject;
 

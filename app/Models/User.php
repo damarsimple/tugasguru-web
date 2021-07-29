@@ -235,7 +235,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function packagequestions(): HasMany
     {
-        return $this->hasMany('App\Models\Packagequestion');
+        return $this->hasMany('App\Models\ Packagequestion');
     }
 
     public function questions(): HasMany
@@ -364,6 +364,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function mybookings(): HasMany
     {
         return $this->hasMany('App\Models\Booking', foreignKey: 'teacher_id');
+    }
+
+
+    public function courses(): HasMany
+    {
+        return $this->hasMany('App\Models\Course');
+    }
+    public function videos(): HasMany
+    {
+        return $this->hasMany('App\Models\Video');
     }
 
     public function bimbels($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QBuilder|EBuilder
