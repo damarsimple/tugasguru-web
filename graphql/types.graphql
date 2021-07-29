@@ -997,6 +997,8 @@ type Video {
     course: Course! @belongsTo
 
     thumbnail: Attachment @morphOne
+    file: Attachment @morphOne
+
     likes: [Like!]!
         @orderBy(column: "created_at", direction: DESC)
         @morphMany(type: CONNECTION)

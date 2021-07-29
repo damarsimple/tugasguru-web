@@ -100,4 +100,6 @@ type Query {
         classtype_id: ID @where(operator: "=")
         name: String @where(operator: "like")
     ): [Course!]! @paginate(type: CONNECTION)
+
+    course(id: ID! @eq): Course! @find @can(ability: "view", find: "id")
 }

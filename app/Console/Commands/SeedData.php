@@ -1107,7 +1107,7 @@ class SeedData extends Command
                     "Siap Abang Jago"
                 ];
 
-                for ($j = 0, $randInside = rand(1, 15); $j < $randInside; $j++) {
+                for ($j = 0, $randInside = rand(5, 15); $j < $randInside; $j++) {
                     $video = new Video();
                     $video->name = $videosName[$j] ?? "Cara Proning " . $j + 1;
                     $video->course_id = $course->id;
