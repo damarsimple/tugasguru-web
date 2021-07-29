@@ -164,27 +164,38 @@ class SeedData extends Command
             $districtMap[$district->name] = $district->id;
         }
 
-        $subjectsData = [
-            "Pendidikan Agama",
-            "Pendidikan Kewarganegaraan",
-            "Bahasa Indonesia",
-            "Matematika",
-            "Ilmu Pengetahuan Alam",
-            "Ilmu Pengetahuan Sosial",
-            "Bahasa Inggris",
-            "Seni Budaya",
-            "Pendidikan Jasmani",
-            "Prakarya",
+        $subjectsMap = [
+            "GENERAL" => [
+                "Pendidikan Agama",
+                "Pendidikan Kewarganegaraan",
+                "Bahasa Indonesia",
+                "Matematika",
+                "Ilmu Pengetahuan Alam",
+                "Ilmu Pengetahuan Sosial",
+                "Bahasa Inggris",
+                "Seni Budaya",
+                "Pendidikan Jasmani",
+                "Prakarya",
+            ],
+            "LOCAL_CONTENT" => [
+                "Bahasa Sunda",
+                "Bahasa Jawa",
+            ],
+            "SPECIAL_DEVELOPMENT" => [
+                "Public Speaking",
+            ],
         ];
 
         // $faker = new Factory();
 
-        foreach ($subjectsData as $subjectdata) {
-            $subject = new Subject();
+        foreach ($subjectsMap as $type => $subjects) {
+            foreach ($subjects as $subject) {
+                $subject = new Subject();
 
-            $subject->name = $subjectdata;
-
-            $subject->save();
+                $subject->name = $subject;
+                $subject->type = $type;
+                $subject->save();
+            }
         }
 
         $subjectsIds = Subject::all()->map(fn ($e) => $e->id);
