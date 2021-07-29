@@ -974,7 +974,7 @@ type Course {
     user: User! @belongsTo
     videos: [Video!]! @hasMany
 
-    videoCount: Int! @count(model: "Video")
+    videoCount: Int! @count(relation: "videos")
 
     thumbnail: Attachment @morphOne
     likes: [Like!]!
