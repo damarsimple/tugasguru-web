@@ -189,10 +189,10 @@ class SeedData extends Command
         // $faker = new Factory();
 
         foreach ($subjectsMap as $type => $subjects) {
-            foreach ($subjects as $subject) {
+            foreach ($subjects as $subjectName) {
                 $subject = new Subject();
 
-                $subject->name = $subject;
+                $subject->name = $subjectName;
                 $subject->type = $type;
                 $subject->save();
             }
