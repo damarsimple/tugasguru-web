@@ -18,6 +18,7 @@ use App\Http\Middleware\EnsureGuardian;
 use App\Http\Middleware\EnsureGuardianPaid;
 use App\Http\Middleware\EnsureStudentPPDB;
 use App\Jobs\FormApproveTest;
+use App\Misc\AppConfig;
 use App\Models\Absent;
 use App\Models\Access;
 use App\Models\Agenda;
@@ -257,6 +258,20 @@ Route::group(['middleware' => ['auth:sanctum', EnsureAdmin::class], 'prefix' => 
 
         $form->save();
     });
+    Route::put('/config/{key}', function (Request $request, $key) {
+        $appConfig = new AppConfig;
+
+        $appConfig->set($key, $request->value);
+
+        return 'OK';
+    });
+
+    Route::get('/config/{key}', function (Request $request, $key) {
+        $appConfig = new AppConfig;
+
+        return $appConfig->get($key);
+    });
+
     Route::group(['prefix' => 'schools'], function () {
         Route::post('/', function (Request $request) {
             $school = new School();
@@ -880,13 +895,17 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
             $booking->teacher_id = $request->teacher;
             $booking->start_at = Carbon::parse($request->start);
+            $booking->finish_at = Carbon::parse($request->finish);
             $booking->address = $request->address;
+            $booking->notes = $request->notes;
             $booking->status = Booking::MENUNGGU;
             $user->bookings()->save($booking);
 
             $transaction = new Transaction();
 
-            $transaction->amount = 50000;
+            $daysDiff = $booking->finish_at->diffInDays($booking->start_at);
+
+            $transaction->amount = $daysDiff == 0 ? 1 : $daysDiff * (new AppConfig)->get(Constant::BOOKING_BIMBEL_BASE_PRICE);
 
             $transaction->from = $user->balance;
             $transaction->to = $user->balance;

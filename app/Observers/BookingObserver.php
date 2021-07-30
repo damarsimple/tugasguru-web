@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Booking;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Support\Str;
 
 class BookingObserver
@@ -29,11 +30,48 @@ class BookingObserver
     {
         if ($booking->status == Booking::SELESAI) {
 
+            $transaction = $booking->transactions()->first()->transaction; // admin transaction
+
+            $admin = User::where('is_admin', true)->first();
+
+            if (!$admin) return;
+
+            $adminTransaction = new Transaction();
+
+            $adminTransaction->uuid = Str::uuid();
+
+            $adminTransaction->from = $admin->balance;
+
+            $adminTransaction->to = $admin->balance - $transaction->amount;
+
+            $adminTransaction->payment_method  = Transaction::BALANCE;
+
+            $adminTransaction->transaction_id = $transaction->id;
+
+            $adminTransaction->transactionable_id = $transaction->transactionable_id;
+
+            $adminTransaction->transactionable_type = $transaction->transactionable_type;
+
+            $adminTransaction->amount = $transaction->amount;
+
+            $adminTransaction->description =
+                $transaction->description;
+
+            $adminTransaction->is_paid = true;
+
+            $adminTransaction->status = Transaction::SUCCESS;
+
+            $admin->transactions()->save($adminTransaction);
+
+            $teacher = $booking->teacher;
+
             $transaction = new Transaction();
 
-            $transaction->amount = 50000;
+            $transaction->amount = $booking->amount;
 
             $transaction->payment_method = 'BALANCE';
+
+            $transaction->transaction_id = $adminTransaction->id;
 
             $transaction->transactionable_id = $booking->id;
             $transaction->transactionable_type = $booking::class;
@@ -41,16 +79,20 @@ class BookingObserver
 
             $transaction->staging_url = null;
 
+            $adminTransaction->from = $teacher->balance;
+
+            $adminTransaction->to = $teacher->balance + $transaction->amount;
+
             $transaction->is_paid = true;
+
             $transaction->status = Transaction::SUCCESS;
 
-            $booking->teacher()->transactions()->save($transaction);
+            $teacher->transactions()->save($transaction);
 
-            $user  = $booking->teacher;
 
-            $user->balance += $transaction->amount;
+            $teacher->balance += $transaction->amount;
 
-            $user->save();
+            $teacher->save();
         }
     }
 

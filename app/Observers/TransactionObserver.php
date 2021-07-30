@@ -74,6 +74,10 @@ class TransactionObserver
 
         $adminTransaction->transaction_id = $transaction->id;
 
+        $adminTransaction->transactionable_id = $transaction->transactionable_id;
+
+        $adminTransaction->transactionable_type = $transaction->transactionable_type;
+
         $adminTransaction->amount = $transaction->amount;
 
         $adminTransaction->description =
@@ -110,7 +114,11 @@ class TransactionObserver
                 $this->payAdmin($transaction);
 
                 break;
-
+            case "App\Models\Booking":
+                if ($transaction->transactionable->user_id == $transaction->user_id) {
+                    $this->payAdmin($transaction);
+                }
+                break;
             default:
                 break;
         }

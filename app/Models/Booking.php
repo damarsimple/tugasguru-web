@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Trait\Transactionable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Booking extends Model
 {
-    use HasFactory;
+    use HasFactory, Transactionable;
 
     public const SEDANG_BERJALAN = 'SEDANG_BERJALAN';
     public const DITOLAK = 'DITOLAK';
@@ -16,6 +17,10 @@ class Booking extends Model
     public const DIPERJALANAN = 'DIPERJALANAN';
     public const MENUNGGU = 'MENUNGGU';
 
+    protected $casts = [
+        'start_at' => 'datetime',
+        'finish_at' => 'datetime',
+    ];
 
 
     public function user(): BelongsTo

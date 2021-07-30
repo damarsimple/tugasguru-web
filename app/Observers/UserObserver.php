@@ -15,7 +15,8 @@ class UserObserver
     public function created(User $user)
     {
         $user->metadata = [
-            'video_access_limit' => 0
+            'video_access_limit' => 0,
+            'rejection_times' => 0,
         ];
         $user->access = [];
         $user->saveQuietly();

@@ -108,6 +108,8 @@ type Booking {
     address: String
     is_approved: Boolean!
     start_at: String!
+    finish_at: String!
+    notes: String
 }
 
 enum BookingStatus {
