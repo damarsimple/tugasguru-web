@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Attachment;
 use App\Models\Booking;
 use App\Models\User;
+use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use Illuminate\Console\Command;
 
 class TestCommand extends Command
@@ -49,11 +51,22 @@ class TestCommand extends Command
 
         // $booking->save();
 
-        $users = User::whereHas('subjects', function ($q) {
-            return $q->where('subjects.id', 1);
-        });
+        // $users = User::whereHas('subjects', function ($q) {
+        //     return $q->where('subjects.id', 1);
+        // });
 
-        dd($users->get()->count());
+        // dd($users->get()->count());
+
+        $attachments = Attachment::all();
+
+        $attachment = $attachments->last();
+
+
+
+        $media =   FFMpeg::open($attachment->path);
+
+        print($media->getDurationInSeconds() . PHP_EOL);
+
 
         return 0;
     }

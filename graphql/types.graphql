@@ -698,6 +698,7 @@ enum FormType {
     REQUEST_ADMIN_SCHOOL @enum(value: "REQUEST_ADMIN_SCHOOL")
     REQUEST_HOMEROOM @enum(value: "REQUEST_HOMEROOM")
     REQUEST_STUDENT_PPDB @enum(value: "REQUEST_STUDENT_PPDB")
+    COURSE_CREATE_REQUEST @enum(value: "COURSE_CREATE_REQUEST")
 }
 
 type FormData {

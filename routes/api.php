@@ -247,7 +247,7 @@ Route::middleware('auth:sanctum')->get("/agenda/{uuid}", function (Request $requ
 });
 
 
-Route::group(['middleware' => [EnsureAdmin::class], 'prefix' => 'admins'], function () {
+Route::group(['middleware' => ['auth:sanctum', EnsureAdmin::class], 'prefix' => 'admins'], function () {
     Route::put('/forms/{id}', function (Request $request, $id) {
         $form = Form::findOrFail($id);
 

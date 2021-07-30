@@ -2,9 +2,13 @@
 
 namespace App\Observers;
 
+use App\Enum\Constant;
+use App\Models\Attachment;
+use App\Models\Course;
 use App\Models\Form;
 use App\Models\School;
 use App\Models\Subject;
+use App\Models\Video;
 use App\Notifications\FormApproved;
 use App\Notifications\FormProcessed;
 use App\Notifications\FormRejected;
@@ -83,6 +87,37 @@ class FormObserver
                 $subject->type = $form->data->type;
 
                 $subject->save();
+                break;
+            case Form::COURSE_CREATE_REQUEST:
+                $data = $form->data;
+                $course = new Course();
+                $course->subject_id = $data->subject;
+                $course->classtype_id = $data->classtype;
+
+                $course->name = $data->name;
+                $course->description = $data->description;
+
+                $form->user->courses()->save($course);
+
+                foreach ($data->videos as $videoData) {
+                    $video = new Video();
+
+                    $video->description = $videoData->description ?? "";
+
+                    $video->name = $videoData->name;
+
+                    $course->videos()->save($video);
+
+                    $attachment = Attachment::findOrFail($videoData->file->id);
+
+                    $attachment->role = Constant::VIDEO;
+
+                    $attachment->attachable_id = $video->id;
+
+                    $attachment->attachable_type = $video::class;
+
+                    $attachment->save();
+                }
                 break;
         }
     }

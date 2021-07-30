@@ -235,7 +235,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function packagequestions(): HasMany
     {
-        return $this->hasMany('App\Models\ Packagequestion');
+        return $this->hasMany('App\Models\Packagequestion');
     }
 
     public function questions(): HasMany
