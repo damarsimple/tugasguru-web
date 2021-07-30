@@ -20,6 +20,7 @@ use App\Models\StudentPpdb;
 use App\Models\Subject;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Video;
 use App\Observers\ArticleObserver;
 use App\Observers\AssigmentObserver;
 use App\Observers\AttachmentObserver;
@@ -38,6 +39,7 @@ use App\Observers\StudentPpdbObserver;
 use App\Observers\SubjectObserver;
 use App\Observers\TransactionObserver;
 use App\Observers\UserObserver;
+use App\Observers\VideoObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -79,5 +81,6 @@ class EventServiceProvider extends ServiceProvider
         Subject::observe(SubjectObserver::class);
         Autosave::observe(AutosaveObserver::class);
         Booking::observe(BookingObserver::class);
+        Video::observe(VideoObserver::class);
     }
 }
