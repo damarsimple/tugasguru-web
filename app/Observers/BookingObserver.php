@@ -2,9 +2,12 @@
 
 namespace App\Observers;
 
+use App\Models\Agenda;
+use App\Models\Attendance;
 use App\Models\Booking;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Str;
 
 class BookingObserver
@@ -17,7 +20,22 @@ class BookingObserver
      */
     public function created(Booking $booking)
     {
-        //
+        $agenda = new Agenda();
+
+        $agenda->agendaable_id = $booking->id;
+        $agenda->agendaable_type = Booking::class;
+        $agenda->user_id = $booking->user_id;
+        $agenda->name = "Absensi Bimbingan Belajar " . $booking->teacher->name;
+        $agenda->save();
+
+        foreach (CarbonPeriod::create($booking->start_at, $booking->finish_at) as $date) {
+            Attendance::firstOrCreate([
+                "name" => "Absensi Bimbel Tanggal  " . $date->format('d-m'),
+                "user_id" => $booking->teacher_id,
+                "agenda_id" => $agenda->id,
+                "created_at" => $date
+            ]);
+        }
     }
 
     /**

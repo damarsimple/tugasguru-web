@@ -1076,7 +1076,7 @@ class SeedData extends Command
             $booking->user_id = 3;
             $booking->teacher_id = 1;
             $booking->start_at = now()->addDay(1);
-            $booking->start_at = now()->addDay(4);
+            $booking->finish_at = now()->addDay(4);
             $booking->address = "JL. Any";
             $booking->status = Booking::MENUNGGU;
             $booking->save();

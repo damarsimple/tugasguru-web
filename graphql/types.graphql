@@ -110,6 +110,7 @@ type Booking {
     start_at: String!
     finish_at: String!
     notes: String
+    agenda: Agenda @morphOne
 }
 
 enum BookingStatus {
@@ -190,7 +191,7 @@ type Attachment {
     attachable: Attachable @morphTo
 }
 
-union Agendaable = Meeting | Exam
+union Agendaable = Meeting | Exam | Booking
 
 type Agenda {
     id: ID!

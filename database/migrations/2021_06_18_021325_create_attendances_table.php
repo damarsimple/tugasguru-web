@@ -11,6 +11,7 @@ class CreateAttendancesTable extends Migration
         Schema::create("attendances", function (Blueprint $table) {
             $table->id();
             $table->uuid("uuid")->nullable();
+            $table->string("name")->nullable();
             $table
                 ->foreignId("user_id")
                 ->index()

@@ -6,6 +6,7 @@ use App\Trait\Transactionable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Booking extends Model
 {
@@ -33,5 +34,10 @@ class Booking extends Model
     public function teacher(): BelongsTo
     {
         return $this->belongsTo('App\Models\User', foreignKey: 'teacher_id');
+    }
+
+    public function agenda(): MorphOne
+    {
+        return $this->morphOne("App\Models\Agenda", "agendaable");
     }
 }
