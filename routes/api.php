@@ -903,9 +903,14 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
 
             $transaction = new Transaction();
 
-            $daysDiff = $booking->finish_at->diffInDays($booking->start_at);
+            $daysDiff = $booking->start_at->diffInDays($booking->finish_at);
+            $basePrice =  (new AppConfig)->get(Constant::BOOKING_BIMBEL_BASE_PRICE);
 
-            $transaction->amount = $daysDiff == 0 ? 1 : $daysDiff * (new AppConfig)->get(Constant::BOOKING_BIMBEL_BASE_PRICE);
+            $transaction->amount = ($daysDiff == 0 ? 1 : $daysDiff) * $basePrice;
+
+            if ($transaction->amount == 1) {
+                $transaction->amount = $basePrice;
+            }
 
             $transaction->from = $user->balance;
             $transaction->to = $user->balance;

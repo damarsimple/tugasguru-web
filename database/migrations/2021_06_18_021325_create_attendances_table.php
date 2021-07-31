@@ -32,6 +32,7 @@ class CreateAttendancesTable extends Migration
             $table->boolean("attended")->default(false);
             $table->string("reason")->nullable();
             $table->timestamps();
+            $table->timestamp('date')->nullable();
         });
     }
 

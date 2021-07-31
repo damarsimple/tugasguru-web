@@ -33,7 +33,7 @@ class BookingObserver
                 "name" => "Absensi Bimbel Tanggal  " . $date->format('d-m'),
                 "user_id" => $booking->teacher_id,
                 "agenda_id" => $agenda->id,
-                "created_at" => $date
+                "date" => $date
             ]);
         }
     }
