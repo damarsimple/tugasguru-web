@@ -966,7 +966,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
         });
         Route::put('{id}', function (Request $request, $id) {
             $booking = Booking::findOrFail($id);
-            $booking->is_approved = $request->approved;
+
+            $booking->is_approved = $request->is_approved;
             $booking->save();
 
             return ['message' => 'ok'];

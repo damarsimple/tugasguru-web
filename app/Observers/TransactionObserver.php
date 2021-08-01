@@ -81,7 +81,7 @@ class TransactionObserver
         $adminTransaction->amount = $transaction->amount;
 
         $adminTransaction->description =
-            $transaction->description;
+            $transaction->description . " Kepada Admin";
 
         $adminTransaction->is_paid = true;
 
