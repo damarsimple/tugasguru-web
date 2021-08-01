@@ -91,6 +91,9 @@ class BookingObserver
 
             $transaction->amount = $baseAdminTransaction->amount;
 
+
+            $transaction->uuid = Str::uuid();
+
             $transaction->payment_method = 'BALANCE';
 
             $transaction->transaction_id = $adminTransaction->id;
