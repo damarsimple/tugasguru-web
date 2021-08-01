@@ -48,7 +48,7 @@ class BookingObserver
     {
         if ($booking->status == Booking::SELESAI) {
 
-            $transaction = $booking->transactions()
+            $baseAdminTransaction = $booking->transactions()
                 ->whereNotNull('transaction_id')
                 ->whereHas('user', function ($e) {
                     return $e->where('is_admin', true);
@@ -64,20 +64,20 @@ class BookingObserver
 
             $adminTransaction->from = $admin->balance;
 
-            $adminTransaction->to = $admin->balance - $transaction->amount;
+            $adminTransaction->to = $admin->balance - $baseAdminTransaction->amount;
 
             $adminTransaction->payment_method  = Transaction::BALANCE;
 
-            $adminTransaction->transaction_id = $transaction->id;
+            $adminTransaction->transaction_id = $baseAdminTransaction->id;
 
-            $adminTransaction->transactionable_id = $transaction->transactionable_id;
+            $adminTransaction->transactionable_id = $baseAdminTransaction->transactionable_id;
 
-            $adminTransaction->transactionable_type = $transaction->transactionable_type;
+            $adminTransaction->transactionable_type = $baseAdminTransaction->transactionable_type;
 
-            $adminTransaction->amount = $transaction->amount;
+            $adminTransaction->amount = $baseAdminTransaction->amount;
 
             $adminTransaction->description =
-                $transaction->description;
+                str_replace('Kepada Admin', 'Kepada Guru', $baseAdminTransaction->description);
 
             $adminTransaction->is_paid = true;
 
@@ -89,7 +89,7 @@ class BookingObserver
 
             $transaction = new Transaction();
 
-            $transaction->amount = $booking->amount;
+            $transaction->amount = $baseAdminTransaction->amount;
 
             $transaction->payment_method = 'BALANCE';
 
