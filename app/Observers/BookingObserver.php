@@ -101,7 +101,7 @@ class BookingObserver
 
             $transaction->transactionable_id = $booking->id;
             $transaction->transactionable_type = $booking::class;
-            $transaction->description = 'Pembayaran Bimbel dari' . $booking->user->name . ' sebesar ' . $transaction->amount;
+            $transaction->description = 'Pembayaran Bimbel dari admin Tugasguru' . $admin->name . ' sebesar ' . $transaction->amount  . " untuk bimbel " . $booking->user->name;
 
             $transaction->staging_url = null;
 
