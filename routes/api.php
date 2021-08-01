@@ -968,6 +968,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             $booking = Booking::findOrFail($id);
 
             $booking->is_approved = $request->is_approved;
+
             $booking->save();
 
             return ['message' => 'ok'];
@@ -1948,7 +1949,8 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
     Route::group(['prefix' => 'bookings'], function () {
         Route::put('{id}', function (Request $request, $id) {
             $booking = Booking::findOrFail($id);
-            if ($booking->is_approved) {
+
+            if ($booking->is_approved || $booking->status == Booking::SELESAI) {
                 $booking->status = $request->status;
                 $booking->save();
 
