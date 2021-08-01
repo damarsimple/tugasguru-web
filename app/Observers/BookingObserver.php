@@ -82,8 +82,9 @@ class BookingObserver
             $adminTransaction->is_paid = true;
 
             $adminTransaction->status = Transaction::SUCCESS;
+            $adminTransaction->user_id = $admin->id;
 
-            $admin->transactions()->save($adminTransaction);
+            $adminTransaction->saveQuietly();
 
             $teacher = $booking->teacher;
 
@@ -112,8 +113,9 @@ class BookingObserver
 
             $transaction->status = Transaction::SUCCESS;
 
-            $teacher->transactions()->save($transaction);
+            $transaction->user_id = Transaction::SUCCESS;
 
+            $transaction->saveQuietly();
 
             $teacher->balance += $transaction->amount;
 
