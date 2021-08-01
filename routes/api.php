@@ -899,6 +899,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             $booking->address = $request->address;
             $booking->notes = $request->notes;
             $booking->status = Booking::MENUNGGU;
+
             $user->bookings()->save($booking);
 
             $transaction = new Transaction();
