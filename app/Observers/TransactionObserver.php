@@ -87,7 +87,9 @@ class TransactionObserver
 
         $adminTransaction->status = Transaction::SUCCESS;
 
-        $admin->transactions()->save($adminTransaction);
+        $adminTransaction->user_id = $admin->id;
+
+        $adminTransaction->saveQuietly();
     }
 
 
