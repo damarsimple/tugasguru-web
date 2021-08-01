@@ -14,10 +14,11 @@ class Attendance extends Model
     protected $fillable = [
         "user_id",
         "school_id",
-        "agenda_id"
+        "agenda_id",
+        "date"
     ];
 
-    protected $with = ["user","agenda"];
+    protected $with = ["user", "agenda"];
 
     public function user(): BelongsTo
     {
