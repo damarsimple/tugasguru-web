@@ -48,7 +48,11 @@ class BookingObserver
     {
         if ($booking->status == Booking::SELESAI) {
 
-            $transaction = $booking->transactions()->first()->transaction; // admin transaction
+            $transaction = $booking->transactions()
+                ->whereNotNull('transaction_id')
+                ->whereHas('user', function ($e) {
+                    return $e->where('is_admin', true);
+                })->first(); // admin transaction
 
             $admin = User::where('is_admin', true)->first();
 
