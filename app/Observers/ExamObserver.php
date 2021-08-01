@@ -35,7 +35,7 @@ class ExamObserver
         $agenda->agendaable_id = $exam->id;
         $agenda->agendaable_type = Exam::class;
         $agenda->user_id = $exam->user_id;
-        $agenda->name = "Absensi " . $exam->name;
+        $agenda->name = "Absensi " . $exam->name . "";
         $agenda->school_id = $exam->classroom->school_id;
         $agenda->save();
         foreach ($studentUserIds as $id) {

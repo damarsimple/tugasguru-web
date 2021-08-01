@@ -30,6 +30,7 @@ class CreateAttendancesTable extends Migration
                 ->constrained()
                 ->onDelete("cascade");
             $table->boolean("attended")->default(false);
+            $table->boolean("is_bimbel")->default(false);
             $table->string("reason")->nullable();
             $table->timestamps();
             $table->timestamp('date')->nullable();

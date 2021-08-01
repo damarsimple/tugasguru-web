@@ -14,4 +14,6 @@ class Constant
     public const GENERAL = "GENERAL";
 
     public const BOOKING_BIMBEL_BASE_PRICE = 'BOOKING_BIMBEL_BASE_PRICE';
+
+    public const BOOKING_ADMIN_FEE = 'BOOKING_ADMIN_FEE';
 }

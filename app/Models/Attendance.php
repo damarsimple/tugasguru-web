@@ -15,7 +15,8 @@ class Attendance extends Model
         "user_id",
         "school_id",
         "agenda_id",
-        "date"
+        "date",
+        "is_bimbel",
     ];
 
     protected $with = ["user", "agenda"];

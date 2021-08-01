@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enum\Ability;
 use App\Enum\Constant;
+use App\Misc\AppConfig;
 use App\Models\Absent;
 use App\Models\Agenda;
 use App\Models\Answer;
@@ -1073,11 +1074,14 @@ class SeedData extends Command
             }
 
             $booking = new Booking();
-            $booking->user_id = 3;
+            $booking->user_id = 1;
             $booking->teacher_id = 1;
             $booking->start_at = now()->addDay(1);
             $booking->finish_at = now()->addDay(4);
             $booking->address = "JL. Any";
+
+            $booking->rate =  (new AppConfig)->get(Constant::BOOKING_BIMBEL_BASE_PRICE);
+
             $booking->status = Booking::MENUNGGU;
             $booking->save();
 

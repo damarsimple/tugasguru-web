@@ -888,7 +888,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
     Route::group(['prefix' => 'bookings'], function () {
         Route::post('/', function (Request $request) {
             $user = $request->user();
-
+            $basePrice =  (new AppConfig)->get(Constant::BOOKING_BIMBEL_BASE_PRICE);
             $teacher = User::findOrFail($request->teacher);
 
             $booking = new Booking();
@@ -899,13 +899,14 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             $booking->address = $request->address;
             $booking->notes = $request->notes;
             $booking->status = Booking::MENUNGGU;
+            $booking->rate = $basePrice;
 
             $user->bookings()->save($booking);
 
             $transaction = new Transaction();
 
             $daysDiff = $booking->start_at->diffInDays($booking->finish_at);
-            $basePrice =  (new AppConfig)->get(Constant::BOOKING_BIMBEL_BASE_PRICE);
+
 
             $transaction->amount = ($daysDiff == 0 ? 1 : $daysDiff) * $basePrice;
 
