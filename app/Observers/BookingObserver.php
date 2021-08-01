@@ -113,7 +113,7 @@ class BookingObserver
 
             $transaction->status = Transaction::SUCCESS;
 
-            $transaction->user_id = Transaction::SUCCESS;
+            $transaction->user_id = $teacher->id;
 
             $transaction->saveQuietly();
 
