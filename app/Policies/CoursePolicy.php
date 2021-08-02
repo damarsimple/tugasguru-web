@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Enum\Ability;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -33,20 +32,16 @@ class CoursePolicy
      */
     public function view(User $user, Course $course)
     {
-        if ($user->is_admin) return true;
+        if ($user->is_admin || !$course->is_paid) return true;
 
-        if (!$course->is_paid) return true;
-
-        if (in_array(Ability::COURSE_PREMIUM, $user->access) || in_array(Ability::COURSE_PRO, $user->access) || $user->metadata['video_access_limit'] > 0) {
-
-            $cp = $user->metadata;
-
-            $cp['video_access_limit']--;
-
-            $user->metadata = $cp;
-
-            $user->save();
-
+        if (is_array($course->access)) {
+            foreach ($course->access as $access) {
+                if (!in_array($user->access, $access)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
             return true;
         }
 

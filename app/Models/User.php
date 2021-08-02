@@ -63,7 +63,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'hidden_attribute' => 'array',
         'access' => 'array',
-        'video_access_limit' => 'array',
         'identity' => 'array'
     ];
 

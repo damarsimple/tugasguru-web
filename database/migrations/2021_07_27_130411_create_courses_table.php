@@ -18,7 +18,9 @@ class CreateCoursesTable extends Migration
             $table->string('name');
             $table->longText('description')->nullable();
             $table->unsignedBigInteger('views')->default(0);
-            $table->boolean('is_paid')->default(false);
+
+            $table->json("access")->nullable();
+
             $table
                 ->foreignId("user_id")
                 ->constrained("users")

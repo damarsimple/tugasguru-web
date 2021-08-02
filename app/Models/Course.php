@@ -14,6 +14,14 @@ class Course extends Model
 {
     use HasFactory, Attachable, Sociable, Thumbnailable;
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'access' => 'array',
+    ];
     public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");

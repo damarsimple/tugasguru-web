@@ -1094,7 +1094,8 @@ class SeedData extends Command
                 $course->user_id = $teacher->id;
                 $course->subject_id = rand(1, $subjects->count());
                 $course->classtype_id = rand(1, 12);
-                $course->is_paid = rand(1, 2) % 2 == 0;
+
+                $course->access = rand(1, 2) % 2 == 0 ? [Ability::COURSE_PREMIUM, Ability::COURSE_PRO] : (rand(1, 2) == 1 ? [Ability::COURSE_PREMIUM] : null);
 
                 $course->save();
 

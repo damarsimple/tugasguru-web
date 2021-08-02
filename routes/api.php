@@ -171,6 +171,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
 
 Route::middleware('web')->get('auth/google/callback', function () {
+
     $data =  Socialite::driver('google')?->stateless()?->user();
 
     $user = User::where('email', $data?->email)->first();
@@ -255,6 +256,10 @@ Route::group(['middleware' => ['auth:sanctum', EnsureAdmin::class], 'prefix' => 
         $form->comment = $request->comment;
 
         $form->status = $request->status;
+
+        if ($request->data) {
+            $form->data = $request->data;
+        }
 
         $form->save();
     });

@@ -971,7 +971,7 @@ type Course {
     created_at: DateTime!
     updated_at: DateTime!
 
-    is_paid: Boolean!
+    access: [String]
     description: String
     views: Int!
     classtype: Classtype! @belongsTo
