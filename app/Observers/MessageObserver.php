@@ -4,6 +4,8 @@ namespace App\Observers;
 
 use App\Events\NewMessageEvent;
 use App\Events\NewPrivateMessageEvent;
+use App\Events\DeletePrivateMessageEvent;
+use App\Events\DeleteMessageEvent;
 use App\Models\Message;
 use App\Models\PrivateRoom;
 use App\Models\Room;
@@ -46,7 +48,13 @@ class MessageObserver
      */
     public function deleted(Message $message)
     {
-        //
+        if ($message->messageable_type == "App\Models\PrivateRoom") {
+            broadcast(new DeletePrivateMessageEvent($message));
+        }
+
+        if ($message->messageable_type == "App\Models\Room") {
+            broadcast(new DeleteMessageEvent($message));
+        }
     }
 
     /**
@@ -68,6 +76,12 @@ class MessageObserver
      */
     public function forceDeleted(Message $message)
     {
-        //
+        if ($message->messageable_type == "App\Models\PrivateRoom") {
+            broadcast(new DeletePrivateMessageEvent($message));
+        }
+
+        if ($message->messageable_type == "App\Models\Room") {
+            broadcast(new DeleteMessageEvent($message));
+        }
     }
 }

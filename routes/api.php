@@ -1032,6 +1032,19 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             return response($check, 200);
         });
     });
+    Route::group(['prefix' => 'messages'], function () {
+        Route::delete('/{id}', function (Request $request, $id) {
+            $message = Message::findOrFail($id);
+
+            if (!$request->user()->id == $message->user_id) {
+                return response('no', 401);
+            }
+
+            $message->delete();
+
+            return response('ok', 200);
+        });
+    });
     Route::group(['prefix' => 'attendances'], function () {
         Route::get('{id}', function (Request $request, $id) {
             return  $request->user()->attendances()->with('agenda')->findOrFail($id);
