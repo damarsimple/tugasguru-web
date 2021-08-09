@@ -95,9 +95,6 @@ class SeedData extends Command
         }
         foreach ($places as $place) {
             $provinceName = $place->nama;
-            if ($onTest && $provinceName !== "Kalimantan Timur") {
-                continue;
-            }
             $province = new Province();
 
             $province->name = $provinceName;
@@ -213,8 +210,6 @@ class SeedData extends Command
 
         $classTypeMap = [];
 
-        $XDCOUNT = 0;
-        $withoutExtra = $this->option('mail');
         foreach (glob(base_path() . "/data/schools/*.json") as $filename) {
             $schoolsData = file_get_contents($filename);
 
@@ -223,15 +218,9 @@ class SeedData extends Command
             // var_dump($schoolsData);
 
             foreach ($schoolsData as $key => $schools) {
-                if ($withoutExtra && $XDCOUNT < 100) {
-                    break;
-                }
-                foreach ($schools as $key => $school) {
-                    $XDCOUNT++;
 
-                    if ($withoutExtra && $XDCOUNT < 100) {
-                        break;
-                    }
+                foreach ($schools as $key => $school) {
+
                     // if (str_contains($school->sekolah, "SD")) {
                     //
                     // }
