@@ -2999,6 +2999,16 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                 'admins'
             )->findOrFail($id);
         });
+
+        Route::post('/join', function (Request $request) {
+            $teacher = $request->user();
+
+            $school = School::findOrFail($request->school);
+
+            $school->teachers()->syncWithoutDetaching($teacher->id);
+
+            return 'ok';
+        });
     });
 
     Route::group(['prefix' => 'classrooms'], function () {

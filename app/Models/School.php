@@ -18,10 +18,7 @@ class School extends Model
     public const COVER = 'COVER';
     public function teachers(): BelongsToMany
     {
-        return $this->belongsToMany("App\Models\User")->where(
-            "roles",
-            User::TEACHER
-        );
+        return $this->belongsToMany("App\Models\User");
     }
 
 
