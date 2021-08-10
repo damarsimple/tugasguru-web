@@ -51,7 +51,7 @@ class ApiAuthController extends Controller
             ]);
         } else {
             return response()->json([
-                'message' => 'The provided credentials do not match our records.',
+                'message' => 'Kredensial ini tidak ditemukan di catatan kami.',
             ]);
         }
     }
