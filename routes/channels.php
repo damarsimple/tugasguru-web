@@ -21,6 +21,14 @@ Broadcast::channel("App.Models.User.{id}", function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
+Broadcast::channel("user.email.verify.{id}", function ($user, $id) {
+    if ($user->id == $id) {
+        return $user;
+    }
+
+    return false;
+});
+
 Broadcast::channel("private.{id}", function ($user, $id) {
     if ($user->id == $id) {
         return $user;
