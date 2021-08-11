@@ -24,6 +24,9 @@ class Form extends Model
     public const REQUEST_STUDENT_PPDB = "REQUEST_STUDENT_PPDB";
     public const REQUEST_ADD_SUBJECT = "REQUEST_ADD_SUBJECT";
     public const COURSE_CREATE_REQUEST = 'COURSE_CREATE_REQUEST';
+    public const REPORT_QUIZ = 'REPORT_QUIZ';
+
+
 
     public const PENDING = 0;
     public const PROCESSED = 1;

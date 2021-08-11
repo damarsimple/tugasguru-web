@@ -890,6 +890,38 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
+    Route::group(['prefix' => 'forms'], function () {
+
+        Route::post('/', function (Request $request) {
+            $form = new Form();
+
+            $form->type = $request->type;
+
+            $form->data = $request->data;
+
+            $form->school_id = $request->school;
+
+            $user = $request->user();
+
+            $user->forms()->save($form);
+
+            if ($request->attachment) {
+                $attachment = Attachment::findOrFail($request->attachment);
+                $attachment->description = $request->description;
+                $attachment->role = $request->role;
+                $attachment->attachable_id = $form->id;
+                $attachment->attachable_type = Form::class;
+                $attachment->save();
+            }
+
+            // if (config('app.env') == 'local' || config('app.debug') == true) {
+            //     dispatch(new FormApproveTest($form));
+            // }
+
+            return ['message' => 'ok'];
+        });
+    });
+
     Route::group(['prefix' => 'bookings'], function () {
         Route::post('/', function (Request $request) {
             $user = $request->user();

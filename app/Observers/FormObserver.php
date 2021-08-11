@@ -6,6 +6,7 @@ use App\Enum\Constant;
 use App\Models\Attachment;
 use App\Models\Course;
 use App\Models\Form;
+use App\Models\Quiz;
 use App\Models\School;
 use App\Models\Subject;
 use App\Models\Video;
@@ -54,6 +55,13 @@ class FormObserver
         // business logic
 
         switch ($form->type) {
+            case Form::REPORT_QUIZ:
+                $user = $form->user;
+
+                $quiz = Quiz::findOrFail($form->data->quiz->id);
+
+                $quiz->delete();
+                break;
             case Form::REQUEST_COUNSELOR:
                 $user = $form->user;
                 $user->is_counselor = true;
