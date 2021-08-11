@@ -697,7 +697,7 @@ class SeedData extends Command
             $classroom->classtype_id = 1;
             $school->classrooms()->save($classroom);
 
-            // $classroom->students()->attach($studentIds);
+            $classroom->students()->attach($studentIds);
 
             $absent = new Absent();
 
@@ -966,6 +966,10 @@ class SeedData extends Command
 
                     foreach ($studentIds as $x) {
                         $user = User::find($x);
+
+                        if ($exam->id > 13) {
+                            continue;
+                        }
 
                         $examresult = new Examresult();
                         $examresult->examsession_id = $examsession->id;

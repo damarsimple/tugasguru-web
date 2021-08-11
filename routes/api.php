@@ -72,6 +72,7 @@ use App\Notifications\QuizInvite;
 use App\Payment\Xendit;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -890,6 +891,14 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
+    Route::post('/reverify', function (Request $request) {
+        try {
+            event(new Registered($request->user()));
+            return response('OK', 200);
+        } catch (\Throwable $th) {
+            return response('Mail Server sedang Overload !', 500);
+        }
+    });
     Route::group(['prefix' => 'forms'], function () {
 
         Route::post('/', function (Request $request) {
