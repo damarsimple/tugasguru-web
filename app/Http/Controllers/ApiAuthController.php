@@ -117,6 +117,12 @@ class ApiAuthController extends Controller
             "roles" => $input["roles"],
         ]);
 
+        // pad 0 to beginning in case of weird integer input
+
+        if (str_starts_with($user->phone, "8") || str_starts_with($user->phone, "2")) {
+            $user->phone = "0" . $user->phone;
+        }
+
         $user->save();
 
         switch ($user->roles) {
