@@ -1197,16 +1197,15 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
     Route::put('/', function (Request $request) {
         $user = $request->user();
 
-        $user->name = $request->name;
-        $user->gender = $request->gender;
-        $user->phone = $request->phone;
-        $user->email = $request->email;
+        $user->name = $request->name ?? $user->name;
+        $user->phone = $request->phone ?? $user->phone;
+        $user->email = $request->email ?? $user->email;
         $user->dob = Carbon::parse($request->dob);
-        $user->gender = $request->gender;
-        $user->address = $request->address;
 
-        $user->specialty = $request->specialty;
-        $user->academic_degree = $request->academic_degree;
+        $user->address = $request->address  ?? $user->address;
+
+        $user->specialty = $request->specialty ?? $user->specialty;
+        $user->academic_degree = $request->academic_degree ?? $user->academic_degree;
 
         if ($request->hidden_attribute) {
             $user->hidden_attribute = $request->hidden_attribute;
