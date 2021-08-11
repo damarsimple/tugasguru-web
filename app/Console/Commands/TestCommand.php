@@ -44,15 +44,15 @@ class TestCommand extends Command
         // $bookie = User::find(3);
         // $booker = User::find(1);
 
-        $booking = new Booking();
+        // $booking = new Booking();
 
-        $booking->user_id = 3;
-        $booking->teacher_id = 1;
-        $booking->start_at = now();
-        $booking->finish_at = now()->addDay(10);
+        // $booking->user_id = 3;
+        // $booking->teacher_id = 1;
+        // $booking->start_at = now();
+        // $booking->finish_at = now()->addDay(10);
 
 
-        $booking->save();
+        // $booking->save();
 
         // $users = User::whereHas('subjects', function ($q) {
         //     return $q->where('subjects.id', 1);
@@ -70,6 +70,14 @@ class TestCommand extends Command
 
         // print($media->getDurationInSeconds() . PHP_EOL);
 
+        foreach (User::all() as  $user) {
+            if (str_starts_with($user->phone, "8") || str_starts_with($user->phone, "2")) {
+                $user->phone = "0" . $user->phone;
+            }
+            $user->save();
+
+            print("replacing " . $user->name);
+        }
 
         return 0;
     }
