@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enum\Ability;
 use App\Enum\Constant;
+use App\Jobs\SendVerifyEmailJob;
 use App\Misc\AppConfig;
 use App\Models\Absent;
 use App\Models\Agenda;
@@ -601,7 +602,7 @@ class SeedData extends Command
 
             $teacher->save();
 
-            if ($this->option('mail'))   event(new Registered($teacher));
+            if ($this->option('mail')) SendVerifyEmailJob::dispatch($teacher->user());;
 
             $teacher->schools()->attach(1, ['is_administrator' => true, 'is_homeroom' => true, 'is_counselor' => true]);
 

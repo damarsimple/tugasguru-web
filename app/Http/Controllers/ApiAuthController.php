@@ -184,7 +184,7 @@ class ApiAuthController extends Controller
             }
         }
 
-        dispatch(new SendVerifyEmailJob($user));
+        SendVerifyEmailJob::dispatch($user);
 
         return response()->json([
             "user" => $user,

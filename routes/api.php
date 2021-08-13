@@ -894,8 +894,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
     Route::post('/reverify', function (Request $request) {
         try {
-
-            dispatch(new SendVerifyEmailJob($request->user()));
+            SendVerifyEmailJob::dispatch($request->user());
             return response('OK', 200);
         } catch (\Throwable $th) {
             return response('Mail Server sedang Overload !', 500);

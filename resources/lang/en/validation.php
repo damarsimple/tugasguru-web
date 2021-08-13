@@ -30,9 +30,7 @@ return [
         'array' => ':atribut harus antara :min and :max items.',
     ],
     'boolean' => ':bidang atribut harus benar atau salah.',
-    'confirmed' => ':konfirmasi atribut tidak cocok.
-
-',
+    'confirmed' => ':confirmed atribut tidak cocok.',
     'date' => ':atribut bukan tanggal yang valid.',
     'date_equals' => ':atribut harus berupa tanggal yang sama dengan :date.',
     'date_format' => ':atribut tidak cocok dengan format :format.',
@@ -60,7 +58,7 @@ return [
     ],
     'image' => ':atribut harus berupa gambar.',
     'in' => 'selected :atribut tidak valid.',
-    'in_array' => ':bidang atribut tidak ada di :other.',
+    'in_array' => ':atribut tidak ada di :other.',
     'integer' => ':atribut harus berupa bilangan bulat.',
     'ip' => ':atribut harus berupa alamat IP yang valid.',
     'ipv4' => ':atribut harus berupa alamat IPv4 yang valid.
