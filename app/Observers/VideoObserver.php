@@ -15,7 +15,7 @@ class VideoObserver
      */
     public function created(Video $video)
     {
-        dispatch(new GetVideoDurationJob($video));
+        GetVideoDurationJob::dispatch($video);
     }
 
     /**

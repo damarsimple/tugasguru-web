@@ -16,7 +16,7 @@ class AttachmentObserver
     public function created(Attachment $attachment)
     {
         if (!$attachment->is_proccessed) {
-            dispatch(new ProcessAttachmentJob($attachment));
+            ProcessAttachmentJob::dispatch($attachment);
         }
     }
 
