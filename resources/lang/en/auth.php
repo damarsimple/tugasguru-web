@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'failed' => 'Kredensial ini tidak ditemukan di catatan kami.',
+    'failed' => 'Email atau Nomor telepon ini tidak ditemukan di catatan kami.',
     'password' => 'Password yang diberikan salah.',
     'throttle' => 'Terlalu banyak upaya login. Silakan coba lagi dalam :seconds detik.',
 
