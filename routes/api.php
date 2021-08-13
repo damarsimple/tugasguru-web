@@ -18,6 +18,7 @@ use App\Http\Middleware\EnsureGuardian;
 use App\Http\Middleware\EnsureGuardianPaid;
 use App\Http\Middleware\EnsureStudentPPDB;
 use App\Jobs\FormApproveTest;
+use App\Jobs\SendVerifyEmailJob;
 use App\Misc\AppConfig;
 use App\Models\Absent;
 use App\Models\Access;
@@ -893,7 +894,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
     Route::post('/reverify', function (Request $request) {
         try {
-            event(new Registered($request->user()));
+
+            dispatch(new SendVerifyEmailJob($request->user()));
             return response('OK', 200);
         } catch (\Throwable $th) {
             return response('Mail Server sedang Overload !', 500);

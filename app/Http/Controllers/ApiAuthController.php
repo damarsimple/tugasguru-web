@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendVerifyEmailJob;
 use App\Models\Attachment;
 use App\Models\Form;
 use App\Models\School;
@@ -183,7 +184,7 @@ class ApiAuthController extends Controller
             }
         }
 
-        event(new Registered($user));
+        dispatch(new SendVerifyEmailJob($user));
 
         return response()->json([
             "user" => $user,
