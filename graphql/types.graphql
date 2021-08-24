@@ -329,7 +329,7 @@ type Examtype {
 }
 
 enum MeetingContentType {
-    Article
+    ARTICLE
     DRAW
 }
 type MeetingContent {
@@ -337,7 +337,7 @@ type MeetingContent {
     content: String
 }
 
-interface MeetingData {
+type MeetingData {
     url: String
     type: MeetingMedia
     content: String
@@ -499,6 +499,7 @@ enum SubjectType {
     VOCATIONAL @enum(value: "VOCATIONAL")
     LOCAL_CONTENT @enum(value: "LOCAL_CONTENT")
     SPECIAL_DEVELOPMENT @enum(value: "SPECIAL_DEVELOPMENT")
+    QUIZ @enum(value: "QUIZ")
 }
 
 type Subject {

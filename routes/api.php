@@ -2503,6 +2503,21 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             return $meeting;
         });
 
+        Route::put('{meetingId}/', function (Request $request, $meetingId) {
+            $user = $request->user();
+
+            $meeting =  $user->meetings()->findOrFail($meetingId);
+
+            $meeting->name = $request->name;
+            $meeting->description = $request->description;
+
+            $meeting->save();
+
+            broadcast(new MeetingChangeEvent($meeting));
+
+            return $meeting;
+        });
+
         Route::post('{meetingId}/rooms', function (Request $request, $meetingId,) {
             $user = $request->user();
 

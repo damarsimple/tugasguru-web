@@ -16,7 +16,7 @@ class Meeting extends Model
 
     public $appends = ["absents"];
 
-    protected $casts = ["data" => "object", "content" => "object"];
+    protected $casts = ["data" => "array", "content" => "array"];
 
     public $with = ['rooms'];
 

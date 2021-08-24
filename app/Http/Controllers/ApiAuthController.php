@@ -52,7 +52,7 @@ class ApiAuthController extends Controller
             ]);
         } else {
             return response()->json([
-                'message' => 'Kredensial ini tidak ditemukan di catatan kami.',
+                'message' => 'Akun ini tidak ditemukan di catatan kami.',
             ]);
         }
     }
