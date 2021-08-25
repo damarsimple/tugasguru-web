@@ -21,6 +21,8 @@ type Query {
     citiesAdmin: [City!]! @paginate(type: CONNECTION)
     districtsAdmin: [District!]! @paginate(type: CONNECTION)
 
+    studentassigment(id: ID! @eq): StudentAssigment @find
+
     me: User @auth
     users(
         name: String @where(operator: "like")
