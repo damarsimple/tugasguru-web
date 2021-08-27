@@ -35,6 +35,7 @@ type Query {
     ): User @paginate(type: CONNECTION, builder: "App\\Models\\User@bimbels")
     quiz(id: ID! @eq): Quiz @find
     meeting(id: ID! @eq): Meeting @find
+    exam(id: ID! @eq): Exam @find
     user(id: ID! @eq): User @find
     school(id: ID! @eq): School @find
     ppdbschools(

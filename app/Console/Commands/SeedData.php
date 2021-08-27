@@ -966,6 +966,7 @@ class SeedData extends Command
                     $exam->examsessions()->save($examsession);
 
                     foreach ($studentIds as $x) {
+                        break;
                         $user = User::find($x);
 
                         if ($exam->id > 13) {
@@ -1030,7 +1031,8 @@ class SeedData extends Command
             $quiz->description = "TEST QUIZ";
             $quiz->visibility = "PUBLIK";
 
-            $user->quizzes()->save($quiz);
+            User::first()->quizzes()->save($quiz);
+
             $quiz->questions()->attach([1]);
 
             $voucher = new Voucher();
