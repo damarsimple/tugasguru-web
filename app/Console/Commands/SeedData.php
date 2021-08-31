@@ -962,7 +962,7 @@ class SeedData extends Command
 
                     $examsession->name = "Test 1";
                     $examsession->open_at = now();
-                    $examsession->close_at = now()->addHour(1);
+                    $examsession->close_at = now()->addHour(100);
                     $exam->examsessions()->save($examsession);
 
                     foreach ($studentIds as $x) {
