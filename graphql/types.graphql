@@ -643,13 +643,14 @@ type User {
     ): [Meeting!]! @hasMany
     examresults(where: _ @whereConditions(columns: ["name"])): [Examresult!]!
         @hasMany
-    studentassigments: [StudentAssigment!]! @hasMany
+    studentassigments(
+        turningAt: String
+            @builder(method: "App\\Models\\StudentAssigment@turningAt")
+    ): [StudentAssigment!]! @hasMany
 
     studentabsents: [Absent!]! @hasMany
     studentanswers: [StudentAnswer!]! @hasMany
-    studentconsultations(
-        where: _ @whereConditions(columns: ["id"])
-    ): [Consultation!]! @hasMany
+    studentconsultations: [Consultation!]! @hasMany
     forms: [Form!]! @hasMany
     reports: [Report!]! @hasMany
     access: [String]

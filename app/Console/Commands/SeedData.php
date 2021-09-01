@@ -32,6 +32,7 @@ use App\Models\StudentAnswer;
 use App\Models\StudentAssigment;
 use App\Models\Subject;
 use App\Models\Access;
+use App\Models\Article;
 use App\Models\Booking;
 use App\Models\Consultation;
 use App\Models\Course;
@@ -46,6 +47,8 @@ use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Faker\Factory;
 
 class SeedData extends Command
 {
@@ -910,7 +913,7 @@ class SeedData extends Command
 
                 for ($j = 0; $j < 5; $j++) {
                     $answer = new Answer();
-                    $answer->content = "Yes Answer " . $j + 1;
+                    $answer->content = ($i + 1) . "  Answer " . ($j + 1);
                     $answer->is_correct = $j == 0;
                     $question->answers()->save($answer);
                     print "answer $j\n";
@@ -1120,6 +1123,22 @@ class SeedData extends Command
                     print("video " . $i + 1 . PHP_EOL);
                 }
             }
+        }
+
+
+
+        for ($i = 0; $i < rand(1, 20); $i++) {
+            $faker = Factory::create();
+            $article = new Article();
+            if (rand(1, 5) > 3) {
+                $article->school_id = $student->school_id;
+            }
+
+            $article->user_id = 1;
+            $article->name = $faker->name;
+            $article->slug = Str::slug($article->name);
+            $article->content = $faker->words(rand(5, 10));
+            $article->role = 'ANNOUNCEMENT';
         }
 
         print "finish at " . time() - $start . PHP_EOL;

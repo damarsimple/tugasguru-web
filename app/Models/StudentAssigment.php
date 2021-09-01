@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Trait\Attachable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,5 +25,14 @@ class StudentAssigment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo("App\Models\User");
+    }
+
+    public function turningAt(Builder $builder, string $turning_at): Builder
+    {
+        if ($turning_at) {
+            return $builder->where('turned_at', $turning_at);
+        } else {
+            return $builder->whereNull('turned_at');
+        }
     }
 }
