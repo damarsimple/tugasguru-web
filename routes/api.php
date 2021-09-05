@@ -571,9 +571,11 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'quiz'], function ()
 
                 $question->answers()->saveMany($answers);
 
-                foreach ($questionData['answerattachments'] as $i => $attachment) {
-                    if (!empty($attachment)) {
-                        Attachment::find($attachment)->attachable()->associate($answers[$i])->save();
+                if (array_key_exists('answerattachments', $questionData)) {
+                    foreach ($questionData['answerattachments'] as $i => $attachment) {
+                        if (!empty($attachment)) {
+                            Attachment::find($attachment)->attachable()->associate($answers[$i])->save();
+                        }
                     }
                 }
 
@@ -3288,11 +3290,14 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
                 // $answers  = $question->answers;
 
-                foreach ($questionData['answerattachments'] as $i => $attachment) {
-                    if (!empty($attachment)) {
-                        Attachment::find($attachment)->attachable()->associate($answers[$i])->save();
+                if (array_key_exists('answerattachments', $questionData)) {
+                    foreach ($questionData['answerattachments'] as $i => $attachment) {
+                        if (!empty($attachment)) {
+                            Attachment::find($attachment)->attachable()->associate($answers[$i])->save();
+                        }
                     }
                 }
+
 
                 foreach (Attachment::whereIn('id', $questionData['attachments'])->get() as $attachment) {
                     $attachment->attachable()->associate($question)->save();
