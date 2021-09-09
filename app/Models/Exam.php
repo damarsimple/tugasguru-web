@@ -46,10 +46,8 @@ class Exam extends Model
         return $this->belongsToMany(
             "App\Models\User",
             "exam_supervisor",
-            "user_id",
             "exam_id",
-            "id",
-            "id"
+            "user_id",
         );
     }
 

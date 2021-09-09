@@ -40,6 +40,7 @@ type Query {
     quiz(id: ID! @eq): Quiz @find
     meeting(id: ID! @eq): Meeting @find
     exam(id: ID! @eq): Exam @find
+    examresult(id: ID! @eq): Examresult @find
     user(id: ID! @eq): User @find
     school(id: ID! @eq): School @find
     ppdbschools(

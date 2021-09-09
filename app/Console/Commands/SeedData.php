@@ -222,9 +222,7 @@ class SeedData extends Command
             // var_dump($schoolsData);
 
             foreach ($schoolsData as $key => $schools) {
-
-                foreach ($schools as $key => $school) {
-
+                foreach ($schools as $keyI => $school) {
                     // if (str_contains($school->sekolah, "SD")) {
                     //
                     // }
@@ -594,7 +592,7 @@ class SeedData extends Command
 
             $teacher->name = "Damar Albaribin Guru 1";
             $teacher->email = "damaralbaribin@gmail.com";
-            $teacher->password = Hash::make("we5n9t5ReNV8gNE");
+            $teacher->password = Hash::make("123456789");
             $teacher->city_id = 1;
             $teacher->province_id = 1;
             $teacher->district_id = 1;
@@ -616,7 +614,7 @@ class SeedData extends Command
             $secondteacher = new User();
             $secondteacher->name = "Damar Albaribin Guru 2";
             $secondteacher->email = "damaralbaribin2@gmail.com";
-            $secondteacher->password = Hash::make("we5n9t5ReNV8gNE");
+            $secondteacher->password = Hash::make("123456789");
             $secondteacher->city_id = 1;
             $secondteacher->province_id = 1;
             $secondteacher->district_id = 1;
@@ -969,7 +967,6 @@ class SeedData extends Command
                     $exam->examsessions()->save($examsession);
 
                     foreach ($studentIds as $x) {
-                        break;
                         $user = User::find($x);
 
                         if ($exam->id > 13) {

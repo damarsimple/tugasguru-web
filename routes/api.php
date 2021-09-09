@@ -2851,8 +2851,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
             foreach ($request->examsessions as $examsessionData) {
                 $examsession = new Examsession();
                 $examsession->name = $examsessionData['name'];
-                $examsession->open_at = Carbon::createFromFormat("Y-m-d H:i", $examsessionData['open_at']);
-                $examsession->close_at = Carbon::createFromFormat("Y-m-d H:i", $examsessionData['close_at']);
+                try {
+                    $examsession->open_at = Carbon::createFromFormat("Y-m-d H:i", $examsessionData['open_at']);
+                    $examsession->close_at = Carbon::createFromFormat("Y-m-d H:i", $examsessionData['close_at']);
+                } catch (\Throwable $th) {
+                    $examsession->open_at = Carbon::parse($examsessionData['open_at']);
+                    $examsession->close_at = Carbon::parse($examsessionData['close_at']);
+                }
                 $examsession->token = $examsessionData['token'];
                 $examsessions[] = $examsession;
             }
@@ -2860,6 +2865,13 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
 
             if ($request->packagequestions) {
                 Packagequestion::whereIn('id', $request->packagequestions)->update(['editable' => false]);
+            }
+
+            if ($request->supervisors) {
+                try {
+                    $exam->supervisors()->attach($request->supervisors);
+                } catch (\Throwable $th) {
+                }
             }
 
 
