@@ -96,9 +96,12 @@ class SeedData extends Command
             $examtype = new Examtype();
             $examtype->name = $examstype;
             $examtype->save();
+
+            print("saving $examstype \n");
         }
         foreach ($places as $place) {
             $provinceName = $place->nama;
+
             $province = new Province();
 
             $province->name = $provinceName;
@@ -106,6 +109,8 @@ class SeedData extends Command
             $province->save();
 
             $cities = $place->cities;
+
+            print("saving $provinceName \n");
 
             foreach ($cities as $city) {
                 $districts = $city->districts;
@@ -145,6 +150,8 @@ class SeedData extends Command
                     $districtsModel[] = $district;
                 }
                 $city->districts()->saveMany($districtsModel);
+
+                print("saving $city->name \n");
             }
         }
 
@@ -197,6 +204,8 @@ class SeedData extends Command
                 $subject->name = $subjectName;
                 $subject->type = $type;
                 $subject->save();
+
+                print("saving $subjectName \n");
             }
         }
 
@@ -208,6 +217,8 @@ class SeedData extends Command
             $subject->name = $subjectdata;
             $subject->type = "QUIZ";
             $subject->save();
+
+            print("saving $subjectdata \n");
         }
 
         $schoolTypeMap = [];

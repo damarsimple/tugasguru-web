@@ -33,8 +33,11 @@ class GetVideoDurationJob implements ShouldQueue
     public function handle()
     {
         $file = $this->video->file;
+        
+        if(!$file) return;
 
         $video = $this->video;
+
 
         $media =  FFMpeg::open($file->path);
 

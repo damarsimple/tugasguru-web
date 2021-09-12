@@ -36,8 +36,8 @@ type Query {
         nisn: String @where(operator: "=")
         is_bimbel: Boolean @where(operator: "=")
         is_bimbel_active: Boolean @where(operator: "=")
-        subject_id: ID
-    ): User @paginate(type: CONNECTION, builder: "App\\Models\\User@bimbels")
+        subject_id: ID @builder(method: "App\\Models\\User@bimbels")
+    ): User @paginate(type: CONNECTION)
     quiz(id: ID! @eq): Quiz @find
     meeting(id: ID! @eq): Meeting @find
     exam(id: ID! @eq): Exam @find

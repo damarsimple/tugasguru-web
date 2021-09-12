@@ -4,8 +4,7 @@ namespace App\Models;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Builder as EBuilder;
-use Illuminate\Database\Query\Builder as QBuilder;
+use Illuminate\Database\Eloquent\Builder;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -375,16 +375,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany('App\Models\Video');
     }
 
-    public function bimbels($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QBuilder|EBuilder
+    public function bimbels(Builder $builder, int $subject_id): Builder
     {
-        $builder = User::getQuery();
+        return $builder->whereHas('subjects', static function (Builder $builder) use ($subject_id): void {
+            $builder->where('subjects.id',  $subject_id);
+        });
+        //dd($resolveInfo);
 
-        if (array_key_exists('subject_id', $args)) {
-            $builder = User::whereHas('subjects', function ($q) use ($args) {
-                return $q->where('subjects.id', $args['subject_id']);
-            });
-        }
+        // return DB::table('users');
 
-        return $builder;
+        // $builder = DB::table('users');
+
+        //    return $builder;
+
+        // if (array_key_exists('subject_id', $args)) {
+        //     $builder = User::whereHas('subjects', function ($q) use ($args) {
+        //         return $q->where('subjects.id', $args['subject_id']);
+        //     });
+        // }
+
+
+        // return $builder;
     }
 }
