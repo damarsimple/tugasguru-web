@@ -35,6 +35,7 @@ type Query {
         roles: Roles @where(operator: "=")
         nisn: String @where(operator: "=")
         is_bimbel: Boolean @where(operator: "=")
+        is_bimbel_active: Boolean @where(operator: "=")
         subject_id: ID
     ): User @paginate(type: CONNECTION, builder: "App\\Models\\User@bimbels")
     quiz(id: ID! @eq): Quiz @find

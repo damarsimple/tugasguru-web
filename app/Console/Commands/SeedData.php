@@ -589,6 +589,7 @@ class SeedData extends Command
             $teacher = new User();
             $teacher->is_admin = true;
             $teacher->is_bimbel = true;
+            $teacher->is_bimbel_active = true;
 
             $teacher->name = "Damar Albaribin Guru 1";
             $teacher->email = "damaralbaribin@gmail.com";
@@ -626,7 +627,8 @@ class SeedData extends Command
 
             $secondteacher->schools()->attach(1);
 
-            $secondteacher->is_bimbel = false;
+            $secondteacher->is_bimbel = true;
+            $secondteacher->is_bimbel_active = true;
             $secondteacher->school_id = 1;
 
             $secondteacher->subjects()->attach(Subject::first());

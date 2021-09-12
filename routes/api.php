@@ -894,6 +894,15 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'rooms'], function (
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function () {
+    Route::post('/togglebimbel', function (Request $request) {
+        $user = auth()->user();
+
+        $user->is_bimbel_active = $request->is_bimbel_active;
+
+        $user->save();
+
+        return $user;
+    });
     Route::post('/reverify', function (Request $request) {
         try {
             SendVerifyEmailJob::dispatch($request->user());
