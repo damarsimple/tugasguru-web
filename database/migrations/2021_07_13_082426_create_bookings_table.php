@@ -25,9 +25,9 @@ class CreateBookingsTable extends Migration
                 ->index()
                 ->constrained('users')
                 ->onDelete("cascade");
-            $table->timestamp('start_at');
+            $table->timestamp('start_at')->useCurrent();
             $table->double('rate');
-            $table->timestamp('finish_at');
+            $table->timestamp('finish_at')->useCurrent();
             $table->string('reason')->nullable();
             $table->string('notes')->nullable();
             $table->string('address');
