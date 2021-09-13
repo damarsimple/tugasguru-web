@@ -956,6 +956,10 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'users'], function (
             $booking->finish_at = Carbon::parse($request->finish);
             $booking->address = $request->address;
             $booking->notes = $request->notes;
+
+            $booking->coordinate = $request->coordinate;
+            $booking->address_detail = $request->address_detail;
+
             $booking->status = Booking::MENUNGGU;
             $booking->rate = $basePrice;
 

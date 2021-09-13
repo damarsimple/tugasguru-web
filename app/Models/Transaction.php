@@ -20,7 +20,7 @@ class Transaction extends Model
     public const SUCCESS = "SUCCESS";
     public const FAILED = "FAILED";
 
-    protected $casts = ['invoice_request' => 'object', 'invoice_response' => 'object'];
+    protected $casts = ['invoice_request' => 'array', 'invoice_response' => 'array'];
 
     public function user(): BelongsTo
     {

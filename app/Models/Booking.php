@@ -21,6 +21,8 @@ class Booking extends Model
     protected $casts = [
         'start_at' => 'datetime',
         'finish_at' => 'datetime',
+        'coordinate' => 'array',
+        'address_detail' => 'array',
     ];
 
 
