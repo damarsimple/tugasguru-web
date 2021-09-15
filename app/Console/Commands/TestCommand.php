@@ -70,14 +70,20 @@ class TestCommand extends Command
 
         // print($media->getDurationInSeconds() . PHP_EOL);
 
-        foreach (User::all() as  $user) {
-            if (str_starts_with($user->phone, "8") || str_starts_with($user->phone, "2")) {
-                $user->phone = "0" . $user->phone;
-            }
-            $user->save();
+        // foreach (User::all() as  $user) {
+        //     if (str_starts_with($user->phone, "8") || str_starts_with($user->phone, "2")) {
+        //         $user->phone = "0" . $user->phone;
+        //     }
+        //     $user->save();
 
-            print("replacing " . $user->name);
-        }
+        //     print("replacing " . $user->name);
+        // }
+
+        $a = User::whereHas('subjects', function ($q) {
+            $q->where('subjects.id', [1, 2, 3, 4]);
+        });
+
+        var_dump($a->count());
 
         return 0;
     }

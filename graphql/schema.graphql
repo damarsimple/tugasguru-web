@@ -19,7 +19,7 @@ type Query {
     extracurriculars: [Extracurricular!]! @all
     majors: [Major!]! @all
 
-    cities: [City!]! @all
+    cities(province_id: ID @where(operator: "=")): [City!]! @all
     districts(city_id: ID @where(operator: "=")): [District!]! @all
     provincesAdmin: [Province!]! @paginate(type: CONNECTION)
     citiesAdmin: [City!]! @paginate(type: CONNECTION)
@@ -112,7 +112,7 @@ type Query {
     ): [Course!]!
         @paginate(type: CONNECTION)
         @orderBy(column: "created_at", direction: DESC)
-
+    booking(id: ID! @eq): Booking!  @find
     course(id: ID! @eq): Course! @find @can(ability: "view", find: "id")
 }
 
