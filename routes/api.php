@@ -1706,7 +1706,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
                                 'subject' => $e->exam->subject,
                                 'classroom' => $e->exam->classroom,
                                 'user' => $e->exam->user,
-                                'id' => $e->id,
+                                'id' => $e->exam->id,
                                 'close_at' => $e->close_at,
                                 'open_at' => $e->open_at,
                                 'created_at' => $e->created_at,
@@ -1894,7 +1894,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         Route::get('{id}', function (Request $request, $id) {
             $user = $request->user();
 
-            $exam = Exam::findOrFail($id);
+            $exam = Exam::with('examsessions')->findOrFail($id);
 
             $check = $exam->classroom->students()->where('user_id', $user->id)->exists();
 
@@ -2644,7 +2644,7 @@ Route::group(['middleware' => ['auth:sanctum', EnsureTeacher::class], 'prefix' =
                                 'subject' => $e->exam->subject,
                                 'classroom' => $e->exam->classroom,
                                 'user' => $e->exam->user,
-                                'id' => $e->id,
+                                'id' => $e->exams->id,
                                 'close_at' => $e->close_at,
                                 'open_at' => $e->open_at,
                                 'created_at' => $e->created_at,
