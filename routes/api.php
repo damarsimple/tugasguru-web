@@ -1769,6 +1769,17 @@ Route::group(['middleware' => ['auth:sanctum', EnsureStudent::class], 'prefix' =
         });
     });
     Route::group(['prefix' => 'exams'], function () {
+        Route::get('{id}/attendances', function (Request $request, $id) {
+            $exam = Exam::findOrFail($id);
+            $user = $request->user();
+            $attendance = Attendance::firstOrCreate([
+                'school_id' => $exam->classroom->school_id,
+                'user_id' => $user->id,
+                'agenda_id' => $exam->agenda->id,
+            ]);
+
+            return $attendance;
+        });
         Route::post('{id}/reportbegin', function (Request $request, $id) {
             $user = $request->user();
 
